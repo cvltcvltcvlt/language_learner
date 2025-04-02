@@ -35,6 +35,7 @@ class User(Base):
     experience = Column(Integer, default=0)
     lessons_progress = relationship("UserLessonProgress", back_populates="user")
     words = relationship("Word", back_populates="user")
+    last_active = Column(DateTime, default=datetime.utcnow)
 
     def set_password(self, password: str):
         self.password_hash = pwd_context.hash(password)

@@ -2,7 +2,7 @@ from aiohttp import web
 from auth.lessons.schemas import LessonCreateSchema, AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
 from auth.lessons.database import create_lesson, assign_lesson_to_student, get_exercise_by_id, get_session, \
     get_user_by_id, get_lesson_by_id, get_full_lesson, update_exercise, calculate_language_level, add_word, \
-    get_random_word_for_level
+    get_random_word_for_level, generate_audio_for_word
 import random
 from sqlalchemy.future import select
 from models import Lesson, Word, User
@@ -532,3 +532,47 @@ async def check_word_answer(request):
                 }, status=200)
 
         return web.json_response({"correct": False}, status=200)
+
+
+@lesson_routes.post("/lessons/generate_audio")
+async def generate_audio_route(request):
+    """
+    ---
+    summary: Generate audio for a word
+    description: Generates an audio file for a word and returns the file name.
+    tags:
+      - Lessons
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              word:
+                type: string
+              word_id:
+                type: integer
+            required:
+              - word
+              - word_id
+    responses:
+      "200":
+        description: Audio generated successfully
+        content:
+          application/json:
+            example:
+              audio_file: "12345.mp3"
+      "400":
+        description: Invalid data
+    """
+    data = await request.json()
+    word = data.get("word")
+    word_id = data.get("word_id")
+
+    if not word or not word_id:
+        return web.json_response({"error": "Missing required fields"}, status=400)
+
+    file_name = generate_audio_for_word(word, word_id)
+
+    return web.json_response({"audio_file": file_name}, status=200)

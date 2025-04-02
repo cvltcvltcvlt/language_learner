@@ -1,9 +1,14 @@
+from datetime import datetime, timedelta
+
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
 from db import SessionLocal
 from models import Lesson, Exercise, User, UserLessonProgress, LanguageLevel, Word
+from gtts import gTTS
+import os
+import boto3
+from io import BytesIO
 
 
 # Получаем сессию при вызове функции
@@ -166,3 +171,20 @@ async def get_random_word_for_level(session: AsyncSession, user_level: str):
     )
     word = result.scalar_one_or_none()
     return word
+
+
+def generate_audio_for_word(word: str, word_id: int, directory: str = "audio_files"):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    file_name = os.path.join(directory, f"{word_id}.mp3")
+
+    if os.path.exists(file_name):
+        print(f"Audio file for word '{word}' with id {word_id} already exists.")
+        return file_name
+
+    tts = gTTS(text=word, lang='en')
+    tts.save(file_name)
+    print(f"Audio saved for word '{word}' with id {word_id} as {file_name}")
+
+    return file_name

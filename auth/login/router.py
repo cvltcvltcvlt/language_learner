@@ -1,5 +1,8 @@
 from aiohttp import web
+
+from auth.lessons.database import get_session
 from auth.login.database import get_user_by_login
+from auth.users.database import update_user_streaks
 
 login_routes = web.RouteTableDef()
 
@@ -32,6 +35,7 @@ async def handle_login(request):
           application/json:
             example:
               message: Login successful
+              streak_days: 5  # Пример возвращаемых стриков
       "400":
         description: Invalid input
         content:
@@ -55,4 +59,10 @@ async def handle_login(request):
     if not user or not user.verify_password(password):
         return web.json_response({"error": "Invalid credentials"}, status=401)
 
-    return web.json_response({"message": "Login successful"})
+    async for session in get_session():
+        streak_days = await update_user_streaks(session, user.id)
+
+    return web.json_response({
+        "message": "Login successful",
+        "streak_days": streak_days
+    })

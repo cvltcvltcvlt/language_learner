@@ -4,6 +4,7 @@ from auth.login.router import login_routes
 from auth.registration.router import registration_routes
 from auth.tests.routes import test_routes
 from auth.lessons.routes import lesson_routes
+from auth.users.routes import user_routes
 
 
 def create_app():
@@ -13,6 +14,7 @@ def create_app():
     app.add_routes(registration_routes)
     app.add_routes(test_routes)
     app.add_routes(lesson_routes)
+    app.add_routes(user_routes)
 
     swagger = SwaggerDocs(
         app,
@@ -26,6 +28,7 @@ def create_app():
     swagger.add_routes(registration_routes)
     swagger.add_routes(test_routes)
     swagger.add_routes(lesson_routes)
+    swagger.add_routes(user_routes)
 
     return app
 
