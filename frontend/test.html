@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Test - English Learning App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    .test-container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    input, button {
+      padding: 12px;
+      margin-top: 10px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    input:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .back-button {
+      background: #6c757d;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .back-button:hover {
+      background: #5a6268;
+      transform: scale(1.05);
+    }
+
+    .audio-button {
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      width: 90%;
+      transition: all 0.3s;
+    }
+
+    .audio-button:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+
+    .question-container {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .question-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f1f3f5;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .question-item input {
+      width: 45%;
+    }
+
+    .question-item button {
+      background: #28a745;
+      padding: 8px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white;
+    }
+
+    .question-item button:hover {
+      background: #218838;
+    }
+
+    .remove-button {
+      background: #dc3545;
+    }
+
+    .remove-button:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="test-container">
+  <h2>Word Test</h2>
+  <form id="test-form"></form>
+  <button onclick="submitTest()">Submit Test</button>
+  <button onclick="backDashboard()">Back</button>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html';
+}
+
+async function loadTest() {
+  const res = await fetch(`${API_URL}/test/words`);
+  const data = await res.json();
+
+  const form = document.getElementById('test-form');
+  form.innerHTML = '';
+
+  const word = data.words;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <p style="font-weight: bold;">${word.word}</p>
+    <input type="text" name="word-${word.id}" placeholder="Translation">
+    <button type="button" class="audio-button" onclick="playAudio(${word.id}, '${word.word}')">Play Audio</button>
+  `;
+  form.appendChild(div);
+}
+
+async function playAudio(wordId, word) {
+  // Запрос на сервер для генерации аудио
+  const res = await fetch(`${API_URL}/lessons/generate_audio`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ word, word_id: wordId })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    // Аудиофайл успешно получен, проигрываем его
+    const audio = new Audio(`../${data.audio_file}`);
+    audio.play();
+  } else {
+    alert("Error generating audio");
+  }
+}
+
+async function submitTest() {
+  const formData = new FormData(document.getElementById('test-form'));
+  const answers = Array.from(formData.entries()).map(([key, value]) => {
+    return { word_id: parseInt(key.replace('word-', '')), translation: value.trim() };
+  });
+
+  const userId = localStorage.getItem('userId');
+
+  const res = await fetch(`${API_URL}/test/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, answers })
+  });
+  const data = await res.json();
+
+  alert(`Correct: ${data.correct}, Incorrect: ${data.incorrect}`);
+  backDashboard();
+}
+
+function backDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+window.onload = loadTest;
+</script>
+
+</body>
+</html>

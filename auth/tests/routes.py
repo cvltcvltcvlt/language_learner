@@ -69,6 +69,6 @@ async def handle_check_answers(request):
     user_id = data.get("user_id")
 
     results = await check_user_answers(answers)
-    await update_user_progress(user_id, results["correct"])
+    await update_user_progress(int(user_id), results["correct"])
 
     return web.json_response(results)

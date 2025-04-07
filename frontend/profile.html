@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - English Learning App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    .profile-container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #555;
+    }
+
+    button {
+      padding: 10px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 200px;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #5a6268;
+      transform: scale(1.05);
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="profile-container">
+  <h2>Profile</h2>
+  <div id="profile-info">Loading...</div>
+  <div id="error-message" class="error"></div>
+  <button onclick="backDashboard()">Back</button>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html'; // Redirect if no token is found
+}
+
+async function loadProfile() {
+  const userId = localStorage.getItem('userId');
+
+  try {
+    const res = await fetch(`${API_URL}/profile/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Send the token with the request
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to load profile. Please try again later.');
+    }
+
+    const data = await res.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    const container = document.getElementById('profile-info');
+    container.innerHTML = `
+      <p><strong>Login:</strong> ${data.login}</p>
+      <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+      <p><strong>Role:</strong> ${data.role}</p>
+      <p><strong>Language Level:</strong> ${data.language_level}</p>
+      <p><strong>Experience:</strong> ${data.experience} XP</p>
+    `;
+  } catch (error) {
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = error.message;
+  }
+}
+
+function backDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+window.onload = loadProfile;
+</script>
+
+</body>
+</html>

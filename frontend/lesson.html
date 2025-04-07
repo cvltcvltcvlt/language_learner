@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson - English Learning App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Пример изображения */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    .lesson-container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(50%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .exercise {
+      margin-bottom: 25px;
+    }
+
+    input, button {
+      padding: 12px;
+      margin-top: 15px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, button:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #finish {
+      background: #28a745;
+    }
+
+    #finish:hover {
+      background: #218838;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      background: #e9ecef;
+      height: 8px;
+      border-radius: 5px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #007bff;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s ease-in-out;
+    }
+
+    .svg-icons {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .svg-icons svg {
+      width: 24px;
+      height: 24px;
+      margin-left: 10px;
+    }
+
+    .correct {
+      fill: #28a745;
+    }
+
+    .incorrect {
+      fill: #dc3545;
+    }
+
+    .back-button {
+      background: #6c757d;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .back-button:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="lesson-container">
+  <h2 id="lesson-title">Loading lesson...</h2>
+  <div id="lesson-content"></div>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <button id="finish" onclick="finishLesson()" disabled>Finish Lesson</button>
+  <button class="back-button" onclick="backDashboard()">Back</button>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html';
+}
+
+let answered = 0;
+let total = 0;
+let lessonId = null;
+
+async function loadLesson() {
+  const userId = localStorage.getItem('userId');
+  const res = await fetch(`${API_URL}/lessons/random/${userId}`);
+  const data = await res.json();
+  lessonId = data.lesson_id;
+
+  const lessonRes = await fetch(`${API_URL}/lessons/${lessonId}`);
+  const lesson = await lessonRes.json();
+
+  document.getElementById('lesson-title').innerText = lesson.title;
+  const container = document.getElementById('lesson-content');
+  container.innerHTML = '';
+
+  lesson.exercises.forEach(ex => {
+    const div = document.createElement('div');
+    div.className = 'exercise';
+    div.innerHTML = `
+      <p>${ex.question}</p>
+      <input id="answer-${ex.id}" placeholder="Your answer">
+      <button onclick="submitAnswer(${ex.id})">Submit</button>
+      <div class="svg-icons" id="icon-${ex.id}"></div>
+    `;
+    container.appendChild(div);
+  });
+
+  total = lesson.exercises.length;
+}
+
+async function submitAnswer(id) {
+  const input = document.getElementById(`answer-${id}`);
+  const answer = input.value.trim();
+  if (!answer) return;
+
+  const res = await fetch(`${API_URL}/lessons/answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ exercise_id: id, answer })
+  });
+  const data = await res.json();
+
+  const iconContainer = document.getElementById(`icon-${id}`);
+  if (data.correct) {
+    input.style.background = '#d4edda'; // Correct answer
+    iconContainer.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" class="correct" /><path d="M5 10L8 13L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  } else {
+    input.style.background = '#f8d7da'; // Incorrect answer
+    iconContainer.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" class="incorrect" /><path d="M5 5L15 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15L15 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  input.disabled = true;
+  answered++;
+
+  updateProgressBar();
+
+  if (answered === total) {
+    document.getElementById('finish').disabled = false;
+  }
+}
+
+function updateProgressBar() {
+  const progress = (answered / total) * 100;
+  document.getElementById('progress-bar').style.width = `${progress}%`;
+}
+
+async function finishLesson() {
+  const userId = localStorage.getItem('userId');
+  await fetch(`${API_URL}/lessons/complete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, lesson_id: lessonId })
+  });
+  alert('Lesson completed!');
+  backDashboard();
+}
+
+function backDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+window.onload = loadLesson;
+</script>
+
+</body>
+</html>

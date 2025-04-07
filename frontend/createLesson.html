@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create/Edit Lesson - English Learning App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-out;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытие фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input, button, select {
+      padding: 12px;
+      margin-top: 10px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .back-button {
+      background: #6c757d;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .back-button:hover {
+      background: #5a6268;
+    }
+
+    .question-container {
+      margin-top: 20px;
+    }
+
+    .question-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f1f3f5;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .question-item input {
+      width: 45%;
+    }
+
+    .question-item button {
+      background: #28a745;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white;
+    }
+
+    .question-item button:hover {
+      background: #218838;
+    }
+
+    .remove-button {
+      background: #dc3545;
+    }
+
+    .remove-button:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="container">
+  <h2 id="form-title">Create New Lesson</h2>
+  <form id="create-lesson-form">
+    <input type="text" id="title" placeholder="Lesson Title" required>
+    <select id="lesson-type" required>
+      <option value="Grammar">Grammar</option>
+      <option value="Vocabulary">Vocabulary</option>
+      <option value="Listening">Listening</option>
+      <option value="Speaking">Speaking</option>
+    </select>
+    <div id="question-container" class="question-container">
+      <!-- Questions will be dynamically loaded here -->
+    </div>
+    <button type="button" onclick="addQuestion()">Add Another Question</button>
+    <input type="number" id="xp" placeholder="XP" required>
+    <button type="submit">Save Lesson</button>
+  </form>
+  <button class="back-button" onclick="backToDashboard()">Back</button>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+const lessonId = new URLSearchParams(window.location.search).get("lessonId");
+
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html';
+}
+
+document.getElementById('create-lesson-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById('title').value.trim();
+  const lessonType = document.getElementById('lesson-type').value;
+  const xp = document.getElementById('xp').value.trim();
+  const teacherId = localStorage.getItem('userId');  // Получаем teacher_id из localStorage
+
+  const questions = [];
+  const questionItems = document.querySelectorAll('.question-item');
+
+  questionItems.forEach((item, index) => {
+    const question = item.querySelector('.question-input').value.trim();
+    const answer = item.querySelector('.answer-input').value.trim();
+    questions.push({ index, question, correct_answer: answer });  // Добавляем index
+  });
+
+  let res;
+  if (lessonId) {
+    // Если lessonId существует, обновляем урок
+    res = await fetch(`${API_URL}/lessons/${lessonId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, lesson_type: lessonType, teacher_id: teacherId, xp, exercises: questions })
+    });
+  } else {
+    // Если нет lessonId, создаем новый урок
+    res = await fetch(`${API_URL}/lessons`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, lesson_type: lessonType, teacher_id: teacherId, xp, exercises: questions })
+    });
+  }
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert(lessonId ? 'Lesson updated successfully!' : 'Lesson created successfully!');
+    window.location.href = 'manageLessons.html';  // Перенаправляем на страницу управления уроками
+  } else {
+    alert(`Error: ${data.error}`);
+  }
+});
+
+function addQuestion() {
+  const questionContainer = document.getElementById('question-container');
+  const newQuestionItem = document.createElement('div');
+  newQuestionItem.classList.add('question-item');
+  newQuestionItem.innerHTML = `
+    <input type="text" placeholder="Question" class="question-input" required>
+    <input type="text" placeholder="Correct Answer" class="answer-input" required>
+    <button type="button" class="remove-button" onclick="removeQuestion(this)">Remove</button>
+  `;
+  questionContainer.appendChild(newQuestionItem);
+}
+
+function removeQuestion(button) {
+  button.parentElement.remove();
+}
+
+function backToDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+async function loadLessonData() {
+  if (!lessonId) return;  // Не пытаемся загрузить данные урока, если lessonId нет в URL
+
+  const res = await fetch(`${API_URL}/lessons/${lessonId}`);
+  const data = await res.json();
+
+  if (res.ok) {
+    document.getElementById('form-title').textContent = 'Edit Lesson';
+    document.getElementById('title').value = data.title;
+    document.getElementById('lesson-type').value = data.lesson_type;
+    document.getElementById('xp').value = data.xp;
+
+    const questionContainer = document.getElementById('question-container');
+    data.exercises.forEach((exercise, index) => {
+      const questionItem = document.createElement('div');
+      questionItem.classList.add('question-item');
+      questionItem.innerHTML = `
+        <input type="text" class="question-input" value="${exercise.question}" required>
+        <input type="text" class="answer-input" value="${exercise.correct_answer}" required>
+        <button type="button" class="remove-button" onclick="removeQuestion(this)">Remove</button>
+      `;
+      questionContainer.appendChild(questionItem);
+    });
+  } else {
+    alert("Error loading lesson data");
+  }
+}
+
+window.onload = loadLessonData;
+</script>
+
+</body>
+</html>

@@ -4,7 +4,7 @@ from models import Word, User
 
 async def get_user_by_id(user_id: int):
     async with SessionLocal() as session:
-        return await session.get(User, user_id)
+        return await session.get(User, int(user_id))
 
 async def get_words(limit=5):
     async with SessionLocal() as session:

@@ -1,11 +1,13 @@
 from aiohttp import web
+from sqlalchemy import delete
+
 from auth.lessons.schemas import LessonCreateSchema, AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
 from auth.lessons.database import create_lesson, assign_lesson_to_student, get_exercise_by_id, get_session, \
     get_user_by_id, get_lesson_by_id, get_full_lesson, update_exercise, calculate_language_level, add_word, \
-    get_random_word_for_level, generate_audio_for_word
+    get_random_word_for_level, generate_audio_for_word, get_lessons_by_teacher
 import random
 from sqlalchemy.future import select
-from models import Lesson, Word, User
+from models import Lesson, Word, User, Exercise
 
 lesson_routes = web.RouteTableDef()
 
@@ -60,7 +62,14 @@ async def create_lesson_route(request):
         if not teacher or teacher.role != "teacher":
             return web.json_response({"error": "Only teachers can create lessons"}, status=403)
 
-        new_lesson = await create_lesson(lesson_data.title, lesson_data.lesson_type, lesson_data.exercises, lesson_data.xp, session)
+        new_lesson = await create_lesson(
+            lesson_data.title,
+             lesson_data.lesson_type,
+             lesson_data.exercises,
+             lesson_data.xp,
+             lesson_data.teacher_id,
+             session,
+         )
         return web.json_response({"message": "Lesson created successfully"}, status=201)
 
 
@@ -345,6 +354,7 @@ async def complete_lesson_route(request):
     async for session in get_session():
         user = await get_user_by_id(user_id, session)
         lesson = await get_lesson_by_id(lesson_id, session)
+        print(lesson.__dict__)
 
         if not user:
             return web.json_response({"error": "User not found"}, status=404)
@@ -400,7 +410,7 @@ async def add_word_to_db(request):
     word = data.get("word")
     translation = data.get("translation")
     language_level = data.get("language_level")
-    teacher_id = data.get("teacher_id")
+    teacher_id = int(data.get("teacher_id"))
 
     if not word or not translation or not language_level or not teacher_id:
         return web.json_response({"error": "Missing required fields"}, status=400)
@@ -576,3 +586,147 @@ async def generate_audio_route(request):
     file_name = generate_audio_for_word(word, word_id)
 
     return web.json_response({"audio_file": file_name}, status=200)
+
+
+@lesson_routes.get("/lessons")
+async def get_lessons_route(request):
+    """
+    ---
+    summary: Get all lessons created by a teacher
+    description: Allows a teacher to view all lessons they have created.
+    tags:
+      - Lessons
+    responses:
+      "200":
+        description: A list of lessons created by the teacher
+    """
+    teacher_id = int(request.query.get("teacher_id"))
+
+    if not teacher_id:
+        return web.json_response({"error": "Teacher ID is required"}, status=400)
+
+    async for session in get_session():
+        lessons = await get_lessons_by_teacher(teacher_id, session)
+        if not lessons:
+            return web.json_response({"message": "No lessons found for this teacher"}, status=404)
+
+        lessons_data = [{"id": lesson.id, "title": lesson.title, "lesson_type": lesson.lesson_type} for lesson in lessons]
+        return web.json_response(lessons_data, status=200)
+
+
+@lesson_routes.delete("/lessons/{lesson_id}")
+async def delete_lesson_route(request):
+    """
+    ---
+    summary: Delete a lesson
+    description: Allows a teacher to delete a lesson by its ID.
+    tags:
+      - Lessons
+    parameters:
+      - in: path
+        name: lesson_id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: Lesson deleted successfully
+      "404":
+        description: Lesson not found
+    """
+    lesson_id = int(request.match_info["lesson_id"])
+
+    async for session in get_session():
+        await session.execute(delete(Exercise).where(Exercise.lesson_id == lesson_id))
+        lesson = await get_lesson_by_id(lesson_id, session)
+
+        if not lesson:
+            return web.json_response({"error": "Lesson not found"}, status=404)
+
+        await session.delete(lesson)
+        await session.commit()
+
+        return web.json_response({"message": "Lesson deleted successfully"}, status=200)
+
+
+@lesson_routes.put("/lessons/{lesson_id}")
+async def update_lesson_route(request):
+    """
+    ---
+    summary: Update a lesson
+    description: Allows a teacher to update a lesson with exercises.
+    tags:
+      - Lessons
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              lesson_type:
+                type: string
+              xp:
+                type: integer
+              exercises:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: integer
+                    question:
+                      type: string
+                    correct_answer:
+                      type: string
+            required:
+              - title
+              - lesson_type
+              - exercises
+    responses:
+      "200":
+        description: Lesson updated successfully
+      "404":
+        description: Lesson not found
+    """
+    data = await request.json()
+    lesson_id = int(request.match_info["lesson_id"])
+    lesson_data = data  # Сохраняем все данные из запроса
+
+    async for session in get_session():
+        lesson = await get_lesson_by_id(lesson_id, session)
+
+        if not lesson:
+            return web.json_response({"error": "Lesson not found"}, status=404)
+
+        lesson.title = lesson_data.get("title", lesson.title)
+        lesson.lesson_type = lesson_data.get("lesson_type", lesson.lesson_type)
+        lesson.xp = int(lesson_data.get("xp", lesson.xp))
+
+        # Обновление упражнений по порядковому номеру
+        for exercise_data in lesson_data.get("exercises", []):
+            index = exercise_data.get("index")  # Извлекаем порядковый номер упражнения
+
+            if index is not None:
+                # Получаем упражнение по порядковому номеру
+                exercise = await session.execute(
+                    select(Exercise).filter(Exercise.lesson_id == int(lesson_id))
+                    .order_by(Exercise.id).offset(index).limit(1)
+                )
+                exercise = exercise.scalars().first()
+
+                if exercise:
+                    exercise.question = exercise_data["question"]
+                    exercise.correct_answer = exercise_data["correct_answer"]
+                    session.add(exercise)
+                else:
+                    return web.json_response({"error": f"Exercise at index {index} not found"}, status=404)
+            else:
+                return web.json_response({"error": "Exercise index is missing"}, status=400)
+
+        session.add(lesson)
+        await session.commit()
+
+        return web.json_response({"message": "Lesson updated successfully"}, status=200)

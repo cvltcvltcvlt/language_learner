@@ -23,7 +23,7 @@ async def get_lesson_by_id(lesson_id: int, session: AsyncSession):
 
 # Функция для получения пользователя по ID
 async def get_user_by_id(user_id: int, session: AsyncSession):
-    result = await session.execute(select(User).filter(User.id == user_id))
+    result = await session.execute(select(User).filter(User.id == int(user_id)))
     return result.scalars().first()
 
 # Функция для получения упражнения по ID
@@ -32,8 +32,8 @@ async def get_exercise_by_id(exercise_id: int, session: AsyncSession):
     return result.scalars().first()
 
 # Функция для создания нового урока и упражнений
-async def create_lesson(title: str, lesson_type: str, exercises: list, xp: int, session: AsyncSession):
-    new_lesson = Lesson(title=title, lesson_type=lesson_type, xp=xp)
+async def create_lesson(title: str, lesson_type: str, exercises: list, xp: int, teacher_id: int, session: AsyncSession):
+    new_lesson = Lesson(title=title, lesson_type=lesson_type, xp=xp, teacher_id=teacher_id)
     session.add(new_lesson)
     await session.commit()
     await session.refresh(new_lesson)
@@ -188,3 +188,10 @@ def generate_audio_for_word(word: str, word_id: int, directory: str = "audio_fil
     print(f"Audio saved for word '{word}' with id {word_id} as {file_name}")
 
     return file_name
+
+
+async def get_lessons_by_teacher(teacher_id: int, session: AsyncSession):
+    stmt = select(Lesson).filter(Lesson.teacher_id == teacher_id)
+    result = await session.execute(stmt)
+    lessons = result.scalars().all()
+    return lessons

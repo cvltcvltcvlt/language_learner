@@ -38,10 +38,9 @@ async def get_user_profile(request):
             example:
               error: "User not found"
     """
-    user_id = int(request.match_info["user_id"])
-
+    user_id = request.match_info["user_id"]
     async for session in get_session():
-        user = await get_user_by_id(session, user_id)
+        user = await get_user_by_id(session, int(user_id))
         if not user:
             return web.json_response({"error": "User not found"}, status=404)
 

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - English Learning App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      animation: fadeIn 1s ease-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #error-message {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="login-container">
+  <h2>Login</h2>
+  <form id="login-form">
+    <input type="text" id="login" placeholder="Login" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+    <div id="error-message">Invalid login or password!</div>
+  </form>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+
+// Автопроверка токена
+if (localStorage.getItem('token')) {
+  window.location.href = 'dashboard.html';
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const login = document.getElementById('login').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  try {
+    const res = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login, password })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      // Успех: сохраняем токен и id
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.user.id);
+      localStorage.setItem('userRole', data.user.role);
+
+      window.location.href = 'dashboard.html';
+    } else {
+      document.getElementById('error-message').style.display = 'block';
+    }
+  } catch (error) {
+    document.getElementById('error-message').innerText = 'Server error!';
+    document.getElementById('error-message').style.display = 'block';
+  }
+});
+</script>
+
+</body>
+</html>

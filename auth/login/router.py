@@ -1,10 +1,17 @@
-from aiohttp import web
+import datetime
 
+from aiohttp import web
+import jwt
 from auth.lessons.database import get_session
 from auth.login.database import get_user_by_login
 from auth.users.database import update_user_streaks
 
 login_routes = web.RouteTableDef()
+
+
+SECRET_KEY = "supersecretkey"
+TOKEN_EXPIRATION_DAYS = 7
+
 
 @login_routes.post("/login")
 async def handle_login(request):
@@ -62,7 +69,22 @@ async def handle_login(request):
     async for session in get_session():
         streak_days = await update_user_streaks(session, user.id)
 
+    payload = {
+        "user_id": user.id,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=TOKEN_EXPIRATION_DAYS)
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
     return web.json_response({
         "message": "Login successful",
-        "streak_days": streak_days
+        "streak_days": streak_days,
+        "token": token,
+        "user":
+            {
+                "id": user.id,
+                "login": user.login,
+                "email": user.email,
+                "role": user.role,
+                "language_level": user.language_level,
+            }
     })

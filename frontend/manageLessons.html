@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Lessons - English Learning App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    #logout {
+      background: #dc3545;
+    }
+
+    #logout:hover {
+      background: #c82333;
+    }
+
+    .lesson-list {
+      margin-top: 20px;
+      list-style: none;
+      padding: 0;
+    }
+
+    .lesson-item {
+      background: #f1f3f5;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .lesson-item button {
+      background: #28a745;
+      font-size: 14px;
+    }
+
+    .lesson-item button:hover {
+      background: #218838;
+    }
+
+    .remove-button {
+      background: #dc3545;
+    }
+
+    .remove-button:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="container">
+  <h2>Your Lessons</h2>
+
+  <ul id="lesson-list" class="lesson-list"></ul>
+
+  <button id="dashboard" onclick="backToDashBoard()">Back to Dashboard</button>
+  <button id="logout" onclick="logout()">Logout</button>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html';
+}
+
+document.addEventListener('DOMContentLoaded', loadLessons);
+
+async function loadLessons() {
+  const teacherId = localStorage.getItem('userId');
+  const res = await fetch(`${API_URL}/lessons?teacher_id=${teacherId}`);
+  const data = await res.json();
+
+  const lessonList = document.getElementById('lesson-list');
+  lessonList.innerHTML = '';
+
+  if (data.length === 0) {
+    lessonList.innerHTML = '<li>No lessons available</li>';
+  } else {
+    data.forEach(lesson => {
+      const li = document.createElement('li');
+      li.classList.add('lesson-item');
+      li.innerHTML = `
+        <span>${lesson.title}</span>
+        <div>
+          <button onclick="editLesson(${lesson.id})">Edit</button>
+          <button class="remove-button" onclick="deleteLesson(${lesson.id})">Delete</button>
+        </div>
+      `;
+      lessonList.appendChild(li);
+    });
+  }
+}
+
+function editLesson(lessonId) {
+  window.location.href = `createLesson.html?lessonId=${lessonId}`;
+}
+
+async function deleteLesson(lessonId) {
+  const res = await fetch(`${API_URL}/lessons/${lessonId}`, {
+    method: 'DELETE',
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert('Lesson deleted successfully');
+    loadLessons();  // Reload the lesson list
+  } else {
+    alert(`Error: ${data.error}`);
+  }
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'index.html';
+}
+
+function backToDashBoard() {
+  window.location.href = 'dashboard.html';
+}
+</script>
+
+</body>
+</html>

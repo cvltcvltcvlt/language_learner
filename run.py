@@ -5,10 +5,15 @@ from auth.registration.router import registration_routes
 from auth.tests.routes import test_routes
 from auth.lessons.routes import lesson_routes
 from auth.users.routes import user_routes
+from aiohttp_middlewares import cors_middleware
 
 
 def create_app():
-    app = web.Application()
+    app = web.Application(
+        middlewares=[
+            cors_middleware(allow_all=True)
+        ]
+    )
 
     app.add_routes(login_routes)
     app.add_routes(registration_routes)

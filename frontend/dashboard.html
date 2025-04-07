@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - English Learning App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-out;
+      overflow: hidden;
+    }
+
+    /* Фон с размытием */
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* Размытость фона */
+      z-index: -1; /* Ставим фон за контент */
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .dashboard-container {
+      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #logout {
+      background: #dc3545;
+    }
+
+    #logout:hover {
+      background: #c82333;
+    }
+
+    .teacher-button {
+      background: #28a745;
+    }
+
+    .teacher-button:hover {
+      background: #218838;
+    }
+
+    .student-button {
+      background: #007bff;
+    }
+
+    .student-button:hover {
+      background: #0056b3;
+    }
+
+    #teacher-buttons {
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Фон с размытием -->
+<div class="background"></div>
+
+<div class="dashboard-container">
+  <h2>Welcome to your Dashboard</h2>
+
+  <!-- Студентские кнопки -->
+  <div id="student-buttons">
+    <button class="student-button" onclick="startLesson()">Start Lesson 📖</button>
+    <button class="student-button" onclick="startTest()">Start Test 📝</button>
+    <button class="student-button" onclick="viewProfile()">View Profile 👤</button>
+  </div>
+
+  <!-- Учительские кнопки -->
+  <div id="teacher-buttons">
+    <button class="teacher-button" onclick="createLesson()">Create Lesson 📖</button>
+    <button class="teacher-button" onclick="viewProfile()">View Profile 👤</button>
+    <button class="teacher-button" onclick="addWord()">Add Word ➕</button>
+    <button class="teacher-button" onclick="manageLessons()">Manage Lessons 📚</button>
+  </div>
+
+  <button id="logout" onclick="logout()">Logout 🚪</button>
+</div>
+
+<script>
+// Автопроверка токена
+if (!localStorage.getItem('token')) {
+  window.location.href = 'index.html';
+}
+
+// Получаем роль пользователя
+const userRole = localStorage.getItem('userRole');
+
+if (userRole === 'teacher') {
+  // Показать кнопки учителя
+  document.getElementById('teacher-buttons').style.display = 'block';
+} else {
+  // Показать кнопки студента
+  document.getElementById('student-buttons').style.display = 'block';
+}
+
+function startLesson() {
+  window.location.href = 'lesson.html'; // Когда будет готов урок
+}
+
+function startTest() {
+  window.location.href = 'test.html'; // Когда будет готов тест
+}
+
+function viewProfile() {
+  window.location.href = 'profile.html'; // Когда будет готов профиль
+}
+
+function addWord() {
+  window.location.href = 'addWord.html'; // Страница добавления нового слова
+}
+
+function manageLessons() {
+  window.location.href = 'manageLessons.html'; // Страница управления уроками
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'index.html';
+}
+
+function createLesson() {
+  window.location.href = 'createLesson.html'
+}
+</script>
+
+</body>
+</html>
