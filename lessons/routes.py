@@ -1,8 +1,8 @@
 from aiohttp import web
 from sqlalchemy import delete
 
-from auth.lessons.schemas import LessonCreateSchema, AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
-from auth.lessons.database import create_lesson, assign_lesson_to_student, get_exercise_by_id, get_session, \
+from lessons.schemas import LessonCreateSchema, AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
+from lessons.database import create_lesson, assign_lesson_to_student, get_exercise_by_id, get_session, \
     get_user_by_id, get_lesson_by_id, get_full_lesson, update_exercise, calculate_language_level, add_word, \
     get_random_word_for_level, generate_audio_for_word, get_lessons_by_teacher
 import random

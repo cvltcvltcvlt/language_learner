@@ -1,6 +1,6 @@
 from aiohttp import web
-from auth.lessons.database import get_session
-from auth.users.database import get_user_by_id, update_user, delete_user, get_teachers_by_filter
+from lessons.database import get_session
+from users.database import get_user_by_id, update_user, delete_user, get_teachers_by_filter
 
 user_routes = web.RouteTableDef()
 

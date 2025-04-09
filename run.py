@@ -2,9 +2,9 @@ from aiohttp import web
 from aiohttp_swagger3 import SwaggerDocs, SwaggerUiSettings
 from auth.login.router import login_routes
 from auth.registration.router import registration_routes
-from auth.tests.routes import test_routes
-from auth.lessons.routes import lesson_routes
-from auth.users.routes import user_routes
+from tests.routes import test_routes
+from lessons.routes import lesson_routes
+from users.routes import user_routes
 from aiohttp_middlewares import cors_middleware
 
 

@@ -1,9 +1,7 @@
-import random
-
 from sqlalchemy import select, func
 
-from auth.lessons.database import get_session
-from auth.tests.database import get_words, get_user_by_id
+from lessons.database import get_session
+from tests.database import get_words, get_user_by_id
 from db import SessionLocal
 from models import Word
 

@@ -1,6 +1,6 @@
 from aiohttp import web
-from auth.tests.service import get_words_for_test, check_user_answers, update_user_progress
-from auth.tests.schemas import AnswerSchema
+from tests.service import get_words_for_test, check_user_answers, update_user_progress
+from tests.schemas import AnswerSchema
 
 test_routes = web.RouteTableDef()
 

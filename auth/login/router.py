@@ -2,9 +2,9 @@ import datetime
 
 from aiohttp import web
 import jwt
-from auth.lessons.database import get_session
+from lessons.database import get_session
 from auth.login.database import get_user_by_login
-from auth.users.database import update_user_streaks
+from users.database import update_user_streaks
 
 login_routes = web.RouteTableDef()
 

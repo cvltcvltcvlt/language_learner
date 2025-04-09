@@ -105,6 +105,7 @@
     <input type="text" id="login" placeholder="Login" required>
     <input type="password" id="password" placeholder="Password" required>
     <button type="submit">Login</button>
+    <button type="submit" onclick="register()">Register</button>
     <div id="error-message">Invalid login or password!</div>
   </form>
 </div>
@@ -145,6 +146,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     document.getElementById('error-message').style.display = 'block';
   }
 });
+
+function register() {
+  window.location.href = 'registration.html';
+}
 </script>
 
 </body>
