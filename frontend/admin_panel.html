@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Админ-панель — Language Learner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ФОН И НАВБАР */
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientMove 15s ease infinite;
+      height: 100vh; overflow-x: hidden; color: white; position: relative;
+    }
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .background-image {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') center center / cover no-repeat;
+      filter: blur(8px) brightness(0.7); z-index: -1;
+    }
+    .navbar {
+      display: flex; justify-content: center; padding: 20px;
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 10;
+    }
+    .nav-item {
+      margin: 0 15px; font-weight: bold; font-size: 18px; color: #fff; text-decoration: none;
+      padding: 10px 20px; border-radius: 8px; transition: 0.3s;
+    }
+    .nav-item:hover {background: #2575fc;}
+
+    /* КОНТЕНТ */
+    .content {margin-top: 120px; padding: 20px; display: flex; flex-direction: column; align-items: center;}
+    h1 {font-size: 32px; margin-bottom: 20px;}
+
+    /* КНОПКИ */
+    .btn {padding: 10px 20px; margin: 5px; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s;}
+    .btn-add {background: #28a745; color: white;}
+    .btn-add:hover {background: #218838;}
+    .btn-edit {background: #ffc107; color: #333;}
+    .btn-edit:hover {background: #e0a800;}
+    .btn-delete {background: #dc3545; color: white;}
+    .btn-delete:hover {background: #c82333;}
+
+    /* ТАБЛИЦА */
+    table {
+      width: 90%; max-width: 1000px; margin-top: 20px; border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.9); color: #333; border-radius: 12px; overflow: hidden;
+    }
+    th, td {padding: 12px 18px; text-align: center; border-bottom: 1px solid #ddd;}
+    th {background: #2575fc; color: white;}
+    tr:hover {background: rgba(0,0,0,0.05);}
+
+    /* МОДАЛКИ */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content {
+      background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; color: #333;
+      overflow-y: auto; max-height: 90vh;
+    }
+    input, select, textarea {
+      width: 90%; margin: 8px 0; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px;
+    }
+    .close-btn {background: #dc3545; margin-top: 15px; color: white;}
+    .close-btn:hover {background: #c82333;}
+  </style>
+</head>
+
+<body>
+
+<div class="background-image"></div>
+
+<!-- НАВБАР -->
+<div class="navbar">
+  <a href="dashboard.html" class="nav-item">Главная 🏠</a>
+  <a href="admin_panel.html" class="nav-item">Админка 🔧</a>
+  <a href="#" class="nav-item" onclick="logout()">Выход 🚪</a>
+</div>
+
+<!-- КОНТЕНТ -->
+<div class="content">
+  <h1>Управление уроками</h1>
+  <button class="btn btn-add" onclick="openCreateLesson()">➕ Создать урок</button>
+  <table id="lesson-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Название</th><th>Тип</th><th>XP</th><th>Требуемый опыт</th><th>Действия</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- МОДАЛКА УРОКА -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h2 id="modal-title">Создать урок</h2>
+    <input type="text" id="lesson-title" placeholder="Название урока">
+    <select id="lesson-type">
+      <option value="GRAMMAR">Грамматика</option>
+      <option value="VOCABULARY">Словарь</option>
+      <option value="READING">Чтение</option>
+      <option value="LISTENING">Аудирование</option>
+    </select>
+    <input type="number" id="lesson-xp" placeholder="XP за урок">
+    <input type="number" id="lesson-req-xp" placeholder="Требуемый опыт">
+    <textarea id="lesson-theory" placeholder="Теория (необязательно)"></textarea>
+
+    <h3>Материалы</h3>
+    <div id="materials-list"></div>
+    <button class="btn btn-add" onclick="addMaterial()">➕ Добавить материал</button>
+
+    <h3>Упражнения</h3>
+    <div id="exercises-list"></div>
+    <button class="btn btn-add" onclick="addExercise()">➕ Добавить упражнение</button>
+
+    <h3>Слова для изучения</h3>
+    <div id="words-list"></div>
+    <button class="btn btn-add" onclick="addWordToLearn()">➕ Добавить слово</button>
+
+    <br><br>
+    <button class="btn btn-add" onclick="submitLesson()">💾 Сохранить</button>
+    <button class="btn close-btn" onclick="closeModal()">Отмена</button>
+  </div>
+</div>
+
+<script>
+const API_URL = 'http://127.0.0.1:8080';
+let editingLessonId = null;
+
+if (localStorage.getItem('isAdmin') !== 'true') {
+  window.location.href = 'login.html';
+}
+
+async function loadLessons() {
+  const res = await fetch(`${API_URL}/lessons`);
+  const lessons = await res.json();
+  const tbody = document.querySelector('#lesson-table tbody');
+  tbody.innerHTML = '';
+  lessons.forEach(lesson => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${lesson.id}</td>
+      <td>${lesson.title}</td>
+      <td>${lesson.lesson_type}</td>
+      <td>${lesson.xp}</td>
+      <td>${lesson.required_experience}</td>
+      <td>
+        <button class="btn btn-edit" onclick="editLesson(${lesson.id})">✏️</button>
+        <button class="btn btn-delete" onclick="deleteLesson(${lesson.id})">🗑️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openCreateLesson() {
+  editingLessonId = null;
+  document.getElementById('modal-title').innerText = "Создать урок";
+  document.getElementById('lesson-title').value = '';
+  document.getElementById('lesson-type').value = 'GRAMMAR';
+  document.getElementById('lesson-xp').value = '';
+  document.getElementById('lesson-req-xp').value = '';
+  document.getElementById('lesson-theory').value = '';
+  document.getElementById('materials-list').innerHTML = '';
+  document.getElementById('exercises-list').innerHTML = '';
+  document.getElementById('words-list').innerHTML = '';
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function addMaterial() {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <input type="text" placeholder="Название" class="material-title">
+    <select class="material-type">
+      <option value="video">Видео</option>
+      <option value="text">Текст</option>
+      <option value="audio">Аудио</option>
+    </select>
+    <input type="text" placeholder="URL" class="material-url">
+    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+    <hr>
+  `;
+  document.getElementById('materials-list').appendChild(div);
+}
+
+async function editLesson(id) {
+  editingLessonId = id;
+
+  const res = await fetch(`${API_URL}/lessons/${id}`);
+  const lesson = await res.json();
+
+  document.getElementById('lesson-title').value = lesson.title;
+  document.getElementById('lesson-type').value = lesson.lesson_type;
+  document.getElementById('lesson-xp').value = lesson.xp;
+  document.getElementById('lesson-req-xp').value = lesson.required_experience;
+  document.getElementById('lesson-theory').value = lesson.theory || '';
+
+  // Чистим старые блоки
+  document.getElementById('materials-list').innerHTML = '';
+  document.getElementById('exercises-list').innerHTML = '';
+  document.getElementById('words-list').innerHTML = '';
+
+  // Заливаем материалы
+  (lesson.material_links || []).forEach(mat => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <input type="text" placeholder="Название" class="material-title" value="${mat.title}">
+      <select class="material-type">
+        <option value="VIDEO" ${mat.content_type === "VIDEO" ? 'selected' : ''}>Видео</option>
+        <option value="TEXT" ${mat.content_type === "TEXT" ? 'selected' : ''}>Текст</option>
+        <option value="AUDIO" ${mat.content_type === "AUDIO" ? 'selected' : ''}>Аудио</option>
+      </select>
+      <input type="text" placeholder="URL" class="material-url" value="${mat.content_url}">
+      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+      <hr>
+    `;
+    document.getElementById('materials-list').appendChild(div);
+  });
+
+  // Заливаем упражнения
+  (lesson.exercises || []).forEach(ex => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <input type="text" placeholder="Вопрос" class="exercise-question" value="${ex.question}">
+      <input type="text" placeholder="Правильный ответ" class="exercise-answer" value="${ex.correct_answer}">
+      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+      <hr>
+    `;
+    document.getElementById('exercises-list').appendChild(div);
+  });
+
+  // Заливаем слова
+  (lesson.words_to_learn_links || []).forEach(word => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <input type="text" placeholder="Слово" class="word-text" value="${word.word}">
+      <input type="text" placeholder="Перевод" class="word-translation" value="${word.translation}">
+      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+      <hr>
+    `;
+    document.getElementById('words-list').appendChild(div);
+  });
+
+  document.getElementById('modal-title').innerText = "Редактировать урок";
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function addExercise() {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <input type="text" placeholder="Вопрос" class="exercise-question">
+    <input type="text" placeholder="Правильный ответ" class="exercise-answer">
+    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+    <hr>
+  `;
+  document.getElementById('exercises-list').appendChild(div);
+}
+
+function addWordToLearn() {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <input type="text" placeholder="Слово" class="word-text">
+    <input type="text" placeholder="Перевод" class="word-translation">
+    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
+    <hr>
+  `;
+  document.getElementById('words-list').appendChild(div);
+}
+
+async function submitLesson() {
+  const title = document.getElementById('lesson-title').value.trim();
+  const type = document.getElementById('lesson-type').value;
+  const xp = parseInt(document.getElementById('lesson-xp').value);
+  const reqXP = parseInt(document.getElementById('lesson-req-xp').value);
+  const theory = document.getElementById('lesson-theory').value.trim();
+  const creator_id = localStorage.getItem('userId');
+
+  const materials = Array.from(document.querySelectorAll('#materials-list > div')).map(div => ({
+    title: div.querySelector('.material-title').value.trim(),
+    content_type: div.querySelector('.material-type').value.trim().toUpperCase(),
+    content_url: div.querySelector('.material-url').value.trim()
+  }));
+
+  const exercises = Array.from(document.querySelectorAll('#exercises-list > div')).map((div, idx) => ({
+    index: idx,
+    question: div.querySelector('.exercise-question').value.trim(),
+    correct_answer: div.querySelector('.exercise-answer').value.trim()
+  }));
+
+  const words_to_learn = Array.from(document.querySelectorAll('#words-list > div')).map(div => ({
+    word: div.querySelector('.word-text').value.trim(),
+    translation: div.querySelector('.word-translation').value.trim()
+  }));
+
+  const payload = {
+    creator_id, title, lesson_type: type, xp, required_experience: reqXP, theory,
+    materials, exercises, words_to_learn
+  };
+
+  let url = `${API_URL}/lessons`;
+  let method = 'POST';
+
+  if (editingLessonId) {
+    url = `${API_URL}/lessons/${editingLessonId}`;
+    method = 'PUT';
+  }
+
+  const res = await fetch(url, {
+    method,
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  if (res.ok) {
+    alert(editingLessonId ? 'Урок обновлен!' : 'Урок создан!');
+    closeModal();
+    loadLessons();
+  } else {
+    alert('Ошибка при сохранении.');
+  }
+}
+
+
+async function deleteLesson(id) {
+  if (confirm('Удалить урок?')) {
+    await fetch(`${API_URL}/lessons/${id}`, { method: 'DELETE' });
+    loadLessons();
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+
+window.onload = loadLessons;
+</script>
+
+</body>
+</html>

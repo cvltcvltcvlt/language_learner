@@ -2,8 +2,11 @@ import datetime
 
 from aiohttp import web
 import jwt
+from sqlalchemy import select
+
 from lessons.database import get_session
 from auth.login.database import get_user_by_login
+from models import Admin
 from users.database import update_user_streaks
 
 login_routes = web.RouteTableDef()
@@ -42,7 +45,14 @@ async def handle_login(request):
           application/json:
             example:
               message: Login successful
-              streak_days: 5  # Пример возвращаемых стриков
+              streak_days: 5
+              token: "jwt_token_here"
+              user:
+                id: 1
+                login: "admin"
+                email: "admin@example.com"
+                language_level: "B2"
+                is_admin: true
       "400":
         description: Invalid input
         content:
@@ -67,7 +77,14 @@ async def handle_login(request):
         return web.json_response({"error": "Invalid credentials"}, status=401)
 
     async for session in get_session():
-        streak_days = await update_user_streaks(session, user.id)
+        streak_days = await update_user_streaks(session, int(user.id))
+
+        # Проверяем админ ли юзер
+        admin = await session.execute(
+            select(Admin).where(Admin.id == int(user.id))
+        )
+        admin = admin.scalar_one_or_none()
+        is_admin = bool(admin)
 
     payload = {
         "user_id": user.id,
@@ -79,12 +96,11 @@ async def handle_login(request):
         "message": "Login successful",
         "streak_days": streak_days,
         "token": token,
-        "user":
-            {
-                "id": user.id,
-                "login": user.login,
-                "email": user.email,
-                "role": user.role,
-                "language_level": user.language_level,
-            }
+        "user": {
+            "id": user.id,
+            "login": user.login,
+            "email": user.email,
+            "language_level": user.language_level.value,
+            "is_admin": is_admin
+        }
     })

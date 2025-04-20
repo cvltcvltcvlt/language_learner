@@ -161,7 +161,7 @@ const API_URL = 'http://127.0.0.1:8080';
 const lessonId = new URLSearchParams(window.location.search).get("lessonId");
 
 if (!localStorage.getItem('token')) {
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
 document.getElementById('create-lesson-form').addEventListener('submit', async (e) => {

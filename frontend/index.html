@@ -1,156 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - English Learning App</title>
+  <title>Language Learner - Добро пожаловать</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      flex-direction: column;
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      text-align: center;
       overflow: hidden;
-      animation: fadeIn 1s ease-out;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientMove 15s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .welcome-container {
+      animation: fadeIn 1s ease;
+    }
+
+    .ml16 {
+      font-weight: 800;
+      font-size: 3em;
+      text-transform: uppercase;
+      letter-spacing: 0.5em;
+      overflow: hidden;
+      margin-bottom: 20px;
+      text-shadow: 4px 4px 12px rgba(0,0,0,0.8);
+    }
+    .ml16 .letter {
+      display: inline-block;
+      line-height: 1em;
+    }
+
+    .ml3 {
+      font-weight: 900;
+      font-size: 1.5em;
+      margin-bottom: 40px;
+      text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+    }
+    .ml3 .letter {
+      display: inline-block;
+      line-height: 1em;
+    }
+
+    .welcome-buttons {
+      opacity: 0;
+      animation: fadeInButtons 1s ease forwards;
+      animation-delay: 1.5s;
+    }
+
+    @keyframes fadeInButtons {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .btn {
+      text-decoration: none;
+      padding: 15px 30px;
+      background: white;
+      color: #2575fc;
+      border-radius: 30px;
+      font-size: 20px;
+      margin: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0px 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .btn:hover {
+      background: #2575fc;
+      color: white;
+      transform: scale(1.08);
+      box-shadow: 0px 12px 30px rgba(0,0,0,0.5);
     }
 
     @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    /* Фон с размытием */
-    .background {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px); /* Размытость фона */
-      z-index: -1; /* Ставим фон за контент */
-    }
-
-    .login-container {
-      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-      0% { transform: translateY(50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    #error-message {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-      font-size: 14px;
-      display: none;
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
 </head>
 <body>
+  <div class="welcome-container">
+    <h1 class="ml16">Language Learner</h1>
 
-<!-- Фон с размытием -->
-<div class="background"></div>
+    <h2 class="ml3">Начни учить новые слова и проходить увлекательные уроки!</h2>
 
-<div class="login-container">
-  <h2>Login</h2>
-  <form id="login-form">
-    <input type="text" id="login" placeholder="Login" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-    <button type="submit" onclick="register()">Register</button>
-    <div id="error-message">Invalid login or password!</div>
-  </form>
-</div>
+    <div class="welcome-buttons">
+      <a href="login.html" class="btn">Войти</a>
+      <a href="registration.html" class="btn">Регистрация</a>
+    </div>
+  </div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+  <script>
+    // Language Learner появляется один раз и остаётся
+    var textWrapper16 = document.querySelector('.ml16');
+    textWrapper16.innerHTML = textWrapper16.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
 
-// Автопроверка токена
-if (localStorage.getItem('token')) {
-  window.location.href = 'dashboard.html';
-}
+    anime.timeline({loop: false})
+      .add({
+        targets: '.ml16 .letter',
+        translateY: [-100,0],
+        easing: "easeOutExpo",
+        duration: 1400,
+        delay: (el, i) => 30 * i
+      });
 
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const login = document.getElementById('login').value.trim();
-  const password = document.getElementById('password').value.trim();
+    // Нижний текст появляется один раз и остаётся
+    var textWrapper3 = document.querySelector('.ml3');
+    textWrapper3.innerHTML = textWrapper3.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
 
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login, password })
-    });
-    const data = await res.json();
-
-    if (res.ok && data.token) {
-      // Успех: сохраняем токен и id
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.user.id);
-      localStorage.setItem('userRole', data.user.role);
-
-      window.location.href = 'dashboard.html';
-    } else {
-      document.getElementById('error-message').style.display = 'block';
-    }
-  } catch (error) {
-    document.getElementById('error-message').innerText = 'Server error!';
-    document.getElementById('error-message').style.display = 'block';
-  }
-});
-
-function register() {
-  window.location.href = 'registration.html';
-}
-</script>
-
+    anime.timeline({loop: false})
+      .add({
+        targets: '.ml3 .letter',
+        opacity: [0,1],
+        easing: "easeInOutQuad",
+        duration: 1200,
+        delay: (el, i) => 70 * (i+1)
+      });
+  </script>
 </body>
 </html>

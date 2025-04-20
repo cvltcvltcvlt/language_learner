@@ -1,5 +1,8 @@
 from aiohttp import web
+from sqlalchemy import select
+
 from lessons.database import get_session
+from models import User
 from users.database import get_user_by_id, update_user, delete_user, get_teachers_by_filter
 
 user_routes = web.RouteTableDef()
@@ -49,7 +52,7 @@ async def get_user_profile(request):
             "login": user.login,
             "email": user.email,
             "streak_days": user.streak_days,
-            "language_level": user.language_level,
+            "language_level": user.language_level.value,
             "experience": user.experience
         }
         return web.json_response(user_info, status=200)
@@ -223,3 +226,40 @@ async def find_teacher(request):
                           "timezone": teacher.timezone} for teacher in teachers]
 
         return web.json_response({"teachers": teachers_info}, status=200)
+
+
+@user_routes.get("/top_users")
+async def get_top_users(request):
+    """
+    ---
+    summary: Get top users by experience
+    description: Returns a list of top users sorted by experience.
+    tags:
+      - Users
+    responses:
+        "200":
+          description: A list of top users
+          content:
+            application/json:
+              example:
+                - id: 1
+                  login: "john_doe"
+                  experience: 1500
+                - id: 2
+                  login: "jane_doe"
+                  experience: 1400
+    """
+    async for session in get_session():
+        stmt = select(User).order_by(User.experience.desc()).limit(10)
+        result = await session.execute(stmt)
+        users = result.scalars().all()
+
+        top_users = [
+            {
+                "id": user.id,
+                "login": user.login,
+                "experience": user.experience
+            }
+            for user in users
+        ]
+        return web.json_response(top_users, status=200)

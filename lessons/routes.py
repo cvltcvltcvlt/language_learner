@@ -1,22 +1,81 @@
+from datetime import datetime
+from functools import wraps
+
 from aiohttp import web
 from sqlalchemy import delete
 
-from lessons.schemas import LessonCreateSchema, AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
+from lessons.schemas import AssignLessonSchema, AnswerSchema, UpdateExerciseSchema
 from lessons.database import create_lesson, assign_lesson_to_student, get_exercise_by_id, get_session, \
     get_user_by_id, get_lesson_by_id, get_full_lesson, update_exercise, calculate_language_level, add_word, \
     get_random_word_for_level, generate_audio_for_word, get_lessons_by_teacher
 import random
 from sqlalchemy.future import select
-from models import Lesson, Word, User, Exercise
+from models import Lesson, Word, User, Exercise, Material, LanguageLevel, UserWordProgress, UserLessonProgress, \
+    AdminLevel, Admin
 
 lesson_routes = web.RouteTableDef()
+
+
+from aiohttp import web
+from sqlalchemy.future import select
+from lessons.database import get_session, calculate_language_level
+from models import Lesson, Exercise, Material, Word, LanguageLevel
+
+
+@lesson_routes.get("/lessons/available/{user_id}")
+async def get_available_lessons(request):
+    """
+    ---
+    summary: Get available lessons for a user
+    description: Returns a list of lessons that the user has enough XP to access.
+    tags:
+      - Lessons
+    responses:
+      "200":
+        description: List of available lessons
+        content:
+          application/json:
+            example:
+              - id: 1
+                title: "Lesson 1"
+                lesson_type: "vocabulary"
+                xp: 10
+                required_experience: 100
+      "404":
+        description: User not found
+    """
+    user_id = int(request.match_info["user_id"])
+
+    async for session in get_session():
+        user = await session.get(User, user_id)
+        if not user:
+            return web.json_response({"error": "User not found"}, status=404)
+
+        stmt = select(Lesson)
+        result = await session.execute(stmt)
+        all_lessons = result.scalars().all()
+
+        available_lessons = [
+            {
+                "id": lesson.id,
+                "title": lesson.title,
+                "lesson_type": lesson.lesson_type,
+                "xp": lesson.xp,
+                "required_experience": lesson.required_experience
+            }
+            for lesson in all_lessons
+            if (lesson.required_experience or 0) <= user.experience
+        ]
+
+        return web.json_response(available_lessons, status=200)
+
 
 @lesson_routes.post("/lessons")
 async def create_lesson_route(request):
     """
     ---
     summary: Create a new lesson
-    description: Allows a teacher to create a lesson with exercises.
+    description: Allows an admin to create a lesson with exercises, materials, and words to learn.
     tags:
       - Lessons
     requestBody:
@@ -26,14 +85,29 @@ async def create_lesson_route(request):
           schema:
             type: object
             properties:
+              creator_id:
+                type: integer
               title:
                 type: string
               lesson_type:
                 type: string
-              teacher_id:
-                type: integer
               xp:
                 type: integer
+              required_experience:
+                type: integer
+              theory:
+                type: string
+              materials:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    content_type:
+                      type: string
+                    content_url:
+                      type: string
               exercises:
                 type: array
                 items:
@@ -43,33 +117,119 @@ async def create_lesson_route(request):
                       type: string
                     correct_answer:
                       type: string
+              words_to_learn:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    word:
+                      type: string
+                    translation:
+                      type: string
             required:
+              - creator_id
               - title
               - lesson_type
-              - teacher_id
               - exercises
     responses:
       "201":
         description: Lesson created successfully
-      "403":
-        description: Only teachers can create lessons
+      "400":
+        description: Invalid input
     """
     async for session in get_session():
         data = await request.json()
-        lesson_data = LessonCreateSchema(**data)
 
-        teacher = await get_user_by_id(lesson_data.teacher_id, session)
-        if not teacher or teacher.role != "teacher":
-            return web.json_response({"error": "Only teachers can create lessons"}, status=403)
+        creator_id = data.get("creator_id")
+        title = data.get("title")
+        lesson_type = data.get("lesson_type")
+        xp = data.get("xp", 10)
+        required_experience = data.get("required_experience", 0)
+        theory = data.get("theory", "")
+        materials = data.get("materials", [])
+        exercises = data.get("exercises", [])
+        words_to_learn_input = data.get("words_to_learn", [])
 
-        new_lesson = await create_lesson(
-            lesson_data.title,
-             lesson_data.lesson_type,
-             lesson_data.exercises,
-             lesson_data.xp,
-             lesson_data.teacher_id,
-             session,
-         )
+        if not creator_id or not title or not lesson_type or not exercises:
+            return web.json_response({"error": "Missing required fields"}, status=400)
+
+        # Рассчитываем уровень языка для новых слов
+        language_level_for_words = calculate_language_level(required_experience)
+
+        # Создание урока
+        lesson = Lesson(
+            title=title,
+            lesson_type=lesson_type,
+            xp=xp,
+            required_experience=required_experience,
+            theory=theory,
+        )
+        session.add(lesson)
+        await session.flush()  # Чтобы получить lesson.id
+
+        # Добавление упражнений
+        for ex in exercises:
+            question = ex.get("question")
+            correct_answer = ex.get("correct_answer")
+            if not question or not correct_answer:
+                return web.json_response({"error": "Each exercise must have question and correct_answer"}, status=400)
+
+            exercise = Exercise(
+                lesson_id=lesson.id,
+                question=question,
+                correct_answer=correct_answer
+            )
+            session.add(exercise)
+
+        # Добавление материалов
+        for mat in materials:
+            material_title = mat.get("title")
+            content_type = mat.get("content_type")
+            content_url = mat.get("content_url")
+            if not material_title or not content_type or not content_url:
+                return web.json_response({"error": "Each material must have title, content_type and content_url"}, status=400)
+
+            material = Material(
+                lesson_id=lesson.id,
+                title=material_title,
+                content_type=content_type,
+                content_url=content_url
+            )
+            session.add(material)
+
+        # Добавление слов
+        word_ids = []
+        for word_entry in words_to_learn_input:
+            word_text = word_entry.get("word")
+            translation = word_entry.get("translation")
+
+            if not word_text or not translation:
+                return web.json_response({"error": "Each word must have 'word' and 'translation'"}, status=400)
+
+            existing_word = await session.execute(
+                select(Word).where(Word.word == word_text)
+            )
+            existing_word = existing_word.scalars().first()
+
+            if existing_word:
+                word_ids.append(int(existing_word.id))
+            else:
+                new_word = Word(
+                    word=word_text,
+                    translation=translation,
+                    language_level=language_level_for_words,
+                    user_id=int(creator_id)
+                )
+                session.add(new_word)
+                await session.flush()
+                word_ids.append(int(new_word.id))
+
+        lesson.words_to_learn = word_ids
+        session.add(lesson)
+        await session.flush()
+
+        await session.commit()
+
         return web.json_response({"message": "Lesson created successfully"}, status=201)
 
 
@@ -321,55 +481,66 @@ async def update_exercise_route(request):
 
 @lesson_routes.post("/lessons/complete")
 async def complete_lesson_route(request):
-    """
-    ---
-    summary: Complete a lesson and gain XP
-    description: Allows a student to complete a lesson and gain XP points based on the lesson.
-    tags:
-      - Lessons
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              user_id:
-                type: integer
-              lesson_id:
-                type: integer
-            required:
-              - user_id
-              - lesson_id
-    responses:
-      "200":
-        description: XP gained successfully
-      "404":
-        description: Lesson or user not found
-    """
     data = await request.json()
     user_id = data.get("user_id")
     lesson_id = data.get("lesson_id")
 
+    if not user_id or not lesson_id:
+        return web.json_response({"error": "Missing user_id or lesson_id"}, status=400)
+
     async for session in get_session():
-        user = await get_user_by_id(user_id, session)
-        lesson = await get_lesson_by_id(lesson_id, session)
-        print(lesson.__dict__)
+        user = await session.get(User, int(user_id))
+        lesson = await session.get(Lesson, int(lesson_id))
 
-        if not user:
-            return web.json_response({"error": "User not found"}, status=404)
+        if not user or not lesson:
+            return web.json_response({"error": "User or Lesson not found"}, status=404)
 
-        if not lesson:
-            return web.json_response({"error": "Lesson not found"}, status=404)
+        # Проверяем что все слова выучены
+        words_ids = lesson.words_to_learn or []
+        if words_ids:
+            stmt = select(UserWordProgress.word_id).where(
+                (UserWordProgress.user_id == int(user_id)) &
+                (UserWordProgress.learned == True) &
+                (UserWordProgress.word_id.in_(words_ids))
+            )
+            result = await session.execute(stmt)
+            learned_words = set(result.scalars().all())
 
+            if len(learned_words) != len(words_ids):
+                return web.json_response({"error": "Not all words learned"}, status=400)
+
+        user_lesson_progress = await session.execute(
+            select(UserLessonProgress).where(
+                (UserLessonProgress.user_id == int(user_id)) &
+                (UserLessonProgress.lesson_id == int(lesson_id))
+            )
+        )
+        user_lesson_progress = user_lesson_progress.scalars().first()
+
+        if not user_lesson_progress:
+            user_lesson_progress = UserLessonProgress(
+                user_id=int(user_id),
+                lesson_id=int(lesson_id),
+                completed=True,
+                completed_at=datetime.utcnow(),
+                progress=100.0
+            )
+            session.add(user_lesson_progress)
+        else:
+            user_lesson_progress.completed = True
+            user_lesson_progress.completed_at = datetime.utcnow()
+            user_lesson_progress.progress = 100.0
+
+        # Выдаем опыт
         user.experience += lesson.xp
 
-        user.language_level = calculate_language_level(user.experience)
-
-        session.add(user)
+        session.add_all([user_lesson_progress, user])
         await session.commit()
 
-        return web.json_response({"message": "XP gained successfully", "total_xp": user.experience}, status=200)
+        return web.json_response({
+            "message": "Lesson completed successfully!",
+            "total_xp": user.experience
+        }, status=200)
 
 
 @lesson_routes.post("/add_word")
@@ -425,30 +596,6 @@ async def add_word_to_db(request):
 
 @lesson_routes.get("/random_word/{user_id}")
 async def get_random_word_for_user(request):
-    """
-    ---
-    summary: Get a random word based on user's language level
-    description: Returns a random word based on the user's current language level.
-    tags:
-      - Lessons
-    parameters:
-      - in: path
-        name: user_id
-        required: true
-        schema:
-          type: integer
-    responses:
-      "200":
-        description: A random word for the user
-        content:
-          application/json:
-            example:
-              word: "dog"
-              translation: "собака"
-              level: "A1"
-      "404":
-        description: No words available
-    """
     user_id = int(request.match_info["user_id"])
 
     async for session in get_session():
@@ -475,7 +622,7 @@ async def check_word_answer(request):
     """
     ---
     summary: Check the answer to a word translation
-    description: Checks if the user's translation of a word is correct.
+    description: Checks if the user's translation of a word is correct and marks word as learned.
     tags:
       - Lessons
     requestBody:
@@ -497,51 +644,78 @@ async def check_word_answer(request):
               - user_translation
     responses:
       "200":
-        description: Answer checked successfully
+        description: Result of answer check
         content:
           application/json:
             example:
               correct: true
-      "404":
-        description: Word not found
+              total_xp: 15
       "400":
         description: Missing required fields
+      "404":
+        description: Word not found
     """
-    data = await request.json()
+    try:
+        data = await request.json()
 
-    user_id = data.get("user_id")
-    word_id = data.get("word_id")
-    user_translation = data.get("user_translation")
+        user_id = data.get("user_id")
+        word_id = data.get("word_id")
+        user_translation = data.get("user_translation")
 
-    if not user_id or not word_id or not user_translation:
-        return web.json_response({"error": "Missing required fields"}, status=400)
+        if not user_id or not word_id or not user_translation:
+            return web.json_response({"error": "Missing required fields"}, status=400)
 
-    async for session in get_session():
-        word_record = await session.execute(
-            select(Word).filter(Word.id == word_id).limit(1)
-        )
-        word_record = word_record.scalar_one_or_none()
+        async for session in get_session():
+            word_record = await session.execute(
+                select(Word).filter(Word.id == word_id).limit(1)
+            )
+            word_record = word_record.scalar_one_or_none()
 
-        if not word_record:
-            return web.json_response({"error": "Word not found"}, status=404)
+            if not word_record:
+                return web.json_response({"error": "Word not found"}, status=404)
 
-        correct_translation = word_record.translation.strip().lower()
-        user_translation = user_translation.strip().lower()
+            correct_translation = word_record.translation.strip().lower()
+            user_translation = user_translation.strip().lower()
 
-        is_correct = correct_translation == user_translation
+            is_correct = (correct_translation == user_translation)
+            print("IS CORRECT", is_correct)
 
-        if is_correct:
-            user = await get_user_by_id(user_id, session)
-            if user:
-                user.experience += 1
-                session.add(user)
+            if is_correct:
+                user = await get_user_by_id(int(user_id), session)
+                if user:
+                    user.experience += 1
+                    session.add(user)
+
+                progress = await session.execute(
+                    select(UserWordProgress).where(
+                        (UserWordProgress.user_id == int(user_id)) &
+                        (UserWordProgress.word_id == int(word_id))
+                    )
+                )
+                progress = progress.scalars().first()
+
+                if progress:
+                    progress.learned = True
+                    progress.last_reviewed_at = datetime.utcnow()
+                else:
+                    progress = UserWordProgress(
+                        user_id=int(user_id),
+                        word_id=int(word_id),
+                        learned=True
+                    )
+                    session.add(progress)
+
                 await session.commit()
+
                 return web.json_response({
                     "correct": True,
                     "total_xp": user.experience
                 }, status=200)
+            else:
+                return web.json_response({"correct": False}, status=200)
 
-        return web.json_response({"correct": False}, status=200)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
 
 
 @lesson_routes.post("/lessons/generate_audio")
@@ -592,25 +766,42 @@ async def generate_audio_route(request):
 async def get_lessons_route(request):
     """
     ---
-    summary: Get all lessons created by a teacher
-    description: Allows a teacher to view all lessons they have created.
+    summary: Get all available lessons
+    description: Returns a list of all lessons, with completion status if user_id provided.
     tags:
       - Lessons
     responses:
       "200":
-        description: A list of lessons created by the teacher
+        description: A list of lessons
     """
-    teacher_id = int(request.query.get("teacher_id"))
-
-    if not teacher_id:
-        return web.json_response({"error": "Teacher ID is required"}, status=400)
-
     async for session in get_session():
-        lessons = await get_lessons_by_teacher(teacher_id, session)
-        if not lessons:
-            return web.json_response({"message": "No lessons found for this teacher"}, status=404)
+        user_id = request.query.get("user_id")
 
-        lessons_data = [{"id": lesson.id, "title": lesson.title, "lesson_type": lesson.lesson_type} for lesson in lessons]
+        stmt = select(Lesson)
+        result = await session.execute(stmt)
+        lessons = result.scalars().all()
+
+        if not lessons:
+            return web.json_response({"message": "No lessons found"}, status=404)
+
+        completed_lessons = set()
+        if user_id:
+            user_progress_stmt = select(UserLessonProgress).where(UserLessonProgress.user_id == int(user_id))
+            user_progress = await session.execute(user_progress_stmt)
+            completed_lessons = {progress.lesson_id for progress in user_progress.scalars().all() if progress.completed}
+
+        lessons_data = [
+            {
+                "id": lesson.id,
+                "title": lesson.title,
+                "lesson_type": lesson.lesson_type,
+                "xp": lesson.xp,
+                "required_experience": lesson.required_experience,
+                "completed": lesson.id in completed_lessons
+            }
+            for lesson in lessons
+        ]
+
         return web.json_response(lessons_data, status=200)
 
 
@@ -730,3 +921,170 @@ async def update_lesson_route(request):
         await session.commit()
 
         return web.json_response({"message": "Lesson updated successfully"}, status=200)
+
+
+@lesson_routes.get("/lesson/{lesson_id}/words/{user_id}")
+async def get_words_for_lesson(request):
+    """
+    ---
+    summary: Get words to learn for a lesson
+    description: Returns words that the user has not yet learned in the lesson.
+    tags:
+      - Lessons
+    parameters:
+      - in: path
+        name: lesson_id
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: List of words to learn
+        content:
+          application/json:
+            example:
+              words:
+                - id: 1
+                  word: "apple"
+                  translation: "яблоко"
+      "404":
+        description: Lesson not found
+    """
+    lesson_id = int(request.match_info["lesson_id"])
+    user_id = int(request.match_info["user_id"])
+
+    async for session in get_session():
+        lesson = await session.get(Lesson, lesson_id)
+
+        if not lesson:
+            return web.json_response({"error": "Lesson not found"}, status=404)
+
+        words_ids = lesson.words_to_learn or []
+
+        learned_stmt = select(UserWordProgress.word_id).where(
+            (UserWordProgress.user_id == user_id) &
+            (UserWordProgress.learned == True)
+        )
+        result = await session.execute(learned_stmt)
+        learned_words_ids = set(result.scalars().all())
+
+        words_to_learn_ids = [wid for wid in words_ids if wid not in learned_words_ids]
+
+        if not words_to_learn_ids:
+            return web.json_response({"message": "All words learned"}, status=200)
+
+        words_stmt = select(Word).where(Word.id.in_(words_to_learn_ids))
+        result = await session.execute(words_stmt)
+        words = result.scalars().all()
+
+        words_data = [{"id": word.id, "word": word.word, "translation": word.translation} for word in words]
+        print('WORDS DATA', words_data)
+
+        return web.json_response({"words": words_data}, status=200)
+
+
+def admin_only(handler):
+    @wraps(handler)
+    async def wrapper(request):
+        user_id = int(request.headers.get("X-User-Id", 0))
+        if not user_id:
+            return web.json_response({"error": "Unauthorized"}, status=401)
+
+        async for session in get_session():
+            admin = await session.get(Admin, user_id)
+            if not admin:
+                return web.json_response({"error": "Admin rights required"}, status=403)
+
+        return await handler(request)
+
+    return wrapper
+
+
+def super_admin_only(handler):
+    @wraps(handler)
+    async def wrapper(request):
+        user_id = int(request.headers.get("X-User-Id", 0))
+        if not user_id:
+            return web.json_response({"error": "Unauthorized"}, status=401)
+
+        async for session in get_session():
+            admin = await session.get(Admin, user_id)
+            if not admin or admin.level.name != "SUPER_ADMIN":
+                return web.json_response({"error": "Super Admin rights required"}, status=403)
+
+        return await handler(request)
+
+    return wrapper
+
+
+@lesson_routes.post("/admin/assign")
+@super_admin_only
+async def assign_admin_role(request):
+    """
+    ---
+    summary: Assign admin or super-admin role to a user
+    description: Allows a super-admin to assign roles to other users.
+    tags:
+      - Admin
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: integer
+              level:
+                type: string
+                enum: ["admin", "super_admin"]
+            required:
+              - user_id
+              - level
+    responses:
+      "200":
+        description: Admin role assigned successfully
+      "400":
+        description: Missing fields or invalid role
+      "404":
+        description: User not found
+      "403":
+        description: No permission
+    """
+    data = await request.json()
+    user_id = data.get("user_id")
+    level = data.get("level")
+
+    if not user_id or not level:
+        return web.json_response({"error": "Missing user_id or level"}, status=400)
+
+    if level not in ["admin", "super_admin"]:
+        return web.json_response({"error": "Invalid role. Must be 'admin' or 'super_admin'"}, status=400)
+
+    async for session in get_session():
+        user = await session.get(User, user_id)
+        if not user:
+            return web.json_response({"error": "User not found"}, status=404)
+
+        admin = await session.get(Admin, user_id)
+
+        if admin:
+            # Обновляем уровень
+            admin.level = AdminLevel.ADMIN if level == "admin" else AdminLevel.SUPER_ADMIN
+        else:
+            # Создаём запись
+            admin = Admin(
+                id=user_id,
+                permissions="",
+                level=AdminLevel.ADMIN if level == "admin" else AdminLevel.SUPER_ADMIN
+            )
+            session.add(admin)
+
+        await session.commit()
+
+        return web.json_response({"message": f"Assigned role '{level}' to user {user_id}"}, status=200)

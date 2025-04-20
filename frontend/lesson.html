@@ -1,257 +1,242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <title>Уроки — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson - English Learning App</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientMove 15s ease infinite;
+      overflow-x: hidden;
+      color: white;
+      position: relative;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .background-image {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
+      background-size: cover;
+      filter: blur(8px) brightness(0.7);
+      z-index: -1;
+    }
+
+    .navbar {
+      width: 100%;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Фон с размытием */
-    .background {
-      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Пример изображения */
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px); /* Размытость фона */
-      z-index: -1; /* Ставим фон за контент */
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    .lesson-container {
-      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
-      padding: 40px 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 600px;
-      text-align: center;
-      animation: slideIn 1s ease-out;
-    }
-
-    @keyframes slideIn {
-      0% { transform: translateY(50%); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
-    h2 {
-      margin-bottom: 25px;
-      color: #333;
-      font-size: 24px;
-    }
-
-    .exercise {
-      margin-bottom: 25px;
-    }
-
-    input, button {
-      padding: 12px;
-      margin-top: 15px;
-      width: 90%;
-      border: 1px solid #ccc;
+    .nav-item {
+      margin: 0 15px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 2px solid transparent;
       border-radius: 8px;
-      font-size: 16px;
       transition: all 0.3s ease;
     }
 
-    input:focus, button:focus {
-      outline: none;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    .nav-item:hover {
+      background: #2575fc;
+      border-color: #2575fc;
+      color: white;
+      transform: scale(1.05);
     }
 
-    button {
+    .content {
+      margin-top: 160px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+   /* Уроки */
+    .lesson-item {
+      background: rgba(255, 255, 255, 0.95); /* чуть ярче */
+      color: #222;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 14px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 95%;
+      max-width: 700px;
+      font-size: 18px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .lesson-item.locked {
+      filter: blur(2px) grayscale(50%);
+      pointer-events: none;
+    }
+
+    .lesson-title {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .completed {
+      color: #28a745;
+      font-size: 22px;
+      margin-left: 10px;
+    }
+
+    .start-btn {
+      margin-top: 10px;
       background: #007bff;
       color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
-      font-weight: bold;
-      transition: background 0.3s ease;
+      transition: all 0.3s;
     }
 
-    button:hover {
+    .start-btn:hover {
       background: #0056b3;
     }
 
-    #finish {
-      background: #28a745;
-    }
-
-    #finish:hover {
-      background: #218838;
-    }
-
-    .progress-bar-container {
-      width: 100%;
+    /* Прогресс бар сверху */
+    .progress-container {
+      width: 90%;
+      max-width: 600px;
+      height: 6px;
       background: #e9ecef;
-      height: 8px;
-      border-radius: 5px;
-      margin-top: 20px;
-      margin-bottom: 30px;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 20px 0;
     }
 
     .progress-bar {
       height: 100%;
-      background: #007bff;
       width: 0%;
-      border-radius: 5px;
-      transition: width 0.3s ease-in-out;
-    }
-
-    .svg-icons {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-    }
-
-    .svg-icons svg {
-      width: 24px;
-      height: 24px;
-      margin-left: 10px;
-    }
-
-    .correct {
-      fill: #28a745;
-    }
-
-    .incorrect {
-      fill: #dc3545;
-    }
-
-    .back-button {
-      background: #6c757d;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    .back-button:hover {
-      background: #5a6268;
+      background: #28a745;
+      transition: width 0.5s ease;
     }
   </style>
 </head>
+
 <body>
 
-<!-- Фон с размытием -->
-<div class="background"></div>
+<div class="background-image"></div>
 
-<div class="lesson-container">
-  <h2 id="lesson-title">Loading lesson...</h2>
-  <div id="lesson-content"></div>
-  <div class="progress-bar-container">
-    <div class="progress-bar" id="progress-bar"></div>
+<!-- Навбар -->
+<div class="navbar">
+  <a href="profile.html" class="nav-item">Профиль 👤</a>
+  <a href="lesson.html" class="nav-item">Уроки 📖</a>
+  <a href="test.html" class="nav-item">Тесты 📝</a>
+  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
+</div>
+
+<!-- Прогресс бар -->
+<div class="content">
+  <div class="progress-container">
+    <div class="progress-bar" id="overall-progress-bar"></div>
   </div>
-  <button id="finish" onclick="finishLesson()" disabled>Finish Lesson</button>
-  <button class="back-button" onclick="backDashboard()">Back</button>
+
+  <!-- Уроки -->
+  <div id="lesson-list">
+    <h1>⏳ Загрузка уроков...</h1>
+  </div>
 </div>
 
 <script>
 const API_URL = 'http://127.0.0.1:8080';
 
 if (!localStorage.getItem('token')) {
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
-let answered = 0;
-let total = 0;
-let lessonId = null;
-
-async function loadLesson() {
+async function loadLessons() {
   const userId = localStorage.getItem('userId');
-  const res = await fetch(`${API_URL}/lessons/random/${userId}`);
-  const data = await res.json();
-  lessonId = data.lesson_id;
 
-  const lessonRes = await fetch(`${API_URL}/lessons/${lessonId}`);
-  const lesson = await lessonRes.json();
+  const resUser = await fetch(`${API_URL}/profile/${userId}`);
+  const userData = await resUser.json();
+  const userXP = userData.experience;
 
-  document.getElementById('lesson-title').innerText = lesson.title;
-  const container = document.getElementById('lesson-content');
+  const resLessons = await fetch(`${API_URL}/lessons?user_id=${userId}`);
+  const lessons = await resLessons.json();
+
+  const container = document.getElementById('lesson-list');
   container.innerHTML = '';
 
-  lesson.exercises.forEach(ex => {
+  let completedCount = 0;
+
+  lessons.forEach(lesson => {
+    const hasAccess = (lesson.required_experience || 0) <= userXP;
+    if (lesson.completed) completedCount++;
+
     const div = document.createElement('div');
-    div.className = 'exercise';
+    div.className = 'lesson-item';
+    if (!hasAccess) div.classList.add('locked');
+
+    const needXp = (lesson.required_experience || 0) - userXP;
+
     div.innerHTML = `
-      <p>${ex.question}</p>
-      <input id="answer-${ex.id}" placeholder="Your answer">
-      <button onclick="submitAnswer(${ex.id})">Submit</button>
-      <div class="svg-icons" id="icon-${ex.id}"></div>
+      <div class="lesson-title">
+        ${lesson.title} ${lesson.completed ? '<span class="completed">✅</span>' : ''} ${!hasAccess ? '🔒' : ''}
+      </div>
+      ${!hasAccess ? `<p>Требуется ещё ${needXp} XP</p>` : ''}
+      <button ${hasAccess ? '' : 'disabled'} onclick="${hasAccess ? `startLesson(${lesson.id})` : ''}" class="start-btn">
+        ${hasAccess ? (lesson.completed ? 'Пройти снова' : 'Начать урок') : 'Недоступно'}
+      </button>
     `;
+
     container.appendChild(div);
   });
 
-  total = lesson.exercises.length;
-}
-
-async function submitAnswer(id) {
-  const input = document.getElementById(`answer-${id}`);
-  const answer = input.value.trim();
-  if (!answer) return;
-
-  const res = await fetch(`${API_URL}/lessons/answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ exercise_id: id, answer })
-  });
-  const data = await res.json();
-
-  const iconContainer = document.getElementById(`icon-${id}`);
-  if (data.correct) {
-    input.style.background = '#d4edda'; // Correct answer
-    iconContainer.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" class="correct" /><path d="M5 10L8 13L15 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  // Прогресс-бар
+  if (lessons.length > 0) {
+    const progressPercent = (completedCount / lessons.length) * 100;
+    document.getElementById('overall-progress-bar').style.width = `${progressPercent}%`;
   } else {
-    input.style.background = '#f8d7da'; // Incorrect answer
-    iconContainer.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" class="incorrect" /><path d="M5 5L15 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15L15 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  }
-
-  input.disabled = true;
-  answered++;
-
-  updateProgressBar();
-
-  if (answered === total) {
-    document.getElementById('finish').disabled = false;
+    document.getElementById('overall-progress-bar').style.width = '0%';
   }
 }
 
-function updateProgressBar() {
-  const progress = (answered / total) * 100;
-  document.getElementById('progress-bar').style.width = `${progress}%`;
+function startLesson(lessonId) {
+  localStorage.setItem('currentLessonId', lessonId);
+  window.location.href = 'startLesson.html';
 }
 
-async function finishLesson() {
-  const userId = localStorage.getItem('userId');
-  await fetch(`${API_URL}/lessons/complete`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, lesson_id: lessonId })
-  });
-  alert('Lesson completed!');
-  backDashboard();
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
 }
 
-function backDashboard() {
-  window.location.href = 'dashboard.html';
-}
-
-window.onload = loadLesson;
+window.onload = loadLessons;
 </script>
 
 </body>

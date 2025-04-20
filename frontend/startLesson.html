@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Урок — Language Learner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* === Стили страницы === */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      height: 100vh;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientMove 15s ease infinite;
+      overflow-x: hidden;
+      color: white;
+      position: relative;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .background-image {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
+      background-size: cover;
+      filter: blur(8px) brightness(0.7);
+      z-index: -1;
+    }
+
+    .navbar {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .nav-item {
+      margin: 0 15px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+      background: #2575fc;
+      border-color: #2575fc;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .content {
+      margin-top: 120px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lesson-box {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      color: #333;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    p, li {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 12px;
+      width: 80%;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(106, 17, 203, 0.6);
+      background: white;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2575fc;
+      background: transparent;
+      border: 2px solid #2575fc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #2575fc;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .finish-btn {
+      margin-top: 30px;
+      background: #28a745;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .finish-btn:hover {
+      background: #218838;
+    }
+
+    .progress-container {
+      width: 100%;
+      background: #e9ecef;
+      height: 12px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #2575fc;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.5s ease-in-out;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="background-image"></div>
+
+<!-- Навбар -->
+<div class="navbar">
+  <a href="profile.html" class="nav-item">Профиль 👤</a>
+  <a href="lesson.html" class="nav-item">Уроки 📖</a>
+  <a href="test.html" class="nav-item">Тесты 📝</a>
+  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
+</div>
+
+<!-- Контент -->
+<div class="content">
+  <div class="lesson-box" id="lesson-box">
+    <h1>Загрузка...</h1>
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === Переменные
+const API_URL = 'http://127.0.0.1:8080';
+const userId = localStorage.getItem('userId');
+const lessonId = localStorage.getItem('currentLessonId');
+const lessonBox = document.getElementById('lesson-box');
+const progressBar = document.getElementById('progress-bar');
+
+let lessonData;
+let step = 0; // 0-материалы, 1-слова, 2-тест
+let totalSteps = 3;
+
+let currentWords = [];
+let wordIndex = 0;
+let totalWords = 0;
+let correctWords = 0;
+
+let currentExercises = [];
+let exerciseIndex = 0;
+let totalExercises = 0;
+let correctExercises = 0;
+
+// === Загрузка урока
+async function loadLesson() {
+  if (!lessonId) {
+    lessonBox.innerHTML = '<h2>Ошибка загрузки урока 🚫</h2>';
+    return;
+  }
+
+  const res = await fetch(`${API_URL}/lessons/${lessonId}`);
+  lessonData = await res.json();
+
+  showMaterials();
+}
+
+// === Этап 1: Материалы
+function showMaterials() {
+  lessonBox.innerHTML = `
+    <h1>${lessonData.title}</h1>
+    <p><strong>Материалы для изучения:</strong></p>
+    ${(lessonData.material_links || []).map(m => `
+      <div class="material-block">
+        <p><strong>${m.title}</strong> (${m.content_type})</p>
+        <div class="iframe-container">
+          <div class="loader" id="loader-${m.id}"></div>
+          ${
+            m.content_url.includes("youtube.com") || m.content_url.includes("youtu.be")
+              ? `<iframe src="https://www.youtube.com/embed/${extractYouTubeId(m.content_url)}" width="100%" height="400px" frameborder="0" allowfullscreen
+                  onload="hideLoader(${m.id})"></iframe>`
+              : `<iframe src="${m.content_url}" width="100%" height="400px" frameborder="0" style="border-radius:10px;"
+                  onload="hideLoader(${m.id})"></iframe>`
+          }
+        </div>
+      </div>
+    `).join('')}
+    <button class="btn" onclick="startWords()">Перейти к словам ➡️</button>
+    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+  `;
+  updateProgress();
+}
+
+function extractYouTubeId(url) {
+  const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([\w-]{11})/);
+  return match ? match[1] : null;
+}
+
+function hideLoader(id) {
+  const loader = document.getElementById(`loader-${id}`);
+  if (loader) {
+    loader.style.display = 'none';
+  }
+}
+
+// === Этап 2: Слова
+async function startWords() {
+  step = 1;
+  const res = await fetch(`${API_URL}/lesson/${lessonId}/words/${userId}`);
+  const wordsData = await res.json();
+  currentWords = wordsData.words || [];
+  totalWords = currentWords.length;
+  wordIndex = 0;
+  correctWords = 0;
+  if (totalWords > 0) {
+    showWord();
+  } else {
+    startExercises();
+  }
+}
+
+function showWord() {
+  const word = currentWords[wordIndex];
+  lessonBox.innerHTML = `
+    <h1>Переведи слово</h1>
+    <p><strong>${word.word}</strong></p>
+    <input id="word-translation" placeholder="Твой перевод">
+        <button class="btn" onclick="playWordAudio('${word.word}', ${word.id})">🔊 Проиграть слово</button>
+    <button class="btn" onclick="submitWord(${word.id})">Проверить</button>
+    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+  `;
+  updateProgress();
+}
+
+
+async function playWordAudio(wordText, wordId) {
+  try {
+    const res = await fetch(`${API_URL}/lessons/generate_audio`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word: wordText, word_id: wordId })
+    });
+    const data = await res.json();
+    const audio = new Audio(`../${data.audio_file}`);
+    await audio.play();
+  } catch (err) {
+    console.error('Ошибка воспроизведения аудио:', err);
+  }
+}
+
+async function submitWord(wordId) {
+  const translation = document.getElementById('word-translation').value.trim();
+  const res = await fetch(`${API_URL}/check_word_answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, word_id: wordId, user_translation: translation })
+  });
+  const data = await res.json();
+  if (data.correct) correctWords++;
+  wordIndex++;
+  if (wordIndex < totalWords) {
+    showWord();
+  } else {
+    startExercises();
+  }
+}
+
+// === Этап 3: Тесты
+function startExercises() {
+  step = 2;
+  currentExercises = lessonData.exercises || [];
+  totalExercises = currentExercises.length;
+  exerciseIndex = 0;
+  correctExercises = 0;
+  if (totalExercises > 0) {
+    showExercise();
+  } else {
+    finishLesson();
+  }
+}
+
+function showExercise() {
+  const ex = currentExercises[exerciseIndex];
+  lessonBox.innerHTML = `
+    <h1>Вопрос</h1>
+    <p>${ex.question}</p>
+    <input id="exercise-answer" placeholder="Твой ответ">
+    <button class="btn" onclick="submitExercise(${ex.id})">Ответить</button>
+    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+  `;
+  updateProgress();
+}
+
+async function submitExercise(exId) {
+  const answer = document.getElementById('exercise-answer').value.trim();
+  const res = await fetch(`${API_URL}/lessons/answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ exercise_id: exId, answer })
+  });
+  const data = await res.json();
+  if (data.correct) correctExercises++;
+  exerciseIndex++;
+  if (exerciseIndex < totalExercises) {
+    showExercise();
+  } else {
+    finishLesson();
+  }
+}
+
+// === Завершение урока
+async function finishLesson() {
+  await fetch(`${API_URL}/lessons/complete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, lesson_id: lessonId })
+  });
+
+  lessonBox.innerHTML = `
+    <h1>Урок завершён!</h1>
+    <p>✅ Правильных переводов: ${correctWords} / ${totalWords}</p>
+    <p>✅ Правильных ответов на тест: ${correctExercises} / ${totalExercises}</p>
+    <button class="finish-btn" onclick="backDashboard()">На главную</button>
+  `;
+}
+
+// === Обновить прогресс-бар
+function updateProgress() {
+  let current = step * 33;
+  if (step === 1) current += (wordIndex / totalWords) * 33;
+  if (step === 2) current += (exerciseIndex / totalExercises) * 34;
+  progressBar.style.width = `${Math.min(current, 100)}%`;
+}
+
+// === Выход
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+
+function backDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+window.onload = loadLesson;
+</script>
+
+</body>
+</html>

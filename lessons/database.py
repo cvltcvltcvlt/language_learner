@@ -4,7 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from db import SessionLocal
-from models import Lesson, Exercise, User, UserLessonProgress, LanguageLevel, Word
+from models import Lesson, Exercise, User, UserLessonProgress, LanguageLevel, Word, Material
 from gtts import gTTS
 import os
 import boto3
@@ -66,6 +66,7 @@ async def assign_lesson_to_student(teacher_id: int, student_id: int, lesson_id: 
 
 async def get_full_lesson(lesson_id: int, session):
     # Получаем урок по ID
+    lesson_id = int(lesson_id)
     lesson_stmt = select(Lesson).filter(Lesson.id == lesson_id)
     lesson_result = await session.execute(lesson_stmt)
     lesson = lesson_result.scalars().first()
@@ -78,6 +79,11 @@ async def get_full_lesson(lesson_id: int, session):
     exercises_result = await session.execute(exercise_stmt)
     exercises = exercises_result.scalars().all()
 
+    # Получаем материалы для урока
+    material_stmt = select(Material).filter(Material.lesson_id == lesson_id)
+    materials_result = await session.execute(material_stmt)
+    materials = materials_result.scalars().all()
+
     # Формируем результат
     return {
         "lesson_id": lesson.id,
@@ -86,8 +92,13 @@ async def get_full_lesson(lesson_id: int, session):
         "exercises": [
             {"id": exercise.id, "question": exercise.question, "correct_answer": exercise.correct_answer}
             for exercise in exercises
+        ],
+        "material_links": [
+            {"id": material.id, "title": material.title, "content_type": material.content_type.value, "content_url": material.content_url}
+            for material in materials
         ]
     }
+
 
 
 async def update_exercise(exercise_id: int, question: str, correct_answer: str, session: AsyncSession):
