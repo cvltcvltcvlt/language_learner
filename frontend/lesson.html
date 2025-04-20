@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <title>Уроки — Language Learner</title>
@@ -74,9 +74,9 @@
       align-items: center;
     }
 
-   /* Уроки */
+    /* Уроки */
     .lesson-item {
-      background: rgba(255, 255, 255, 0.95); /* чуть ярче */
+      background: rgba(255, 255, 255, 0.95);
       color: #222;
       padding: 30px;
       margin: 20px 0;
@@ -128,7 +128,7 @@
       background: #0056b3;
     }
 
-    /* Прогресс бар сверху */
+    /* Прогрес-бар */
     .progress-container {
       width: 90%;
       max-width: 600px;
@@ -152,23 +152,23 @@
 
 <div class="background-image"></div>
 
-<!-- Навбар -->
+<!-- Навігаційна панель -->
 <div class="navbar">
-  <a href="profile.html" class="nav-item">Профиль 👤</a>
+  <a href="profile.html" class="nav-item">Профіль 👤</a>
   <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тесты 📝</a>
-  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
+  <a href="test.html" class="nav-item">Тести 📝</a>
+  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
 </div>
 
-<!-- Прогресс бар -->
 <div class="content">
+  <!-- Прогрес-бар -->
   <div class="progress-container">
     <div class="progress-bar" id="overall-progress-bar"></div>
   </div>
 
-  <!-- Уроки -->
+  <!-- Список уроків -->
   <div id="lesson-list">
-    <h1>⏳ Загрузка уроков...</h1>
+    <h1>⏳ Завантаження уроків...</h1>
   </div>
 </div>
 
@@ -198,26 +198,29 @@ async function loadLessons() {
     const hasAccess = (lesson.required_experience || 0) <= userXP;
     if (lesson.completed) completedCount++;
 
-    const div = document.createElement('div');
-    div.className = 'lesson-item';
-    if (!hasAccess) div.classList.add('locked');
+    const needXp = Math.max((lesson.required_experience || 0) - userXP, 0);
 
-    const needXp = (lesson.required_experience || 0) - userXP;
+    const div = document.createElement('div');
+    div.className = 'lesson-item' + (hasAccess ? '' : ' locked');
 
     div.innerHTML = `
       <div class="lesson-title">
         ${lesson.title} ${lesson.completed ? '<span class="completed">✅</span>' : ''} ${!hasAccess ? '🔒' : ''}
       </div>
-      ${!hasAccess ? `<p>Требуется ещё ${needXp} XP</p>` : ''}
+      ${!hasAccess ? `<p>Потрібно ще ${needXp} XP</p>` : ''}
       <button ${hasAccess ? '' : 'disabled'} onclick="${hasAccess ? `startLesson(${lesson.id})` : ''}" class="start-btn">
-        ${hasAccess ? (lesson.completed ? 'Пройти снова' : 'Начать урок') : 'Недоступно'}
+        ${hasAccess
+          ? (lesson.completed
+              ? 'Пройти знову'
+              : 'Почати урок')
+          : 'Недоступно'}
       </button>
     `;
 
     container.appendChild(div);
   });
 
-  // Прогресс-бар
+  // Оновлюємо прогрес-бар
   if (lessons.length > 0) {
     const progressPercent = (completedCount / lessons.length) * 100;
     document.getElementById('overall-progress-bar').style.width = `${progressPercent}%`;

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Админ-панель — Language Learner</title>
+  <title>Адмін-панель — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ФОН И НАВБАР */
+    /* ФОН І НАВБАР */
     body {
       margin: 0; padding: 0;
       font-family: 'Roboto', sans-serif;
@@ -48,7 +48,7 @@
     .btn-delete {background: #dc3545; color: white;}
     .btn-delete:hover {background: #c82333;}
 
-    /* ТАБЛИЦА */
+    /* ТАБЛИЦЯ */
     table {
       width: 90%; max-width: 1000px; margin-top: 20px; border-collapse: collapse;
       background: rgba(255, 255, 255, 0.9); color: #333; border-radius: 12px; overflow: hidden;
@@ -80,55 +80,55 @@
 
 <!-- НАВБАР -->
 <div class="navbar">
-  <a href="dashboard.html" class="nav-item">Главная 🏠</a>
-  <a href="admin_panel.html" class="nav-item">Админка 🔧</a>
-  <a href="#" class="nav-item" onclick="logout()">Выход 🚪</a>
+  <a href="dashboard.html" class="nav-item">Головна 🏠</a>
+  <a href="admin_panel.html" class="nav-item">Адмін-панель 🔧</a>
+  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
 </div>
 
 <!-- КОНТЕНТ -->
 <div class="content">
-  <h1>Управление уроками</h1>
-  <button class="btn btn-add" onclick="openCreateLesson()">➕ Создать урок</button>
+  <h1>Управління уроками</h1>
+  <button class="btn btn-add" onclick="openCreateLesson()">➕ Створити урок</button>
   <table id="lesson-table">
     <thead>
       <tr>
-        <th>ID</th><th>Название</th><th>Тип</th><th>XP</th><th>Требуемый опыт</th><th>Действия</th>
+        <th>ID</th><th>Назва</th><th>Тип</th><th>XP</th><th>Необхідний досвід</th><th>Дії</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 </div>
 
-<!-- МОДАЛКА УРОКА -->
+<!-- МОДАЛКА УРОКУ -->
 <div id="modal" class="modal">
   <div class="modal-content">
-    <h2 id="modal-title">Создать урок</h2>
-    <input type="text" id="lesson-title" placeholder="Название урока">
+    <h2 id="modal-title">Створити урок</h2>
+    <input type="text" id="lesson-title" placeholder="Назва уроку">
     <select id="lesson-type">
-      <option value="GRAMMAR">Грамматика</option>
-      <option value="VOCABULARY">Словарь</option>
-      <option value="READING">Чтение</option>
-      <option value="LISTENING">Аудирование</option>
+      <option value="GRAMMAR">Граматика</option>
+      <option value="VOCABULARY">Словник</option>
+      <option value="READING">Читання</option>
+      <option value="LISTENING">Аудіювання</option>
     </select>
     <input type="number" id="lesson-xp" placeholder="XP за урок">
-    <input type="number" id="lesson-req-xp" placeholder="Требуемый опыт">
-    <textarea id="lesson-theory" placeholder="Теория (необязательно)"></textarea>
+    <input type="number" id="lesson-req-xp" placeholder="Необхідний досвід">
+    <textarea id="lesson-theory" placeholder="Теорія (необов’язково)"></textarea>
 
-    <h3>Материалы</h3>
+    <h3>Матеріали</h3>
     <div id="materials-list"></div>
-    <button class="btn btn-add" onclick="addMaterial()">➕ Добавить материал</button>
+    <button class="btn btn-add" onclick="addMaterial()">➕ Додати матеріал</button>
 
-    <h3>Упражнения</h3>
+    <h3>Вправи</h3>
     <div id="exercises-list"></div>
-    <button class="btn btn-add" onclick="addExercise()">➕ Добавить упражнение</button>
+    <button class="btn btn-add" onclick="addExercise()">➕ Додати вправу</button>
 
-    <h3>Слова для изучения</h3>
+    <h3>Слова для вивчення</h3>
     <div id="words-list"></div>
-    <button class="btn btn-add" onclick="addWordToLearn()">➕ Добавить слово</button>
+    <button class="btn btn-add" onclick="addWordToLearn()">➕ Додати слово</button>
 
     <br><br>
-    <button class="btn btn-add" onclick="submitLesson()">💾 Сохранить</button>
-    <button class="btn close-btn" onclick="closeModal()">Отмена</button>
+    <button class="btn btn-add" onclick="submitLesson()">💾 Зберегти</button>
+    <button class="btn close-btn" onclick="closeModal()">Скасувати</button>
   </div>
 </div>
 
@@ -136,6 +136,7 @@
 const API_URL = 'http://127.0.0.1:8080';
 let editingLessonId = null;
 
+// Перевірка прав адміністратора
 if (localStorage.getItem('isAdmin') !== 'true') {
   window.location.href = 'login.html';
 }
@@ -164,7 +165,7 @@ async function loadLessons() {
 
 function openCreateLesson() {
   editingLessonId = null;
-  document.getElementById('modal-title').innerText = "Создать урок";
+  document.getElementById('modal-title').innerText = "Створити урок";
   document.getElementById('lesson-title').value = '';
   document.getElementById('lesson-type').value = 'GRAMMAR';
   document.getElementById('lesson-xp').value = '';
@@ -179,11 +180,11 @@ function openCreateLesson() {
 function addMaterial() {
   const div = document.createElement('div');
   div.innerHTML = `
-    <input type="text" placeholder="Название" class="material-title">
+    <input type="text" placeholder="Назва" class="material-title">
     <select class="material-type">
-      <option value="video">Видео</option>
-      <option value="text">Текст</option>
-      <option value="audio">Аудио</option>
+      <option value="VIDEO">Відео</option>
+      <option value="TEXT">Текст</option>
+      <option value="AUDIO">Аудіо</option>
     </select>
     <input type="text" placeholder="URL" class="material-url">
     <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
@@ -194,7 +195,6 @@ function addMaterial() {
 
 async function editLesson(id) {
   editingLessonId = id;
-
   const res = await fetch(`${API_URL}/lessons/${id}`);
   const lesson = await res.json();
 
@@ -204,20 +204,18 @@ async function editLesson(id) {
   document.getElementById('lesson-req-xp').value = lesson.required_experience;
   document.getElementById('lesson-theory').value = lesson.theory || '';
 
-  // Чистим старые блоки
   document.getElementById('materials-list').innerHTML = '';
   document.getElementById('exercises-list').innerHTML = '';
   document.getElementById('words-list').innerHTML = '';
 
-  // Заливаем материалы
   (lesson.material_links || []).forEach(mat => {
     const div = document.createElement('div');
     div.innerHTML = `
-      <input type="text" placeholder="Название" class="material-title" value="${mat.title}">
+      <input type="text" placeholder="Назва" class="material-title" value="${mat.title}">
       <select class="material-type">
-        <option value="VIDEO" ${mat.content_type === "VIDEO" ? 'selected' : ''}>Видео</option>
+        <option value="VIDEO" ${mat.content_type === "VIDEO" ? 'selected' : ''}>Відео</option>
         <option value="TEXT" ${mat.content_type === "TEXT" ? 'selected' : ''}>Текст</option>
-        <option value="AUDIO" ${mat.content_type === "AUDIO" ? 'selected' : ''}>Аудио</option>
+        <option value="AUDIO" ${mat.content_type === "AUDIO" ? 'selected' : ''}>Аудіо</option>
       </select>
       <input type="text" placeholder="URL" class="material-url" value="${mat.content_url}">
       <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
@@ -226,39 +224,37 @@ async function editLesson(id) {
     document.getElementById('materials-list').appendChild(div);
   });
 
-  // Заливаем упражнения
   (lesson.exercises || []).forEach(ex => {
     const div = document.createElement('div');
     div.innerHTML = `
-      <input type="text" placeholder="Вопрос" class="exercise-question" value="${ex.question}">
-      <input type="text" placeholder="Правильный ответ" class="exercise-answer" value="${ex.correct_answer}">
+      <input type="text" placeholder="Питання" class="exercise-question" value="${ex.question}">
+      <input type="text" placeholder="Правильна відповідь" class="exercise-answer" value="${ex.correct_answer}">
       <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
       <hr>
     `;
     document.getElementById('exercises-list').appendChild(div);
   });
 
-  // Заливаем слова
   (lesson.words_to_learn_links || []).forEach(word => {
     const div = document.createElement('div');
     div.innerHTML = `
       <input type="text" placeholder="Слово" class="word-text" value="${word.word}">
-      <input type="text" placeholder="Перевод" class="word-translation" value="${word.translation}">
+      <input type="text" placeholder="Переклад" class="word-translation" value="${word.translation}">
       <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
       <hr>
     `;
     document.getElementById('words-list').appendChild(div);
   });
 
-  document.getElementById('modal-title').innerText = "Редактировать урок";
+  document.getElementById('modal-title').innerText = "Редагувати урок";
   document.getElementById('modal').style.display = 'flex';
 }
 
 function addExercise() {
   const div = document.createElement('div');
   div.innerHTML = `
-    <input type="text" placeholder="Вопрос" class="exercise-question">
-    <input type="text" placeholder="Правильный ответ" class="exercise-answer">
+    <input type="text" placeholder="Питання" class="exercise-question">
+    <input type="text" placeholder="Правильна відповідь" class="exercise-answer">
     <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
     <hr>
   `;
@@ -269,7 +265,7 @@ function addWordToLearn() {
   const div = document.createElement('div');
   div.innerHTML = `
     <input type="text" placeholder="Слово" class="word-text">
-    <input type="text" placeholder="Перевод" class="word-translation">
+    <input type="text" placeholder="Переклад" class="word-translation">
     <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
     <hr>
   `;
@@ -321,17 +317,16 @@ async function submitLesson() {
   });
 
   if (res.ok) {
-    alert(editingLessonId ? 'Урок обновлен!' : 'Урок создан!');
+    alert(editingLessonId ? 'Урок оновлено!' : 'Урок створено!');
     closeModal();
     loadLessons();
   } else {
-    alert('Ошибка при сохранении.');
+    alert('Помилка при збереженні.');
   }
 }
 
-
 async function deleteLesson(id) {
-  if (confirm('Удалить урок?')) {
+  if (confirm('Видалити урок?')) {
     await fetch(`${API_URL}/lessons/${id}`, { method: 'DELETE' });
     loadLessons();
   }

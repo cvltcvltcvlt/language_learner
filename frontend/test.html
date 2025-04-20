@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Тест слов — Language Learner</title>
+  <title>Тест слів — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* === Общие стили === */
+    /* === Загальні стилі === */
     body {
       margin: 0;
       padding: 0;
@@ -164,84 +164,84 @@
 
 <body>
 
-<div class="background-image"></div>
+  <div class="background-image"></div>
 
-<div class="navbar">
-  <a href="profile.html" class="nav-item">Профиль 👤</a>
-  <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тесты 📝</a>
-  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
-</div>
-
-<div class="content">
-  <div class="test-box" id="test-box">
-    <h1>Загрузка...</h1>
+  <div class="navbar">
+    <a href="profile.html" class="nav-item">Профіль 👤</a>
+    <a href="lesson.html" class="nav-item">Уроки 📖</a>
+    <a href="test.html" class="nav-item">Тести 📝</a>
+    <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
   </div>
-</div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+  <div class="content">
+    <div class="test-box" id="test-box">
+      <h1>Завантаження...</h1>
+    </div>
+  </div>
 
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
+  <script>
+  const API_URL = 'http://127.0.0.1:8080';
 
-async function loadTest() {
-  const res = await fetch(`${API_URL}/test/words`);
-  const data = await res.json();
+  if (!localStorage.getItem('token')) {
+    window.location.href = 'login.html';
+  }
 
-  const box = document.getElementById('test-box');
-  box.innerHTML = `
-    <h1>Переведи слово</h1>
-    <p style="font-weight: bold; font-size: 22px;">${data.words.word}</p>
-    <input id="word-translation" placeholder="Твой перевод">
-    <button class="audio-btn" onclick="playAudio('${data.words.word}', ${data.words.id})">🔊 Проиграть</button>
-    <br>
-    <button class="btn" onclick="submitTest(${data.words.id})">Проверить</button>
-    <button class="back-btn" onclick="backDashboard()">⬅️ Назад</button>
-  `;
-}
+  async function loadTest() {
+    const res = await fetch(`${API_URL}/test/words`);
+    const data = await res.json();
 
-async function playAudio(word, wordId) {
-  const res = await fetch(`${API_URL}/lessons/generate_audio`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ word, word_id: wordId })
-  });
-  const data = await res.json();
-  const audio = new Audio(`../${data.audio_file}`);
-  await audio.play();
-}
+    const box = document.getElementById('test-box');
+    box.innerHTML = `
+      <h1>Переклади слово</h1>
+      <p style="font-weight: bold; font-size: 22px;">${data.words.word}</p>
+      <input id="word-translation" placeholder="Твій переклад">
+      <button class="audio-btn" onclick="playAudio('${data.words.word}', ${data.words.id})">🔊 Відтворити</button>
+      <br>
+      <button class="btn" onclick="submitTest(${data.words.id})">Перевірити</button>
+      <button class="back-btn" onclick="backDashboard()">⬅️ Назад</button>
+    `;
+  }
 
-async function submitTest(wordId) {
-  const translation = document.getElementById('word-translation').value.trim();
-  const userId = localStorage.getItem('userId');
+  async function playAudio(word, wordId) {
+    const res = await fetch(`${API_URL}/lessons/generate_audio`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, word_id: wordId })
+    });
+    const data = await res.json();
+    const audio = new Audio(`../${data.audio_file}`);
+    await audio.play();
+  }
 
-  const res = await fetch(`${API_URL}/test/check`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      user_id: userId,
-      answers: [{ word_id: wordId, translation }]
-    })
-  });
-  const data = await res.json();
+  async function submitTest(wordId) {
+    const translation = document.getElementById('word-translation').value.trim();
+    const userId = localStorage.getItem('userId');
 
-  alert(`Правильных ответов: ${data.correct} / Ошибок: ${data.incorrect}`);
-  backDashboard();
-}
+    const res = await fetch(`${API_URL}/test/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        answers: [{ word_id: wordId, translation }]
+      })
+    });
+    const data = await res.json();
 
-function backDashboard() {
-  window.location.href = 'dashboard.html';
-}
+    alert(`Правильних відповідей: ${data.correct} / Неправильних: ${data.incorrect}`);
+    backDashboard();
+  }
 
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
+  function backDashboard() {
+    window.location.href = 'dashboard.html';
+  }
 
-window.onload = loadTest;
-</script>
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+
+  window.onload = loadTest;
+  </script>
 
 </body>
 </html>

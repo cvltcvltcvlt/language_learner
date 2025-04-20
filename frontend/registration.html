@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - English Learning App</title>
+  <title>Реєстрація — Додаток для вивчення англійської</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,18 +17,18 @@
       animation: fadeIn 1s ease-out;
     }
 
-    /* Фон с размытием */
+    /* Фон з розмиванням */
     .background {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
       background-size: cover;
       background-position: center;
-      filter: blur(8px); /* Размытие фона */
-      z-index: -1; /* Ставим фон за контент */
+      filter: blur(8px);
+      z-index: -1;
     }
 
     @keyframes fadeIn {
@@ -37,7 +37,7 @@
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      background: rgba(255, 255, 255, 0.9);
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -45,6 +45,7 @@
       max-width: 500px;
       text-align: center;
       animation: slideIn 0.5s ease-out;
+      position: relative;
     }
 
     @keyframes slideIn {
@@ -54,6 +55,9 @@
 
     h2 {
       margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
     }
 
     input, button, select {
@@ -94,18 +98,17 @@
 </head>
 <body>
 
-<!-- Фон с размытием -->
 <div class="background"></div>
 
 <div class="container">
-  <h2>Register</h2>
+  <h2>Реєстрація</h2>
   <form id="register-form">
-    <input type="text" id="login" placeholder="Login" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="login" placeholder="Логін" required>
+    <input type="password" id="password" placeholder="Пароль" required>
     <input type="email" id="email" placeholder="Email" required>
     <select id="role" required>
-      <option value="student">Student</option>
-      <option value="teacher">Teacher</option>
+      <option value="student">Учень</option>
+      <option value="teacher">Вчитель</option>
     </select>
     <select id="language-level" required>
       <option value="A1">A1</option>
@@ -115,9 +118,9 @@
       <option value="C1">C1</option>
       <option value="C2">C2</option>
     </select>
-    <button type="submit">Register</button>
+    <button type="submit">Зареєструватися</button>
   </form>
-  <button class="back-button" onclick="backToLogin()">Back to Login</button>
+  <button class="back-button" onclick="backToLogin()">Назад до входу</button>
 </div>
 
 <script>
@@ -141,15 +144,15 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
   const data = await res.json();
 
   if (res.ok) {
-    alert('Registration successful!');
-    window.location.href = 'login.html';  // Redirect to login page
+    alert('Реєстрація успішна!');
+    window.location.href = 'login.html';
   } else {
-    alert(`Error: ${data.error}`);
+    alert(`Помилка: ${data.error}`);
   }
 });
 
 function backToLogin() {
-  window.location.href = 'login.html';  // Redirect to login page
+  window.location.href = 'login.html';
 }
 </script>
 

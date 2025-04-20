@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Вход — Language Learner</title>
+  <title>Вхід — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -28,7 +28,7 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Задний фон с динозавром */
+    /* Фон із динозавром */
     .background-image {
       position: absolute;
       top: 0;
@@ -132,20 +132,20 @@
 <div class="background-image"></div>
 
 <div class="login-container">
-  <h1>Добро пожаловать</h1>
+  <h1>Ласкаво просимо</h1>
   <form id="login-form">
-    <input type="text" id="login" placeholder="Логин" required>
+    <input type="text" id="login" placeholder="Логін" required>
     <input type="password" id="password" placeholder="Пароль" required>
-    <button type="submit" class="btn-login">Войти</button>
+    <button type="submit" class="btn-login">Увійти</button>
   </form>
-  <button class="btn-register" onclick="register()">Регистрация</button>
-  <div id="error-message">Неверный логин или пароль!</div>
+  <button class="btn-register" onclick="register()">Реєстрація</button>
+  <div id="error-message">Невірний логін або пароль!</div>
 </div>
 
 <script>
 const API_URL = 'http://127.0.0.1:8080';
 
-// Автопроверка токена
+// Автоматична перевірка токена
 if (localStorage.getItem('token')) {
   window.location.href = 'dashboard.html';
 }
@@ -166,7 +166,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     if (res.ok && data.token) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('isAdmin', data.user.is_admin);
+      localStorage.setItem('isAdmin', data.user.is_admin);
 
       if (data.user.is_admin) {
         window.location.href = 'admin_panel.html';
@@ -177,7 +177,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       document.getElementById('error-message').style.display = 'block';
     }
   } catch (error) {
-    document.getElementById('error-message').innerText = 'Ошибка сервера!';
+    document.getElementById('error-message').innerText = 'Помилка сервера!';
     document.getElementById('error-message').style.display = 'block';
   }
 });

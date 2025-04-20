@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <title>Урок — Language Learner</title>
@@ -181,240 +181,204 @@
 
 <body>
 
-<div class="background-image"></div>
+  <div class="background-image"></div>
 
-<!-- Навбар -->
-<div class="navbar">
-  <a href="profile.html" class="nav-item">Профиль 👤</a>
-  <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тесты 📝</a>
-  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
-</div>
+  <!-- Навігаційна панель -->
+  <div class="navbar">
+    <a href="profile.html" class="nav-item">Профіль 👤</a>
+    <a href="lesson.html" class="nav-item">Уроки 📖</a>
+    <a href="test.html" class="nav-item">Тести 📝</a>
+    <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
+  </div>
 
-<!-- Контент -->
-<div class="content">
-  <div class="lesson-box" id="lesson-box">
-    <h1>Загрузка...</h1>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
+  <!-- Контент -->
+  <div class="content">
+    <div class="lesson-box" id="lesson-box">
+      <h1>Завантаження...</h1>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-// === Переменные
-const API_URL = 'http://127.0.0.1:8080';
-const userId = localStorage.getItem('userId');
-const lessonId = localStorage.getItem('currentLessonId');
-const lessonBox = document.getElementById('lesson-box');
-const progressBar = document.getElementById('progress-bar');
+  <script>
+  // === Переменные
+  const API_URL = 'http://127.0.0.1:8080';
+  const userId = localStorage.getItem('userId');
+  const lessonId = localStorage.getItem('currentLessonId');
+  const lessonBox = document.getElementById('lesson-box');
+  const progressBar = document.getElementById('progress-bar');
 
-let lessonData;
-let step = 0; // 0-материалы, 1-слова, 2-тест
-let totalSteps = 3;
+  let lessonData;
+  let step = 0; // 0 – матеріали, 1 – слова, 2 – тест
+  let currentWords = [], wordIndex = 0, totalWords = 0, correctWords = 0;
+  let currentExercises = [], exerciseIndex = 0, totalExercises = 0, correctExercises = 0;
 
-let currentWords = [];
-let wordIndex = 0;
-let totalWords = 0;
-let correctWords = 0;
-
-let currentExercises = [];
-let exerciseIndex = 0;
-let totalExercises = 0;
-let correctExercises = 0;
-
-// === Загрузка урока
-async function loadLesson() {
-  if (!lessonId) {
-    lessonBox.innerHTML = '<h2>Ошибка загрузки урока 🚫</h2>';
-    return;
+  // === Завантаження уроку
+  async function loadLesson() {
+    if (!lessonId) {
+      lessonBox.innerHTML = '<h1>Помилка завантаження уроку 🚫</h1>';
+      return;
+    }
+    const res = await fetch(`${API_URL}/lessons/${lessonId}`);
+    lessonData = await res.json();
+    showMaterials();
   }
 
-  const res = await fetch(`${API_URL}/lessons/${lessonId}`);
-  lessonData = await res.json();
-
-  showMaterials();
-}
-
-// === Этап 1: Материалы
-function showMaterials() {
-  lessonBox.innerHTML = `
-    <h1>${lessonData.title}</h1>
-    <p><strong>Материалы для изучения:</strong></p>
-    ${(lessonData.material_links || []).map(m => `
-      <div class="material-block">
-        <p><strong>${m.title}</strong> (${m.content_type})</p>
-        <div class="iframe-container">
-          <div class="loader" id="loader-${m.id}"></div>
-          ${
-            m.content_url.includes("youtube.com") || m.content_url.includes("youtu.be")
-              ? `<iframe src="https://www.youtube.com/embed/${extractYouTubeId(m.content_url)}" width="100%" height="400px" frameborder="0" allowfullscreen
-                  onload="hideLoader(${m.id})"></iframe>`
-              : `<iframe src="${m.content_url}" width="100%" height="400px" frameborder="0" style="border-radius:10px;"
-                  onload="hideLoader(${m.id})"></iframe>`
-          }
+  // === Етап 1: Матеріали
+  function showMaterials() {
+    lessonBox.innerHTML = `
+      <h1>${lessonData.title}</h1>
+      <p><strong>Матеріали для вивчення:</strong></p>
+      ${(lessonData.material_links || []).map(m => `
+        <div class="material-block">
+          <p><strong>${m.title}</strong> (${m.content_type})</p>
+          <div class="iframe-container">
+            <div class="loader" id="loader-${m.id}"></div>
+            ${
+              m.content_url.includes("youtube.com") || m.content_url.includes("youtu.be")
+                ? `<iframe src="https://www.youtube.com/embed/${extractYouTubeId(m.content_url)}" width="100%" height="400px" frameborder="0" allowfullscreen onload="hideLoader(${m.id})"></iframe>`
+                : `<iframe src="${m.content_url}" width="100%" height="400px" frameborder="0" style="border-radius:10px;" onload="hideLoader(${m.id})"></iframe>`
+            }
+          </div>
         </div>
-      </div>
-    `).join('')}
-    <button class="btn" onclick="startWords()">Перейти к словам ➡️</button>
-    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-  `;
-  updateProgress();
-}
-
-function extractYouTubeId(url) {
-  const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([\w-]{11})/);
-  return match ? match[1] : null;
-}
-
-function hideLoader(id) {
-  const loader = document.getElementById(`loader-${id}`);
-  if (loader) {
-    loader.style.display = 'none';
+      `).join('')}
+      <button class="btn" onclick="startWords()">Перейти до слів ➡️</button>
+      <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+    `;
+    updateProgress();
   }
-}
 
-// === Этап 2: Слова
-async function startWords() {
-  step = 1;
-  const res = await fetch(`${API_URL}/lesson/${lessonId}/words/${userId}`);
-  const wordsData = await res.json();
-  currentWords = wordsData.words || [];
-  totalWords = currentWords.length;
-  wordIndex = 0;
-  correctWords = 0;
-  if (totalWords > 0) {
-    showWord();
-  } else {
-    startExercises();
+  function extractYouTubeId(url) {
+    const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([\w-]{11})/);
+    return match ? match[1] : null;
   }
-}
 
-function showWord() {
-  const word = currentWords[wordIndex];
-  lessonBox.innerHTML = `
-    <h1>Переведи слово</h1>
-    <p><strong>${word.word}</strong></p>
-    <input id="word-translation" placeholder="Твой перевод">
-        <button class="btn" onclick="playWordAudio('${word.word}', ${word.id})">🔊 Проиграть слово</button>
-    <button class="btn" onclick="submitWord(${word.id})">Проверить</button>
-    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-  `;
-  updateProgress();
-}
+  function hideLoader(id) {
+    const loader = document.getElementById(`loader-${id}`);
+    if (loader) loader.style.display = 'none';
+  }
 
+  // === Етап 2: Слова
+  async function startWords() {
+    step = 1;
+    const res = await fetch(`${API_URL}/lesson/${lessonId}/words/${userId}`);
+    const data = await res.json();
+    currentWords = data.words || [];
+    totalWords = currentWords.length;
+    wordIndex = 0; correctWords = 0;
+    if (totalWords) showWord(); else startExercises();
+  }
 
-async function playWordAudio(wordText, wordId) {
-  try {
-    const res = await fetch(`${API_URL}/lessons/generate_audio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: wordText, word_id: wordId })
+  function showWord() {
+    const word = currentWords[wordIndex];
+    lessonBox.innerHTML = `
+      <h1>Переклади слово</h1>
+      <p><strong>${word.word}</strong></p>
+      <input id="word-translation" placeholder="Твій переклад">
+      <button class="btn" onclick="playWordAudio('${word.word}', ${word.id})">🔊 Програти слово</button>
+      <button class="btn" onclick="submitWord(${word.id})">Перевірити</button>
+      <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+    `;
+    updateProgress();
+  }
+
+  async function playWordAudio(wordText, wordId) {
+    try {
+      const res = await fetch(`${API_URL}/lessons/generate_audio`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ word: wordText, word_id: wordId })
+      });
+      const data = await res.json();
+      const audio = new Audio(`../${data.audio_file}`);
+      await audio.play();
+    } catch (e) {
+      console.error('Помилка відтворення аудіо:', e);
+    }
+  }
+
+  async function submitWord(wordId) {
+    const translation = document.getElementById('word-translation').value.trim();
+    const res = await fetch(`${API_URL}/check_word_answer`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ user_id: userId, word_id: wordId, user_translation: translation })
     });
     const data = await res.json();
-    const audio = new Audio(`../${data.audio_file}`);
-    await audio.play();
-  } catch (err) {
-    console.error('Ошибка воспроизведения аудио:', err);
+    if (data.correct) correctWords++;
+    wordIndex++;
+    if (wordIndex < totalWords) showWord(); else startExercises();
   }
-}
 
-async function submitWord(wordId) {
-  const translation = document.getElementById('word-translation').value.trim();
-  const res = await fetch(`${API_URL}/check_word_answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, word_id: wordId, user_translation: translation })
-  });
-  const data = await res.json();
-  if (data.correct) correctWords++;
-  wordIndex++;
-  if (wordIndex < totalWords) {
-    showWord();
-  } else {
-    startExercises();
+  // === Етап 3: Тест
+  function startExercises() {
+    step = 2;
+    currentExercises = lessonData.exercises || [];
+    totalExercises = currentExercises.length;
+    exerciseIndex = 0; correctExercises = 0;
+    if (totalExercises) showExercise(); else finishLesson();
   }
-}
 
-// === Этап 3: Тесты
-function startExercises() {
-  step = 2;
-  currentExercises = lessonData.exercises || [];
-  totalExercises = currentExercises.length;
-  exerciseIndex = 0;
-  correctExercises = 0;
-  if (totalExercises > 0) {
-    showExercise();
-  } else {
-    finishLesson();
+  function showExercise() {
+    const ex = currentExercises[exerciseIndex];
+    lessonBox.innerHTML = `
+      <h1>Питання</h1>
+      <p>${ex.question}</p>
+      <input id="exercise-answer" placeholder="Твоя відповідь">
+      <button class="btn" onclick="submitExercise(${ex.id})">Відповісти</button>
+      <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+    `;
+    updateProgress();
   }
-}
 
-function showExercise() {
-  const ex = currentExercises[exerciseIndex];
-  lessonBox.innerHTML = `
-    <h1>Вопрос</h1>
-    <p>${ex.question}</p>
-    <input id="exercise-answer" placeholder="Твой ответ">
-    <button class="btn" onclick="submitExercise(${ex.id})">Ответить</button>
-    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-  `;
-  updateProgress();
-}
-
-async function submitExercise(exId) {
-  const answer = document.getElementById('exercise-answer').value.trim();
-  const res = await fetch(`${API_URL}/lessons/answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ exercise_id: exId, answer })
-  });
-  const data = await res.json();
-  if (data.correct) correctExercises++;
-  exerciseIndex++;
-  if (exerciseIndex < totalExercises) {
-    showExercise();
-  } else {
-    finishLesson();
+  async function submitExercise(exId) {
+    const answer = document.getElementById('exercise-answer').value.trim();
+    const res = await fetch(`${API_URL}/lessons/answer`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ exercise_id: exId, answer })
+    });
+    const data = await res.json();
+    if (data.correct) correctExercises++;
+    exerciseIndex++;
+    if (exerciseIndex < totalExercises) showExercise(); else finishLesson();
   }
-}
 
-// === Завершение урока
-async function finishLesson() {
-  await fetch(`${API_URL}/lessons/complete`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, lesson_id: lessonId })
-  });
+  // === Завершення уроку
+  async function finishLesson() {
+    await fetch(`${API_URL}/lessons/complete`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ user_id: userId, lesson_id: lessonId })
+    });
+    lessonBox.innerHTML = `
+      <h1>Урок завершено!</h1>
+      <p>✅ Перекладів правильно: ${correctWords} / ${totalWords}</p>
+      <p>✅ Відповідей правильно: ${correctExercises} / ${totalExercises}</p>
+      <button class="finish-btn" onclick="backDashboard()">На головну</button>
+    `;
+  }
 
-  lessonBox.innerHTML = `
-    <h1>Урок завершён!</h1>
-    <p>✅ Правильных переводов: ${correctWords} / ${totalWords}</p>
-    <p>✅ Правильных ответов на тест: ${correctExercises} / ${totalExercises}</p>
-    <button class="finish-btn" onclick="backDashboard()">На главную</button>
-  `;
-}
+  // === Оновити прогрес
+  function updateProgress() {
+    let current = step * 33;
+    if (step === 1 && totalWords) current += (wordIndex/totalWords)*33;
+    if (step === 2 && totalExercises) current += (exerciseIndex/totalExercises)*34;
+    progressBar.style.width = `${Math.min(current,100)}%`;
+  }
 
-// === Обновить прогресс-бар
-function updateProgress() {
-  let current = step * 33;
-  if (step === 1) current += (wordIndex / totalWords) * 33;
-  if (step === 2) current += (exerciseIndex / totalExercises) * 34;
-  progressBar.style.width = `${Math.min(current, 100)}%`;
-}
+  // === Вихід і повернення
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+  function backDashboard() {
+    window.location.href = 'dashboard.html';
+  }
 
-// === Выход
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
-
-function backDashboard() {
-  window.location.href = 'dashboard.html';
-}
-
-window.onload = loadLesson;
-</script>
+  window.onload = loadLesson;
+  </script>
 
 </body>
 </html>

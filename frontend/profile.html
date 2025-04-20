@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Профиль — Language Learner</title>
+  <title>Профіль — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* === Общие стили === */
+    /* === Загальні стилі === */
     body {
       margin: 0;
       padding: 0;
@@ -173,26 +173,26 @@
 
 <div class="background-image"></div>
 
-<!-- Навбар -->
+<!-- Навігаційна панель -->
 <div class="navbar">
-  <a href="profile.html" class="nav-item">Профиль 👤</a>
+  <a href="profile.html" class="nav-item">Профіль 👤</a>
   <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тесты 📝</a>
-  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
+  <a href="test.html" class="nav-item">Тести 📝</a>
+  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
 </div>
 
 <!-- Контент -->
 <div class="content">
   <div class="profile-box">
-    <h1>Профиль</h1>
-    <div id="profile-info">Загрузка...</div>
+    <h1>Профіль</h1>
+    <div id="profile-info">Завантаження...</div>
     <div class="progress-container">
       <div class="progress-bar" id="progress-bar"></div>
     </div>
     <div class="medal" id="medal"></div>
 
-    <h2 style="margin-top: 30px;">🏆 Топ пользователей</h2>
-    <div id="top-users-list">Загрузка...</div>
+    <h2 style="margin-top: 30px;">🏆 Топ користувачів</h2>
+    <div id="top-users-list">Завантаження...</div>
 
     <button class="btn" onclick="backDashboard()">⬅️ Назад</button>
     <div id="error-message" class="error"></div>
@@ -214,42 +214,41 @@ async function loadProfile() {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
 
-    if (!res.ok) throw new Error('Ошибка загрузки профиля.');
+    if (!res.ok) throw new Error('Помилка завантаження профілю.');
 
     const data = await res.json();
 
     const container = document.getElementById('profile-info');
     container.innerHTML = `
-      <p><strong>Логин:</strong> ${data.login}</p>
+      <p><strong>Логін:</strong> ${data.login}</p>
       <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
-      <p><strong>Уровень языка:</strong> ${data.language_level}</p>
-      <p><strong>Опыт:</strong> ${data.experience} XP</p>
+      <p><strong>Рівень мови:</strong> ${data.language_level}</p>
+      <p><strong>Досвід:</strong> ${data.experience} XP</p>
     `;
 
     updateProgress(data.experience);
     showMedal(data.experience);
 
   } catch (error) {
-    const errorMessage = document.getElementById('error-message');
-    errorMessage.textContent = error.message;
+    document.getElementById('error-message').textContent = error.message;
   }
 }
 
 function updateProgress(xp) {
-  const progressPercent = Math.min((xp / 1000) * 100, 100);
-  document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+  const percent = Math.min((xp / 1000) * 100, 100);
+  document.getElementById('progress-bar').style.width = `${percent}%`;
 }
 
 function showMedal(xp) {
   const medalEl = document.getElementById('medal');
   if (xp >= 800) {
-    medalEl.innerHTML = '🥇 Золотая медаль!';
+    medalEl.innerHTML = '🥇 Золота медаль!';
   } else if (xp >= 500) {
-    medalEl.innerHTML = '🥈 Серебряная медаль!';
+    medalEl.innerHTML = '🥈 Срібна медаль!';
   } else if (xp >= 200) {
-    medalEl.innerHTML = '🥉 Бронзовая медаль!';
+    medalEl.innerHTML = '🥉 Бронзова медаль!';
   } else {
-    medalEl.innerHTML = '🎖️ Новичок';
+    medalEl.innerHTML = '🎖️ Новачок';
   }
 }
 
@@ -261,7 +260,7 @@ async function loadTopUsers() {
     const container = document.getElementById('top-users-list');
     container.innerHTML = '';
 
-    users.slice(0, 10).forEach((user, index) => {  // ⬅️ slice(0, 10) чтобы максимум 10
+    users.slice(0, 10).forEach((user, index) => {
       let medal = '';
       if (index === 0) medal = '🥇';
       else if (index === 1) medal = '🥈';
@@ -275,12 +274,12 @@ async function loadTopUsers() {
       `;
     });
 
-    if (users.length === 0) {
-      container.innerHTML = '<p>Нет пользователей в топе.</p>';
+    if (!users.length) {
+      container.innerHTML = '<p>Немає користувачів у топі.</p>';
     }
 
   } catch (error) {
-    document.getElementById('top-users-list').innerText = 'Ошибка загрузки топа.';
+    document.getElementById('top-users-list').innerText = 'Помилка завантаження топу.';
   }
 }
 

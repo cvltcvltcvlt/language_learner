@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Word - English Learning App</title>
+  <title>Додати слово – Додаток для вивчення англійської</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -18,18 +18,18 @@
       overflow: hidden;
     }
 
-    /* Фон с размытием */
+    /* Фон з розмиванням */
     .background {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
       background-size: cover;
       background-position: center;
-      filter: blur(8px); /* Размытие фона */
-      z-index: -1; /* Ставим фон за контент */
+      filter: blur(8px);
+      z-index: -1;
     }
 
     @keyframes fadeIn {
@@ -38,7 +38,7 @@
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      background: rgba(255, 255, 255, 0.9);
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -95,64 +95,63 @@
 </head>
 <body>
 
-<!-- Фон с размытием -->
-<div class="background"></div>
+  <div class="background"></div>
 
-<div class="container">
-  <h2>Add New Word</h2>
-  <form id="add-word-form">
-    <input type="text" id="word" placeholder="Word" required>
-    <input type="text" id="translation" placeholder="Translation" required>
-    <select id="language-level" required>
-      <option value="A1">A1</option>
-      <option value="A2">A2</option>
-      <option value="B1">B1</option>
-      <option value="B2">B2</option>
-      <option value="C1">C1</option>
-      <option value="C2">C2</option>
-    </select>
-    <button type="submit">Add Word</button>
-  </form>
-  <button class="back-button" onclick="backToDashboard()">Back</button>
-</div>
+  <div class="container">
+    <h2>Додати нове слово</h2>
+    <form id="add-word-form">
+      <input type="text" id="word" placeholder="Слово" required>
+      <input type="text" id="translation" placeholder="Переклад" required>
+      <select id="language-level" required>
+        <option value="A1">A1</option>
+        <option value="A2">A2</option>
+        <option value="B1">B1</option>
+        <option value="B2">B2</option>
+        <option value="C1">C1</option>
+        <option value="C2">C2</option>
+      </select>
+      <button type="submit">Додати слово</button>
+    </form>
+    <button class="back-button" onclick="backToDashboard()">Назад</button>
+  </div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+  <script>
+    const API_URL = 'http://127.0.0.1:8080';
 
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'login.html';
+    }
 
-document.getElementById('add-word-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
+    document.getElementById('add-word-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  const word = document.getElementById('word').value.trim();
-  const translation = document.getElementById('translation').value.trim();
-  const languageLevel = document.getElementById('language-level').value;
-  const teacherId = localStorage.getItem('userId');  // Берем teacher_id из localStorage
+      const word = document.getElementById('word').value.trim();
+      const translation = document.getElementById('translation').value.trim();
+      const languageLevel = document.getElementById('language-level').value;
+      const teacherId = localStorage.getItem('userId');
 
-  const res = await fetch(`${API_URL}/add_word`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ word, translation, language_level: languageLevel, teacher_id: teacherId })
-  });
+      const res = await fetch(`${API_URL}/add_word`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word, translation, language_level: languageLevel, teacher_id: teacherId })
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-  if (res.ok) {
-    alert('Word added successfully!');
-    document.getElementById('word').value = '';
-    document.getElementById('translation').value = '';
-    document.getElementById('language-level').value = 'A1';
-  } else {
-    alert(`Error: ${data.error}`);
-  }
-});
+      if (res.ok) {
+        alert('Слово успішно додано!');
+        document.getElementById('word').value = '';
+        document.getElementById('translation').value = '';
+        document.getElementById('language-level').value = 'A1';
+      } else {
+        alert(`Помилка: ${data.error}`);
+      }
+    });
 
-function backToDashboard() {
-  window.location.href = 'dashboard.html';
-}
-</script>
+    function backToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
 
 </body>
 </html>

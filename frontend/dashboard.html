@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard — Language Learner</title>
+  <title>Панель керування — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -34,7 +34,7 @@
       z-index: -1;
     }
 
-    /* Навбар */
+    /* Навігаційна панель */
     .navbar {
       width: 100%;
       display: flex;
@@ -111,33 +111,33 @@
 
 <div class="background-image"></div>
 
-<!-- Навбар -->
+<!-- Навігаційна панель -->
 <div class="navbar">
-  <a href="profile.html" class="nav-item">Профиль 👤</a>
+  <a href="profile.html" class="nav-item">Профіль 👤</a>
   <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тесты 📝</a>
-  <a href="#" class="nav-item" onclick="logout()">Выйти 🚪</a>
+  <a href="test.html" class="nav-item">Тести 📝</a>
+  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
 </div>
 
 <!-- Контент -->
 <div class="content">
   <div class="dashboard-box">
-    <h1>Добро пожаловать!</h1>
-    <p>Начни изучение английского прямо сейчас — выбирай уроки, проходи тесты и улучшай свой уровень каждый день!</p>
+    <h1>Ласкаво просимо!</h1>
+    <p>Почни вивчати англійську просто зараз — обирай уроки, проходь тести та покращуй свій рівень щодня!</p>
   </div>
 </div>
 
 <script>
-// Проверка токена
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
+  // Перевірка токена
+  if (!localStorage.getItem('token')) {
+    window.location.href = 'login.html';
+  }
 
-// Выход
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
+  // Вихід
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
 </script>
 
 </body>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
+  <title>Управління уроками — Додаток для вивчення англійської</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Lessons - English Learning App</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,22 +16,22 @@
       overflow: hidden;
     }
 
-    /* Фон с размытием */
+    /* Фон з розмиванням */
     .background {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s'); /* Example image */
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
       background-size: cover;
       background-position: center;
-      filter: blur(8px); /* Размытость фона */
-      z-index: -1; /* Ставим фон за контент */
+      filter: blur(8px);
+      z-index: -1;
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон для контейнера */
+      background: rgba(255, 255, 255, 0.9);
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -116,81 +116,80 @@
 </head>
 <body>
 
-<!-- Фон с размытием -->
-<div class="background"></div>
+  <!-- Фон з розмиванням -->
+  <div class="background"></div>
 
-<div class="container">
-  <h2>Your Lessons</h2>
+  <div class="container">
+    <h2>Ваші уроки</h2>
 
-  <ul id="lesson-list" class="lesson-list"></ul>
+    <ul id="lesson-list" class="lesson-list"></ul>
 
-  <button id="dashboard" onclick="backToDashBoard()">Back to Dashboard</button>
-  <button id="logout" onclick="logout()">Logout</button>
-</div>
+    <button id="dashboard" onclick="backToDashBoard()">Назад до панелі</button>
+    <button id="logout" onclick="logout()">Вийти</button>
+  </div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+  <script>
+    const API_URL = 'http://127.0.0.1:8080';
 
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'login.html';
+    }
 
-document.addEventListener('DOMContentLoaded', loadLessons);
+    document.addEventListener('DOMContentLoaded', loadLessons);
 
-async function loadLessons() {
-  const teacherId = localStorage.getItem('userId');
-  const res = await fetch(`${API_URL}/lessons?teacher_id=${teacherId}`);
-  const data = await res.json();
+    async function loadLessons() {
+      const teacherId = localStorage.getItem('userId');
+      const res = await fetch(`${API_URL}/lessons?teacher_id=${teacherId}`);
+      const data = await res.json();
 
-  const lessonList = document.getElementById('lesson-list');
-  lessonList.innerHTML = '';
+      const lessonList = document.getElementById('lesson-list');
+      lessonList.innerHTML = '';
 
-  if (data.length === 0) {
-    lessonList.innerHTML = '<li>No lessons available</li>';
-  } else {
-    data.forEach(lesson => {
-      const li = document.createElement('li');
-      li.classList.add('lesson-item');
-      li.innerHTML = `
-        <span>${lesson.title}</span>
-        <div>
-          <button onclick="editLesson(${lesson.id})">Edit</button>
-          <button class="remove-button" onclick="deleteLesson(${lesson.id})">Delete</button>
-        </div>
-      `;
-      lessonList.appendChild(li);
-    });
-  }
-}
+      if (!data.length) {
+        lessonList.innerHTML = '<li>Немає доступних уроків</li>';
+      } else {
+        data.forEach(lesson => {
+          const li = document.createElement('li');
+          li.classList.add('lesson-item');
+          li.innerHTML = `
+            <span>${lesson.title}</span>
+            <div>
+              <button onclick="editLesson(${lesson.id})">Редагувати</button>
+              <button class="remove-button" onclick="deleteLesson(${lesson.id})">Видалити</button>
+            </div>
+          `;
+          lessonList.appendChild(li);
+        });
+      }
+    }
 
-function editLesson(lessonId) {
-  window.location.href = `createLesson.html?lessonId=${lessonId}`;
-}
+    function editLesson(lessonId) {
+      window.location.href = `createLesson.html?lessonId=${lessonId}`;
+    }
 
-async function deleteLesson(lessonId) {
-  const res = await fetch(`${API_URL}/lessons/${lessonId}`, {
-    method: 'DELETE',
-  });
+    async function deleteLesson(lessonId) {
+      const res = await fetch(`${API_URL}/lessons/${lessonId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
 
-  const data = await res.json();
+      if (res.ok) {
+        alert('Урок успішно видалено');
+        loadLessons();
+      } else {
+        alert(`Помилка: ${data.error}`);
+      }
+    }
 
-  if (res.ok) {
-    alert('Lesson deleted successfully');
-    loadLessons();  // Reload the lesson list
-  } else {
-    alert(`Error: ${data.error}`);
-  }
-}
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
 
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
-
-function backToDashBoard() {
-  window.location.href = 'dashboard.html';
-}
-</script>
+    function backToDashBoard() {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
 
 </body>
 </html>
