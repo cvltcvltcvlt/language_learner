@@ -24,7 +24,7 @@ def create_app():
     swagger = SwaggerDocs(
         app,
         title="Language Learning API",
-        version="1.0.0",
+        version="1.0.1",
         description="API для веб-приложения изучения языков",
         swagger_ui_settings=SwaggerUiSettings(path="/swagger")
     )
