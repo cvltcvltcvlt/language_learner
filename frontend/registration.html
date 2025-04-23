@@ -2,103 +2,117 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
+  <title>Реєстрація — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Реєстрація — Додаток для вивчення англійської</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fc;
       margin: 0;
       padding: 0;
+      font-family: 'Roboto', sans-serif;
+      height: 100vh;
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientMove 15s ease infinite;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      animation: fadeIn 1s ease-out;
+      position: relative;
     }
 
-    /* Фон з розмиванням */
-    .background {
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .background-image {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
       background-size: cover;
-      background-position: center;
-      filter: blur(8px);
+      filter: blur(8px) brightness(0.7);
       z-index: -1;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
     }
 
     .container {
       background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 450px;
       width: 100%;
-      max-width: 500px;
+      animation: fadeIn 0.6s ease-out;
       text-align: center;
-      animation: slideIn 0.5s ease-out;
-      position: relative;
+      color: #333;
     }
 
-    @keyframes slideIn {
-      0% { transform: translateY(50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(40px);}
+      to {opacity: 1; transform: translateY(0);}
     }
 
     h2 {
       margin-bottom: 20px;
+      font-size: 26px;
       color: #333;
-      font-size: 24px;
-      font-weight: bold;
     }
 
-    input, button, select {
+    input, select {
+      width: 90%;
       padding: 12px;
       margin-top: 10px;
-      width: 90%;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      background: #fff;
     }
 
-    button {
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      margin-top: 20px;
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(106, 17, 203, 0.4);
     }
 
-    button:hover {
-      background: #0056b3;
-    }
-
-    .back-button {
-      background: #6c757d;
-      color: white;
+    .btn {
+      width: 100%;
       padding: 12px;
-      border: none;
-      border-radius: 8px;
       font-size: 16px;
-      cursor: pointer;
       margin-top: 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      background: #2575fc;
+      color: white;
+      transition: 0.3s;
     }
 
-    .back-button:hover {
+    .btn:hover {
+      background: #1d5ed8;
+      transform: scale(1.02);
+    }
+
+    .back-btn {
+      background: #6c757d;
+    }
+
+    .back-btn:hover {
       background: #5a6268;
+    }
+
+    .error-message {
+      margin-top: 10px;
+      color: #dc3545;
+      font-size: 14px;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<div class="background"></div>
+<div class="background-image"></div>
 
 <div class="container">
   <h2>Реєстрація</h2>
@@ -106,21 +120,20 @@
     <input type="text" id="login" placeholder="Логін" required>
     <input type="password" id="password" placeholder="Пароль" required>
     <input type="email" id="email" placeholder="Email" required>
-    <select id="role" required>
-      <option value="student">Учень</option>
-      <option value="teacher">Вчитель</option>
-    </select>
+
     <select id="language-level" required>
-      <option value="A1">A1</option>
-      <option value="A2">A2</option>
-      <option value="B1">B1</option>
-      <option value="B2">B2</option>
-      <option value="C1">C1</option>
-      <option value="C2">C2</option>
+      <option value="A1">A1 — Початковий</option>
+      <option value="A2">A2 — Базовий</option>
+      <option value="B1">B1 — Середній</option>
+      <option value="B2">B2 — Вище середнього</option>
+      <option value="C1">C1 — Просунутий</option>
+      <option value="C2">C2 — Вільне володіння</option>
     </select>
-    <button type="submit">Зареєструватися</button>
+
+    <button type="submit" class="btn">Зареєструватися</button>
   </form>
-  <button class="back-button" onclick="backToLogin()">Назад до входу</button>
+  <button class="btn back-btn" onclick="backToLogin()">⬅ Назад</button>
+  <div class="error-message" id="error-message">Помилка реєстрації</div>
 </div>
 
 <script>
@@ -132,13 +145,12 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
   const login = document.getElementById('login').value.trim();
   const password = document.getElementById('password').value.trim();
   const email = document.getElementById('email').value.trim();
-  const role = document.getElementById('role').value;
   const languageLevel = document.getElementById('language-level').value;
 
   const res = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ login, password, email, role, language_level: languageLevel })
+    body: JSON.stringify({ login, password, email, language_level: languageLevel })
   });
 
   const data = await res.json();

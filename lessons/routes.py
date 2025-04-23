@@ -484,18 +484,13 @@ async def complete_lesson_route(request):
     data = await request.json()
     user_id = data.get("user_id")
     lesson_id = data.get("lesson_id")
-
     if not user_id or not lesson_id:
         return web.json_response({"error": "Missing user_id or lesson_id"}, status=400)
-
     async for session in get_session():
         user = await session.get(User, int(user_id))
         lesson = await session.get(Lesson, int(lesson_id))
-
         if not user or not lesson:
             return web.json_response({"error": "User or Lesson not found"}, status=404)
-
-        # Проверяем что все слова выучены
         words_ids = lesson.words_to_learn or []
         if words_ids:
             stmt = select(UserWordProgress.word_id).where(
@@ -505,10 +500,8 @@ async def complete_lesson_route(request):
             )
             result = await session.execute(stmt)
             learned_words = set(result.scalars().all())
-
             if len(learned_words) != len(words_ids):
                 return web.json_response({"error": "Not all words learned"}, status=400)
-
         user_lesson_progress = await session.execute(
             select(UserLessonProgress).where(
                 (UserLessonProgress.user_id == int(user_id)) &
@@ -516,7 +509,6 @@ async def complete_lesson_route(request):
             )
         )
         user_lesson_progress = user_lesson_progress.scalars().first()
-
         if not user_lesson_progress:
             user_lesson_progress = UserLessonProgress(
                 user_id=int(user_id),
@@ -530,13 +522,9 @@ async def complete_lesson_route(request):
             user_lesson_progress.completed = True
             user_lesson_progress.completed_at = datetime.utcnow()
             user_lesson_progress.progress = 100.0
-
-        # Выдаем опыт
         user.experience += lesson.xp
-
         session.add_all([user_lesson_progress, user])
         await session.commit()
-
         return web.json_response({
             "message": "Lesson completed successfully!",
             "total_xp": user.experience

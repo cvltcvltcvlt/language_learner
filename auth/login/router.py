@@ -71,27 +71,22 @@ async def handle_login(request):
         login, password = data["login"], data["password"]
     except Exception:
         return web.json_response({"error": "Invalid input"}, status=400)
-
     user = await get_user_by_login(login)
     if not user or not user.verify_password(password):
         return web.json_response({"error": "Invalid credentials"}, status=401)
-
     async for session in get_session():
         streak_days = await update_user_streaks(session, int(user.id))
 
-        # Проверяем админ ли юзер
         admin = await session.execute(
             select(Admin).where(Admin.id == int(user.id))
         )
         admin = admin.scalar_one_or_none()
         is_admin = bool(admin)
-
     payload = {
         "user_id": user.id,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(days=TOKEN_EXPIRATION_DAYS)
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-
     return web.json_response({
         "message": "Login successful",
         "streak_days": streak_days,

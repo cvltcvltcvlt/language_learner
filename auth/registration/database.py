@@ -30,7 +30,6 @@ async def insert_user(login: str, password: str, email: str, role: str, language
         new_user = User(
             login=login,
             email=email,
-            role=role,
             language_level=language_level,
             experience=initial_xp,
         )

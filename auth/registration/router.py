@@ -52,16 +52,12 @@ async def handle_registration(request):
         login = data["login"]
         password = data["password"]
         email = data.get("email", None)
-        role = data.get("role", "student").lower()
         language_level = data.get("language_level", "A1")
-
-        if role not in ["student", "teacher"]:
-            return web.json_response({"error": "Invalid role"}, status=400)
 
     except Exception:
         return web.json_response({"error": "Invalid input"}, status=400)
 
-    new_user = await insert_user(login, password, email, role, language_level)
+    new_user = await insert_user(login, password, email, language_level)
     if not new_user:
         return web.json_response({"error": "User already exists"}, status=400)
 
