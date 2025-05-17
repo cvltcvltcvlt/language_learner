@@ -52,12 +52,13 @@ async def handle_registration(request):
         login = data["login"]
         password = data["password"]
         email = data.get("email", None)
-        language_level = data.get("language_level", "A1")
+        language_level = data.get("language_level")
+        print('LNG LVL', language_level)
 
     except Exception:
         return web.json_response({"error": "Invalid input"}, status=400)
 
-    new_user = await insert_user(login, password, email, language_level)
+    new_user = await insert_user(login, password, email, language_level=language_level, role='1')
     if not new_user:
         return web.json_response({"error": "User already exists"}, status=400)
 

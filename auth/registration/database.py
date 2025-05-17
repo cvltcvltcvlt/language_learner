@@ -19,7 +19,7 @@ LANGUAGE_LEVEL_XP = {
 }
 
 
-async def insert_user(login: str, password: str, email: str, role: str, language_level: str = "A1"):
+async def insert_user(login: str, password: str, email: str, role: str, language_level: str):
     async with SessionLocal() as session:
         existing_user = await get_user_by_login(login)
         if existing_user:

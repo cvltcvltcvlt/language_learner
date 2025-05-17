@@ -147,12 +147,6 @@ def calculate_language_level(experience: int) -> str:
 async def add_word(db: AsyncSession, word: str, translation: str, language_level: str, teacher_id: int):
     if language_level not in LanguageLevel.__members__:
         raise ValueError("Invalid language level.")
-
-    user = await get_user_by_id(teacher_id, db)
-
-    if user.role != "teacher":
-        raise ValueError("Only teachers can add words")
-
     new_word = Word(word=word, translation=translation, language_level=language_level, user_id=teacher_id)
 
     db.add(new_word)
