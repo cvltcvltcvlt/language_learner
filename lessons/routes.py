@@ -1,6 +1,8 @@
+import os
 from datetime import datetime
 from functools import wraps
-
+import aioboto3
+from botocore.config import Config
 from aiohttp import web
 from sqlalchemy import delete
 
@@ -706,6 +708,37 @@ async def check_word_answer(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
+MINIO_ENDPOINT   = os.getenv("S3_ENDPOINT_URL", "http://localhost:9000")
+MINIO_BUCKET     = os.getenv("S3_BUCKET_NAME",   "audio-files")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY",  "minioadmin")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY",  "minioadmin")
+MINIO_REGION     = os.getenv("MINIO_REGION",      "us-east-1")
+
+
+_aiob3 = aioboto3.Session()
+
+@lesson_routes.get("/audio-files/{key:.+}")
+async def proxy_audio(request):
+    key = request.match_info["key"]
+    async with _aiob3.client(
+        "s3",
+        endpoint_url          = MINIO_ENDPOINT,
+        aws_access_key_id     = MINIO_ACCESS_KEY,
+        aws_secret_access_key = MINIO_SECRET_KEY,
+        region_name           = MINIO_REGION,
+        config                = Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+        use_ssl               = MINIO_ENDPOINT.startswith("https")
+    ) as s3:
+        try:
+            resp = await s3.get_object(Bucket=MINIO_BUCKET, Key=key)
+        except Exception:
+            raise web.HTTPNotFound(text=f"Audio {key} not found")
+
+        body = await resp["Body"].read()
+        content_type = resp.get("ContentType", "application/octet-stream")
+        return web.Response(body=body, content_type=content_type)
+
+
 @lesson_routes.post("/lessons/generate_audio")
 async def generate_audio_route(request):
     """
@@ -744,10 +777,10 @@ async def generate_audio_route(request):
 
     if not word or not word_id:
         return web.json_response({"error": "Missing required fields"}, status=400)
+    async for session in get_session():
+        file_name = await generate_audio_for_word(word, session=session)
 
-    file_name = generate_audio_for_word(word, word_id)
-
-    return web.json_response({"audio_file": file_name}, status=200)
+    return web.json_response({"s3_key": str(file_name.id)}, status=200)
 
 
 @lesson_routes.get("/lessons")

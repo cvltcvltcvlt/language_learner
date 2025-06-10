@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+vosk-model-small-en-us-0.15/
+venv/
+.env/
+.env/*

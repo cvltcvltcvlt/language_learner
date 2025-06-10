@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, Enum as PgEnum, ARRAY
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, Enum as PgEnum, ARRAY, UUID
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 from passlib.context import CryptContext
@@ -40,6 +40,7 @@ class User(Base):
     registered_at = Column(DateTime, default=datetime.utcnow)
     last_active = Column(DateTime, default=datetime.utcnow)
     timezone = Column(String, default="UTC")
+    profile_picture_s3_link = Column(String)
 
     language_level = Column(PgEnum(LanguageLevel), default=LanguageLevel.A1)
     experience = Column(Integer, default=0)
@@ -90,7 +91,7 @@ class Lesson(Base):
     theory = Column(Text)
     xp = Column(Integer, default=10)
     required_experience = Column(Integer, default=0, nullable=False)
-    words_to_learn = Column(ARRAY(Integer), nullable=True)
+    words_to_learn = Column(Text, nullable=True)
     exercises = relationship("Exercise", back_populates="lesson", cascade="all, delete")
     materials = relationship("Material", back_populates="lesson", cascade="all, delete")
 
@@ -161,3 +162,11 @@ class UserWordProgress(Base):
 
     user = relationship("User", backref="word_progress")
     word = relationship("Word")
+
+
+class AudioFiles(Base):
+    __tablename__ = "audio_files"
+
+    id = Column(UUID, primary_key=True, index=True)
+    word = Column(String, nullable=False)
+    s3_link = Column(String, nullable=False)

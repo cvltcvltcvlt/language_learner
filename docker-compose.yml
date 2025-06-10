@@ -3,8 +3,44 @@ services:
   postgres:
     image: postgres:13
     environment:
-      POSGRES_USER: postgres
+      POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '54323:5432'
+      - "54323:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:RELEASE.2020-11-13T20-10-18Z
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - miniodata:/data
+
+  minio_createbucket:
+    image: minio/mc:RELEASE.2021-03-10T05-59-20Z
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        # Ждём, пока MinIO станет доступен
+        until curl -f http://minio:9000/minio/health/live; do
+          echo 'Waiting for MinIO…'; sleep 3;
+        done;
+        # Настраиваем хост и создаём бакеты (игнорируем уже существующие)
+        mc config host add local http://minio:9000 minioadmin minioadmin
+        mc mb --ignore-existing local/audio-files
+      "
+volumes:
+  pgdata:
+  miniodata:

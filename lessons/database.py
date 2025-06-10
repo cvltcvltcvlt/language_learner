@@ -1,17 +1,24 @@
-from datetime import datetime, timedelta
-
 from sqlalchemy import func
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from db import SessionLocal
-from models import Lesson, Exercise, User, UserLessonProgress, LanguageLevel, Word, Material
+from models import Lesson, Exercise, User, UserLessonProgress, LanguageLevel, Word, Material, AudioFiles
+import io
+import uuid
+import aioboto3
+
+from pydub import AudioSegment
+
+from botocore.config import Config
 from gtts import gTTS
-import os
-import boto3
-from io import BytesIO
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+MINIO_ENDPOINT = "http://localhost:9000"
+MINIO_ACCESS_KEY = "minioadmin"
+MINIO_SECRET_KEY = "minioadmin"
+MINIO_BUCKET = "audio-files"
+MINIO_REGION = "us-east-1"
 
 
-# Получаем сессию при вызове функции
 async def get_session():
     async with SessionLocal() as session:
         yield session
@@ -178,21 +185,64 @@ async def get_random_word_for_level(session: AsyncSession, user_level: str):
     return word
 
 
-def generate_audio_for_word(word: str, word_id: int, directory: str = "audio_files"):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+async def generate_audio_for_word(
+    word: str,
+    session: AsyncSession,
+) -> AudioFiles:
+    q      = select(AudioFiles).where(AudioFiles.word == word)
+    result = await session.execute(q)
+    if existing := result.scalars().first():
+        return existing
 
-    file_name = os.path.join(directory, f"{word_id}.mp3")
+    mp3_buffer = io.BytesIO()
+    tts        = gTTS(text=word, lang="en")
+    tts.write_to_fp(mp3_buffer)
+    mp3_buffer.seek(0)
 
-    if os.path.exists(file_name):
-        print(f"Audio file for word '{word}' with id {word_id} already exists.")
-        return file_name
+    wav_buffer = io.BytesIO()
+    audio_seg  = AudioSegment.from_file(mp3_buffer, format="mp3")
+    audio_seg.export(wav_buffer, format="wav")
+    wav_buffer.seek(0)
 
-    tts = gTTS(text=word, lang='en')
-    tts.save(file_name)
-    print(f"Audio saved for word '{word}' with id {word_id} as {file_name}")
+    file_id = uuid.uuid4()
+    mp3_key = f"{file_id}.mp3"
+    wav_key = f"{file_id}.wav"
+    s3_url_mp3 = f"{MINIO_ENDPOINT}/{MINIO_BUCKET}/{mp3_key}"
+    s3_url_wav = f"{MINIO_ENDPOINT}/{MINIO_BUCKET}/{wav_key}"
 
-    return file_name
+    aiob3 = aioboto3.Session()
+    async with aiob3.client(
+        "s3",
+        endpoint_url          = MINIO_ENDPOINT,
+        aws_access_key_id     = MINIO_ACCESS_KEY,
+        aws_secret_access_key = MINIO_SECRET_KEY,
+        region_name           = MINIO_REGION,
+        config                = Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+        use_ssl               = MINIO_ENDPOINT.startswith("https")
+    ) as s3:
+        await s3.put_object(
+            Bucket     = MINIO_BUCKET,
+            Key        = mp3_key,
+            Body       = mp3_buffer.getvalue(),
+            ContentType= "audio/mpeg"
+        )
+        await s3.put_object(
+            Bucket     = MINIO_BUCKET,
+            Key        = wav_key,
+            Body       = wav_buffer.getvalue(),
+            ContentType= "audio/wav"
+        )
+
+    audio_record = AudioFiles(
+        id     = file_id,
+        word   = word,
+        s3_link= s3_url_wav
+    )
+    session.add(audio_record)
+    await session.commit()
+    await session.refresh(audio_record)
+
+    return audio_record
 
 
 async def get_lessons_by_teacher(teacher_id: int, session: AsyncSession):

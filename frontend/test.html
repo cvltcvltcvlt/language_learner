@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Тест слів — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
   <style>
     /* === Загальні стилі === */
     body {
@@ -158,8 +159,8 @@
       background: #5a6268;
       border-color: #5a6268;
     }
-
   </style>
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 
 <body>
@@ -170,6 +171,7 @@
     <a href="profile.html" class="nav-item">Профіль 👤</a>
     <a href="lesson.html" class="nav-item">Уроки 📖</a>
     <a href="test.html" class="nav-item">Тести 📝</a>
+    <a href="chat.html" class="nav-item">Чат 🤖</a>
     <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
   </div>
 
@@ -179,69 +181,175 @@
     </div>
   </div>
 
-  <script>
-  const API_URL = 'http://127.0.0.1:8080';
+<script>
+    const API_URL = 'http://127.0.0.1:8080'; // или ваш реальный
+    let currentWord = '';
+    let currentWordId = null;
 
-  if (!localStorage.getItem('token')) {
-    window.location.href = 'login.html';
-  }
+    // Глобальные переменные для записи
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
 
-  async function loadTest() {
-    const res = await fetch(`${API_URL}/test/words`);
-    const data = await res.json();
+    if (!localStorage.getItem('token')) {
+      window.location.href = 'login.html';
+    }
 
-    const box = document.getElementById('test-box');
-    box.innerHTML = `
-      <h1>Переклади слово</h1>
-      <p style="font-weight: bold; font-size: 22px;">${data.words.word}</p>
-      <input id="word-translation" placeholder="Твій переклад">
-      <button class="audio-btn" onclick="playAudio('${data.words.word}', ${data.words.id})">🔊 Відтворити</button>
-      <br>
-      <button class="btn" onclick="submitTest(${data.words.id})">Перевірити</button>
-      <button class="back-btn" onclick="backDashboard()">⬅️ Назад</button>
-    `;
-  }
+    // --- Функция загрузки теста ---
+    async function loadTest() {
+      console.log('loadTest()');
+      try {
+        const res = await fetch(`${API_URL}/test/words`);
+        const data = await res.json();
+        currentWord = data.words.word;
+        currentWordId = data.words.id;
 
-  async function playAudio(word, wordId) {
-    const res = await fetch(`${API_URL}/lessons/generate_audio`, {
+        document.getElementById('test-box').innerHTML = `
+          <h1>Переклади слово</h1>
+          <p style="font-weight:bold; font-size:22px;">${currentWord}</p>
+          <input id="word-translation" placeholder="Твій переклад">
+          <button class="audio-btn" onclick="playAudio()">🔊 Відтворити</button><br>
+          <button class="btn" onclick="submitTest()">Перевірити</button>
+          <button class="btn" id="record-btn" onclick="toggleRecording()">🎤 Оцінити вимову</button>
+          <button class="back-btn" onclick="backDashboard()">⬅️ Назад</button>
+        `;
+      } catch (err) {
+        console.error('Error in loadTest:', err);
+        alert('Не вдалося завантажити тест.');
+      }
+    }
+
+    // --- Воспроизведение аудио ---
+async function playAudio() {
+  try {
+    // 1) Запрос ключа (или s3_key) от вашего бэка
+    const res1 = await fetch(`${API_URL}/lessons/generate_audio`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word, word_id: wordId })
+      body: JSON.stringify({ word: currentWord, word_id: currentWordId })
     });
-    const data = await res.json();
-    const audio = new Audio(`../${data.audio_file}`);
+    const data = await res1.json();
+
+    // допустим, эндпоинт возвращает { s3_key: "1122...fc74.wav" }
+    const key = data.s3_key;
+    if (!key) throw new Error('No s3_key in response');
+
+    // 2) Формируем URL на прокси (8080)
+    const url = `${API_URL}/audio-files/${encodeURIComponent(key)}`;
+
+    // 3) Проигрываем через Audio
+    const audio = new Audio(url);
     await audio.play();
+
+  } catch (err) {
+    console.error('Error in playAudio:', err);
+    alert('Не вдалося відтворити аудіо.');
   }
+}
 
-  async function submitTest(wordId) {
-    const translation = document.getElementById('word-translation').value.trim();
-    const userId = localStorage.getItem('userId');
+    // --- Отправка перевода ---
+    async function submitTest() {
+      console.log('submitTest()');
+      const translation = document.getElementById('word-translation').value.trim();
+      try {
+        const res = await fetch(`${API_URL}/test/check`, {
+          method: 'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            user_id: localStorage.getItem('userId'),
+            answers: [{ word_id: currentWordId, translation }]
+          })
+        });
+        const result = await res.json();
+        alert(`Правильних: ${result.correct} / Неправильних: ${result.incorrect}`);
+        backDashboard();
+      } catch (err) {
+        console.error('Error in submitTest:', err);
+        alert('Помилка при перевірці відповіді.');
+      }
+    }
 
-    const res = await fetch(`${API_URL}/test/check`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId,
-        answers: [{ word_id: wordId, translation }]
-      })
-    });
-    const data = await res.json();
+    function backDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
 
-    alert(`Правильних відповідей: ${data.correct} / Неправильних: ${data.incorrect}`);
-    backDashboard();
-  }
+    // --- Утилита для getUserMedia с fallback ---
+    function getUserMediaCompat(constraints) {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        return navigator.mediaDevices.getUserMedia(constraints);
+      }
+      const legacy = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+      if (!legacy) {
+        return Promise.reject(new Error('getUserMedia не поддерживается'));
+      }
+      return new Promise((resolve, reject) => {
+        legacy.call(navigator, constraints, resolve, reject);
+      });
+    }
 
-  function backDashboard() {
-    window.location.href = 'dashboard.html';
-  }
+    // --- Callback для остановки записи ---
+    async function onRecordingStop() {
+      console.log('onRecordingStop()');
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const file = new File([blob], 'pronunciation.webm', { type: blob.type });
+      const form = new FormData();
+      form.append('user_id', localStorage.getItem('userId'));
+      form.append('word_id', currentWordId);
+      form.append('audio', file);
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
-  }
+      try {
+        const res = await fetch(`${API_URL}/test/check`, {
+          method: 'POST',
+          body: form
+        });
+        const result = await res.json();
+        if (result.average_confidence != null) {
+          alert(`Оцінка вимови: ${(result.average_confidence * 100).toFixed(1)}%`);
+        } else {
+          alert('Вимова не була оцінована.');
+        }
+      } catch (err) {
+        console.error('Error sending pronunciation:', err);
+        alert('Помилка при оцінці вимови.');
+      }
+    }
 
-  window.onload = loadTest;
+    // --- Запуск/остановка записи ---
+    async function toggleRecording() {
+      console.log('toggleRecording(), isRecording=', isRecording);
+      const btn = document.getElementById('record-btn');
+
+      if (!isRecording) {
+        try {
+          const stream = await getUserMediaCompat({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = onRecordingStop;
+          mediaRecorder.start();
+          btn.textContent = '⏹️ Зупинити запис';
+          isRecording = true;
+          console.log('Recording started');
+        } catch (err) {
+          console.error('Error accessing mic:', err);
+          alert('Не вдалося отримати доступ до мікрофона.');
+        }
+      } else {
+        if (mediaRecorder) {
+          mediaRecorder.stop();
+          btn.textContent = '🎤 Оцінити вимову';
+          isRecording = false;
+          console.log('Recording stopped');
+        }
+      }
+    }
+
+    // Инициализируем при загрузке страницы
+    window.onload = loadTest;
   </script>
-
 </body>
 </html>
