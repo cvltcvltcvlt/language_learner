@@ -3,254 +3,771 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Створити/Редагувати урок – Додаток для вивчення англійської</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Створити урок – Language Learner</title>
   <style>
+    :root {
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-border: #30363d;
+      --github-text: #e6edf3;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #2f81f7;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-danger: #da3633;
+      --github-danger-emphasis: #f85149;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fc;
-      margin: 0;
-      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    .nav {
+      background: var(--github-surface);
+      border-bottom: 1px solid var(--github-border);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .nav-content {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      height: 100vh;
-      animation: fadeIn 1s ease-out;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
+    }
+
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 10px;
+    }
+
+    .nav-user:hover {
+      background: var(--github-surface-hover);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .user-name {
+      color: var(--github-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Form Container */
+    .form-container {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      position: relative;
       overflow: hidden;
     }
 
-    /* Фон з розмиванням */
-    .background {
+    .form-container::before {
+      content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px);
-      z-index: -1;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue), var(--github-purple));
     }
 
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 2rem;
     }
 
-    .container {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    .form-label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: var(--github-text);
+      font-size: 0.95rem;
+    }
+
+    .form-input, .form-select, .form-textarea {
       width: 100%;
-      max-width: 600px;
-      text-align: center;
-      animation: slideIn 0.5s ease-out;
+      padding: 1rem 1.25rem;
+      background: var(--github-bg);
+      border: 2px solid var(--github-border);
+      border-radius: 12px;
+      color: var(--github-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
     }
 
-    @keyframes slideIn {
-      0% { transform: translateY(50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 4px rgba(35, 134, 54, 0.1);
     }
 
-    h2 {
-      margin-bottom: 20px;
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
-    input, button, select {
-      padding: 12px;
-      margin-top: 10px;
-      width: 90%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--github-border);
     }
 
-    button {
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      margin-top: 20px;
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--github-text);
     }
 
-    button:hover {
-      background: #0056b3;
-    }
-
-    .back-button {
-      background: #6c757d;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-
-    .back-button:hover {
-      background: #5a6268;
-    }
-
-    .question-container {
-      margin-top: 20px;
+    /* Question Items */
+    .questions-container {
+      margin-top: 1rem;
     }
 
     .question-item {
-      margin-bottom: 15px;
-      padding: 10px;
-      background: #f1f3f5;
-      border-radius: 8px;
+      background: var(--github-bg);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .question-item-header {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
     }
 
-    .question-item input {
-      width: 45%;
+    .question-number {
+      font-weight: 600;
+      color: var(--github-accent);
     }
 
-    .question-item button {
-      background: #28a745;
-      padding: 8px 12px;
-      font-size: 14px;
+    .question-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
-      border-radius: 5px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
       color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
     }
 
-    .question-item button:hover {
-      background: #218838;
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
     }
 
-    .remove-button {
-      background: #dc3545;
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      border: 2px solid var(--github-border);
     }
 
-    .remove-button:hover {
-      background: #c82333;
+    .btn-secondary:hover {
+      background: var(--github-border);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--github-danger), var(--github-danger-emphasis));
+      color: white;
+      box-shadow: 0 3px 10px rgba(218, 54, 51, 0.3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(218, 54, 51, 0.4);
+    }
+
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-large {
+      padding: 1.2rem 2rem;
+      font-size: 1.1rem;
+      width: 100%;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .btn-add {
+      background: var(--github-blue);
+      color: white;
+      box-shadow: 0 3px 10px rgba(47, 129, 247, 0.3);
+    }
+
+    .btn-add:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(47, 129, 247, 0.4);
+    }
+
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--github-border);
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--github-border);
+      border-top: 4px solid var(--github-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .main-container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      .question-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-
-  <div class="background"></div>
-
-  <div class="container">
-    <h2 id="form-title">Створити новий урок</h2>
-    <form id="create-lesson-form">
-      <input type="text" id="title" placeholder="Назва уроку" required>
-      <select id="lesson-type" required>
-        <option value="Grammar">Граматика</option>
-        <option value="Vocabulary">Словниковий запас</option>
-        <option value="Listening">Аудіювання</option>
-        <option value="Speaking">Говоріння</option>
-      </select>
-
-      <div id="question-container" class="question-container">
-        <!-- Поля питань будуть додаватися тут -->
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="dashboard.html" class="nav-brand">
+        <div class="nav-brand-icon">✏️</div>
+        <span id="nav-title">Створити урок</span>
+      </a>
+      <div class="nav-user" onclick="goToProfile()">
+        <div class="user-avatar" id="navAvatar">👤</div>
+        <span class="user-name" id="navUserName">Вчитель</span>
       </div>
-      <button type="button" onclick="addQuestion()">Додати ще питання</button>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+        <a href="manageLessons.html" class="nav-link">📚 Уроки</a>
+        <a href="admin_panel.html" class="nav-link">🔧 Адмін-панель</a>
+        <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+      </div>
+    </div>
+  </nav>
 
-      <input type="number" id="xp" placeholder="XP" required>
-      <button type="submit">Зберегти урок</button>
-    </form>
-    <button class="back-button" onclick="backToDashboard()">Назад</button>
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title" id="page-title">Створити урок</h1>
+      <p class="page-subtitle">Додайте новий урок до вашого курсу</p>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading" style="display: none;">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Form Container -->
+    <div id="formContainer" class="form-container">
+      <form id="create-lesson-form">
+        <!-- Basic Info -->
+        <div class="form-group">
+          <label class="form-label" for="title">Назва уроку</label>
+          <input type="text" id="title" class="form-input" placeholder="Введіть назву уроку" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="lesson-type">Тип уроку</label>
+          <select id="lesson-type" class="form-select" required>
+            <option value="">Оберіть тип уроку</option>
+            <option value="GRAMMAR">📝 Граматика</option>
+            <option value="VOCABULARY">📚 Словниковий запас</option>
+            <option value="READING">📖 Читання</option>
+            <option value="LISTENING">🎧 Аудіювання</option>
+            <option value="SPEAKING">🗣️ Говоріння</option>
+            <option value="WRITING">✍️ Письмо</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="xp">Винагорода в XP</label>
+          <input type="number" id="xp" class="form-input" placeholder="Кількість XP за урок" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="required-experience">Необхідний досвід</label>
+          <input type="number" id="required-experience" class="form-input" placeholder="Скільки XP потрібно для доступу" min="0" value="0">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="theory">Теорія (необов'язково)</label>
+          <textarea id="theory" class="form-textarea" placeholder="Додайте теоретичний матеріал для уроку"></textarea>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="section-header">
+          <h3 class="section-title">Питання та вправи</h3>
+          <button type="button" class="btn btn-add btn-small" onclick="addQuestion()">
+            ➕ Додати питання
+          </button>
+        </div>
+
+        <div id="questions-container" class="questions-container">
+          <!-- Questions will be added here dynamically -->
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-large">
+            💾 Зберегти урок
+          </button>
+          <button type="button" class="btn btn-secondary btn-large" onclick="backToLessons()">
+            🔙 Скасувати
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script>
     const API_URL = 'http://127.0.0.1:8080';
     const lessonId = new URLSearchParams(window.location.search).get("lessonId");
+    let questionCounter = 0;
 
-    if (!localStorage.getItem('token')) {
+    // Check authentication
+    const token = localStorage.getItem('access_token');
+    if (!token) {
       window.location.href = 'login.html';
     }
 
-    document.getElementById('create-lesson-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const title = document.getElementById('title').value.trim();
-      const lessonType = document.getElementById('lesson-type').value;
-      const xp = document.getElementById('xp').value.trim();
-      const teacherId = localStorage.getItem('userId');
-
-      const questions = [];
-      document.querySelectorAll('.question-item').forEach((item, index) => {
-        const question = item.querySelector('.question-input').value.trim();
-        const answer = item.querySelector('.answer-input').value.trim();
-        questions.push({ index, question, correct_answer: answer });
-      });
-
-      let res;
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCurrentUser();
       if (lessonId) {
-        res = await fetch(`${API_URL}/lessons/${lessonId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, lesson_type: lessonType, teacher_id: teacherId, xp, exercises: questions })
-        });
+        await loadLessonData();
       } else {
-        res = await fetch(`${API_URL}/lessons`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, lesson_type: lessonType, teacher_id: teacherId, xp, exercises: questions })
-        });
-      }
-
-      const data = await res.json();
-      if (res.ok) {
-        alert(lessonId ? 'Урок успішно оновлено!' : 'Урок успішно створено!');
-        window.location.href = 'manageLessons.html';
-      } else {
-        alert(`Помилка: ${data.error}`);
+        addQuestion(); // Add first question by default
       }
     });
 
-    function addQuestion() {
-      const container = document.getElementById('question-container');
-      const div = document.createElement('div');
-      div.classList.add('question-item');
-      div.innerHTML = `
-        <input type="text" class="question-input" placeholder="Питання" required>
-        <input type="text" class="answer-input" placeholder="Правильна відповідь" required>
-        <button type="button" class="remove-button" onclick="removeQuestion(this)">Видалити</button>
-      `;
-      container.appendChild(div);
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          updateNavbarUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
     }
 
-    function removeQuestion(btn) {
-      btn.parentElement.remove();
-    }
-
-    function backToDashboard() {
-      window.location.href = 'dashboard.html';
+    function updateNavbarUserInfo(userData) {
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      
+      if (navAvatar) {
+        const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+        if (avatarUrl) {
+          navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+          navAvatar.textContent = '';
+        }
+      }
+      
+      if (navUserName) {
+        navUserName.textContent = userData.name || userData.login || 'Вчитель';
+      }
     }
 
     async function loadLessonData() {
       if (!lessonId) return;
 
-      const res = await fetch(`${API_URL}/lessons/${lessonId}`);
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById('form-title').textContent = 'Редагувати урок';
-        document.getElementById('title').value = data.title;
-        document.getElementById('lesson-type').value = data.lesson_type;
-        document.getElementById('xp').value = data.xp;
+      const loadingState = document.getElementById('loadingState');
+      const formContainer = document.getElementById('formContainer');
 
-        const container = document.getElementById('question-container');
-        data.exercises.forEach(ex => {
-          const div = document.createElement('div');
-          div.classList.add('question-item');
-          div.innerHTML = `
-            <input type="text" class="question-input" value="${ex.question}" required>
-            <input type="text" class="answer-input" value="${ex.correct_answer}" required>
-            <button type="button" class="remove-button" onclick="removeQuestion(this)">Видалити</button>
-          `;
-          container.appendChild(div);
+      try {
+        loadingState.style.display = 'block';
+        formContainer.style.display = 'none';
+
+        const response = await fetch(`${API_URL}/lessons/${lessonId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
-      } else {
-        alert('Помилка завантаження даних уроку');
+
+        if (!response.ok) {
+          throw new Error('Failed to load lesson');
+        }
+
+        const lesson = await response.json();
+
+        // Update UI for editing
+        document.getElementById('nav-title').textContent = 'Редагувати урок';
+        document.getElementById('page-title').textContent = 'Редагувати урок';
+
+        // Fill form fields
+        document.getElementById('title').value = lesson.title || '';
+        document.getElementById('lesson-type').value = lesson.lesson_type || '';
+        document.getElementById('xp').value = lesson.xp || '';
+        document.getElementById('required-experience').value = lesson.required_experience || 0;
+        document.getElementById('theory').value = lesson.theory || '';
+
+        // Load questions
+        if (lesson.exercises && lesson.exercises.length > 0) {
+          lesson.exercises.forEach(exercise => {
+            addQuestion(exercise.question, exercise.correct_answer);
+          });
+        } else {
+          addQuestion(); // Add empty question if none exist
+        }
+
+        loadingState.style.display = 'none';
+        formContainer.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading lesson:', error);
+        loadingState.style.display = 'none';
+        showNotification('Помилка завантаження уроку', 'error');
       }
     }
 
-    window.onload = loadLessonData;
-  </script>
+    function addQuestion(questionText = '', answerText = '') {
+      questionCounter++;
+      const container = document.getElementById('questions-container');
+      
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'question-item';
+      questionDiv.innerHTML = `
+        <div class="question-item-header">
+          <span class="question-number">Питання ${questionCounter}</span>
+          <button type="button" class="btn btn-danger btn-small" onclick="removeQuestion(this)">
+            🗑️ Видалити
+          </button>
+        </div>
+        <div class="question-fields">
+          <div class="form-group">
+            <label class="form-label">Питання</label>
+            <input type="text" class="form-input question-input" placeholder="Введіть питання" value="${questionText}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Правильна відповідь</label>
+            <input type="text" class="form-input answer-input" placeholder="Введіть правильну відповідь" value="${answerText}" required>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(questionDiv);
+    }
 
+    function removeQuestion(button) {
+      const questionItem = button.closest('.question-item');
+      questionItem.remove();
+      
+      // Update question numbers
+      const questions = document.querySelectorAll('.question-item');
+      questions.forEach((item, index) => {
+        const numberSpan = item.querySelector('.question-number');
+        numberSpan.textContent = `Питання ${index + 1}`;
+      });
+      
+      questionCounter = questions.length;
+    }
+
+    // Form submission
+    document.getElementById('create-lesson-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value.trim();
+      const lessonType = document.getElementById('lesson-type').value;
+      const xp = parseInt(document.getElementById('xp').value);
+      const requiredExperience = parseInt(document.getElementById('required-experience').value) || 0;
+      const theory = document.getElementById('theory').value.trim();
+      const teacherId = localStorage.getItem('userId');
+
+      if (!title || !lessonType || !xp) {
+        showNotification('Будь ласка, заповніть всі обов\'язкові поля', 'error');
+        return;
+      }
+
+      // Collect questions
+      const exercises = [];
+      const questionItems = document.querySelectorAll('.question-item');
+      
+      for (let i = 0; i < questionItems.length; i++) {
+        const item = questionItems[i];
+        const question = item.querySelector('.question-input').value.trim();
+        const answer = item.querySelector('.answer-input').value.trim();
+        
+        if (!question || !answer) {
+          showNotification(`Заповніть питання та відповідь для питання ${i + 1}`, 'error');
+          return;
+        }
+        
+        exercises.push({
+          index: i,
+          question: question,
+          correct_answer: answer
+        });
+      }
+
+      if (exercises.length === 0) {
+        showNotification('Додайте хоча б одне питання', 'error');
+        return;
+      }
+
+      try {
+        const payload = {
+          title,
+          lesson_type: lessonType,
+          xp,
+          required_experience: requiredExperience,
+          theory: theory || null,
+          creator_id: parseInt(teacherId),
+          exercises
+        };
+
+        const url = lessonId ? `${API_URL}/lessons/${lessonId}` : `${API_URL}/lessons`;
+        const method = lessonId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          showNotification(lessonId ? 'Урок успішно оновлено!' : 'Урок успішно створено!', 'success');
+          setTimeout(() => {
+            window.location.href = 'manageLessons.html';
+          }, 2000);
+        } else {
+          const error = await response.json();
+          showNotification(`Помилка: ${error.error || 'Невідома помилка'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error saving lesson:', error);
+        showNotification('Помилка при збереженні уроку', 'error');
+      }
+    });
+
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        background: ${type === 'success' ? 'var(--github-accent)' : 'var(--github-danger)'};
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 4000);
+    }
+
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
+    function backToLessons() {
+      if (confirm('Ви впевнені, що хочете скасувати? Всі незбережені зміни будуть втрачені.')) {
+        window.location.href = 'manageLessons.html';
+      }
+    }
+
+    function logout() {
+      if (confirm('Ви впевнені, що хочете вийти?')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 </body>
 </html>

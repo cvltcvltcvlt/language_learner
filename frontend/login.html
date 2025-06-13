@@ -1,193 +1,936 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Вхід — Language Learner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
-      overflow: hidden;
-      color: white;
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід - Майстер англійської з ШІ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --github-bg: #0d1117;
+            --github-surface: #161b22;
+            --github-border: #30363d;
+            --github-text: #f0f6fc;
+            --github-text-secondary: #7d8590;
+            --github-accent: #238636;
+            --github-accent-emphasis: #2ea043;
+            --github-blue: #1f6feb;
+            --github-purple: #8b5cf6;
+            --github-orange: #fb8500;
+            --github-pink: #d63384;
+            --github-red: #f85149;
+        }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Фон із динозавром */
-    .background-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    .login-container {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(15px);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 400px;
-      animation: fadeInUp 1s ease forwards;
-      text-align: center;
-      color: #333;
-      z-index: 1;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--github-bg);
+            color: var(--github-text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        /* Animated particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
 
-    h1 {
-      font-size: 2em;
-      margin-bottom: 20px;
-      letter-spacing: 2px;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--github-accent);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+            opacity: 0.3;
+        }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 10px;
-    }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 0.8; }
+        }
 
-    input {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
-      transition: 0.3s;
-    }
+        /* Login Container */
+        .login-container {
+            background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+            border: 1px solid var(--github-border);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            margin: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transform: translateX(0) rotate(0deg) scale(1);
+            opacity: 1;
+            z-index: 1;
+        }
+        
+        /* Animation start state - will be applied by JS */
+        .login-container.animate-start {
+            transform: translateX(-100vw) rotate(-10deg) scale(0.5);
+            opacity: 0;
+        }
 
-    input:focus {
-      outline: none;
-      box-shadow: 0 0 10px rgba(106, 17, 203, 0.7);
-      background: white;
-    }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(35, 134, 54, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
 
-    .btn-login, .btn-register {
-      padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      border: 2px solid #2575fc;
-      background: transparent;
-      color: #2575fc;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      width: 100%;
-    }
+        .login-container:hover::before {
+            left: 100%;
+        }
 
-    .btn-login:hover, .btn-register:hover {
-      background: #2575fc;
-      color: white;
-      transform: scale(1.05);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
+        /* Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
 
-    .btn-register {
-      margin-top: 10px;
-    }
+        .login-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--github-text), var(--github-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            transform: translateY(0);
+            opacity: 1;
+        }
 
-    #error-message {
-      color: #ff4d4d;
-      margin-top: 15px;
-      display: none;
-      font-size: 14px;
-    }
-  </style>
-  <link rel="stylesheet" href="style.css?v=2">
+        .login-subtitle {
+            color: var(--github-text-secondary);
+            font-size: 1.1rem;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            position: relative;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--github-text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid var(--github-border);
+            border-radius: 8px;
+            color: var(--github-text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--github-accent);
+            box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-input:focus + .input-glow {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        .input-glow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--github-accent), var(--github-blue));
+            transform: scaleX(0);
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(35, 134, 54, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--github-text-secondary);
+            border: 1px solid var(--github-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--github-surface);
+            color: var(--github-text);
+            border-color: var(--github-accent);
+            transform: translateY(-2px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Social Login */
+        .social-login {
+            margin-top: 2rem;
+            text-align: center;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .social-title {
+            color: var(--github-text-secondary);
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .social-title::before,
+        .social-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: var(--github-border);
+        }
+
+        .social-title::before { left: 0; }
+        .social-title::after { right: 0; }
+
+        .social-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            border: 1px solid var(--github-border);
+            background: var(--github-surface);
+            color: var(--github-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            border-color: var(--github-accent);
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.2);
+        }
+
+        /* Register Link */
+        .register-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--github-text-secondary);
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .register-link a {
+            color: var(--github-accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: var(--github-accent-emphasis);
+            text-decoration: underline;
+        }
+
+        .back-home {
+            color: var(--github-text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .back-home:hover {
+            color: var(--github-text);
+        }
+
+        /* Mascot */
+        .login-mascot {
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 120px;
+            height: 120px;
+            opacity: 0;
+            animation: mascotFloat 4s ease-in-out infinite;
+            z-index: -10;
+            pointer-events: none;
+        }
+
+        @keyframes mascotFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .login-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
 
-<div class="background-image"></div>
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Login Mascot -->
+        <svg class="login-mascot" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="40" r="20" fill="#f0f6fc" stroke="#238636" stroke-width="2"/>
+            <circle cx="45" cy="35" r="2" fill="#0d1117"/>
+            <circle cx="55" cy="35" r="2" fill="#0d1117"/>
+            <path d="M 42 45 Q 50 50 58 45" stroke="#238636" stroke-width="2" fill="none"/>
+            <ellipse cx="50" cy="70" rx="15" ry="12" fill="#1f6feb" stroke="#238636" stroke-width="2"/>
+            <rect x="40" y="75" width="20" height="15" fill="#8b5cf6" stroke="#238636" stroke-width="1" rx="2"/>
+            <circle cx="25" cy="25" r="1" fill="#238636" opacity="0.6">
+                <animate attributeName="cy" values="25;15;25" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="75" cy="30" r="1" fill="#1f6feb" opacity="0.4">
+                <animate attributeName="cy" values="30;20;30" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
 
-<div class="login-container">
-  <h1>Ласкаво просимо</h1>
-  <form id="login-form">
-    <input type="text" id="login" placeholder="Логін" required>
-    <input type="password" id="password" placeholder="Пароль" required>
-    <button type="submit" class="btn-login">Увійти</button>
-  </form>
-  <button class="btn-register" onclick="register()">Реєстрація</button>
-  <div id="error-message">Невірний логін або пароль!</div>
-</div>
+        <!-- Header -->
+        <div class="login-header">
+            <h1 class="login-title">Вітаємо знову!</h1>
+            <p class="login-subtitle">Увійдіть до свого облікового запису</p>
+        </div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+        <!-- Login Form -->
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="login">Логін</label>
+                <input type="text" id="login" name="login" class="form-input" required placeholder="Введіть ваш логін">
+                <div class="input-glow"></div>
+            </div>
 
-// Автоматична перевірка токена
-if (localStorage.getItem('token')) {
-  window.location.href = 'dashboard.html';
-}
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <input type="password" id="password" name="password" class="form-input" required placeholder="Введіть ваш пароль">
+                <div class="input-glow"></div>
+            </div>
 
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const login = document.getElementById('login').value.trim();
-  const password = document.getElementById('password').value.trim();
+            <button type="submit" class="btn btn-primary">Увійти</button>
+            <a href="#" class="btn btn-secondary">Забули пароль?</a>
+        </form>
 
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login, password })
-    });
-    const data = await res.json();
+        <!-- Social Login -->
+        <div class="social-login">
+            <p class="social-title">Або увійдіть через</p>
+            <div class="social-buttons">
+                <button class="social-btn google-btn" onclick="loginWithOAuth('google')" title="Увійти через Google">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                </button>
+                <button class="social-btn facebook-btn" onclick="loginWithOAuth('facebook')" title="Увійти через Facebook">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877f2">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </button>
+                <button class="social-btn github-btn" onclick="loginWithOAuth('github')" title="Увійти через GitHub">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
-    if (res.ok && data.token) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.user.id);
-      localStorage.setItem('isAdmin', data.user.is_admin);
+        <!-- Register Link -->
+        <div class="register-link">
+            <p>Немає облікового запису? <a href="register.html">Зареєструватися</a></p>
+            <a href="index.html" class="back-home">← Повернутися на головну</a>
+        </div>
+    </div>
 
-      if (data.user.is_admin) {
-        window.location.href = 'admin_panel.html';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
-    } else {
-      document.getElementById('error-message').style.display = 'block';
-    }
-  } catch (error) {
-    document.getElementById('error-message').innerText = 'Помилка сервера!';
-    document.getElementById('error-message').style.display = 'block';
-  }
-});
+    <script>
+        // Create particles
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            const particleCount = 30;
 
-function register() {
-  window.location.href = 'registration.html';
-}
-</script>
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                particles.appendChild(particle);
+            }
+        }
 
+                 // Animate login container
+         function animateLogin() {
+             const container = document.querySelector('.login-container');
+             const title = document.querySelector('.login-title');
+             const subtitle = document.querySelector('.login-subtitle');
+             const formGroups = document.querySelectorAll('.form-group');
+             const buttons = document.querySelectorAll('.btn');
+             const socialLogin = document.querySelector('.social-login');
+             const registerLink = document.querySelector('.register-link');
+
+             // Add animation start class and animate
+             container.classList.add('animate-start');
+             
+             // Small delay to ensure class is applied
+             setTimeout(() => {
+                 // Epic container entrance animation
+                 anime({
+                     targets: container,
+                     translateX: ['-100vw', 0],
+                     rotate: [-10, 0],
+                     scale: [0.5, 1],
+                     opacity: [0, 1],
+                     duration: 1200,
+                     easing: 'easeOutExpo',
+                     complete: () => {
+                         // Remove animation class
+                         container.classList.remove('animate-start');
+                         
+                         // Bounce effect after landing
+                         anime({
+                             targets: container,
+                             scale: [1, 1.05, 1],
+                             duration: 400,
+                             easing: 'easeOutBack'
+                         });
+                         
+                         // Create explosion particles effect
+                         createExplosionParticles();
+                     }
+                 });
+             }, 100);
+
+            // Title and subtitle
+            anime({
+                targets: [title, subtitle],
+                translateY: [-20, 0],
+                opacity: [0, 1],
+                duration: 600,
+                delay: anime.stagger(100, {start: 300}),
+                easing: 'easeOutExpo'
+            });
+
+            // Form groups
+            anime({
+                targets: formGroups,
+                translateY: [20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                delay: anime.stagger(100, {start: 600}),
+                easing: 'easeOutExpo'
+            });
+
+            // Buttons
+            anime({
+                targets: buttons,
+                translateY: [20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                delay: anime.stagger(50, {start: 900}),
+                easing: 'easeOutExpo'
+            });
+
+            // Social login
+            anime({
+                targets: socialLogin,
+                translateY: [20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                delay: 1100,
+                easing: 'easeOutExpo'
+            });
+
+            // Register link
+            anime({
+                targets: registerLink,
+                translateY: [20, 0],
+                opacity: [0, 1],
+                duration: 500,
+                delay: 1200,
+                easing: 'easeOutExpo'
+            });
+        }
+
+        // Form interactions
+        function setupInteractions() {
+            const inputs = document.querySelectorAll('.form-input');
+            const socialBtns = document.querySelectorAll('.social-btn');
+            const form = document.getElementById('loginForm');
+
+            // Input focus animations
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    anime({
+                        targets: input.previousElementSibling,
+                        color: '#238636',
+                        duration: 300
+                    });
+                });
+
+                input.addEventListener('blur', () => {
+                    if (!input.value) {
+                        anime({
+                            targets: input.previousElementSibling,
+                            color: '#f0f6fc',
+                            duration: 300
+                        });
+                    }
+                });
+            });
+
+            // Social button animations
+            socialBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    anime({
+                        targets: btn,
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 10, 0],
+                        duration: 400,
+                        easing: 'easeOutBack'
+                    });
+                });
+            });
+
+            // Form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitBtn = form.querySelector('.btn-primary');
+                const originalText = submitBtn.textContent;
+                
+                // Get form data
+                const formData = new FormData(form);
+                const loginData = {
+                    login: formData.get('login'),
+                    password: formData.get('password')
+                };
+                
+                // Validate inputs
+                if (!loginData.login || !loginData.password) {
+                    showErrorMessage('Будь ласка, заповніть всі поля');
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.classList.add('loading');
+                submitBtn.textContent = '';
+                submitBtn.disabled = true;
+                
+                try {
+                    const response = await fetch('http://127.0.0.1:8080/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(loginData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Success! Store token and user data
+                        localStorage.setItem('access_token', data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.user));
+                        
+                        // Show success animation
+                        createExplosionParticles();
+                        showSuccessMessage('Успішний вхід!');
+                        
+                        // Redirect to dashboard after animation
+                        setTimeout(() => {
+                            window.location.href = '/dashboard.html';
+                        }, 1500);
+                        
+                    } else {
+                        // Error handling
+                        const errorMessage = data.error || 'Помилка входу';
+                        showErrorMessage(errorMessage);
+                    }
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showErrorMessage('Помилка мережі. Перевірте підключення та спробуйте ще раз.');
+                } finally {
+                    // Reset button state
+                    submitBtn.classList.remove('loading');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+                 // Create explosion particles effect
+         function createExplosionParticles() {
+             const container = document.querySelector('.login-container');
+             const rect = container.getBoundingClientRect();
+             const centerX = rect.left + rect.width / 2;
+             const centerY = rect.top + rect.height / 2;
+             
+             const colors = ['#238636', '#1f6feb', '#8b5cf6', '#fb8500'];
+             
+             for (let i = 0; i < 20; i++) {
+                 const particle = document.createElement('div');
+                 particle.style.position = 'fixed';
+                 particle.style.left = centerX + 'px';
+                 particle.style.top = centerY + 'px';
+                 particle.style.width = Math.random() * 8 + 4 + 'px';
+                 particle.style.height = particle.style.width;
+                 particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                 particle.style.borderRadius = '50%';
+                 particle.style.pointerEvents = 'none';
+                 particle.style.zIndex = '1000';
+                 
+                 document.body.appendChild(particle);
+                 
+                 const angle = (Math.PI * 2 * i) / 20;
+                 const velocity = 100 + Math.random() * 100;
+                 const endX = centerX + Math.cos(angle) * velocity;
+                 const endY = centerY + Math.sin(angle) * velocity;
+                 
+                 anime({
+                     targets: particle,
+                     left: endX + 'px',
+                     top: endY + 'px',
+                     scale: [1, 0],
+                     opacity: [1, 0],
+                     duration: 800,
+                     easing: 'easeOutQuad',
+                     complete: () => {
+                         document.body.removeChild(particle);
+                     }
+                 });
+             }
+         }
+
+                  // OAuth Login Function
+         async function loginWithOAuth(provider) {
+             try {
+                 // Show loading state
+                 const button = document.querySelector(`.${provider}-btn`);
+                 const originalContent = button.innerHTML;
+                 button.innerHTML = '<div class="loading-spinner"></div>';
+                 button.disabled = true;
+                 
+                 // Request OAuth URL from backend
+                 const response = await fetch(`http://localhost:8080/auth/oauth/${provider}/login`, {
+                     method: 'GET',
+                     credentials: 'include'
+                 });
+                 
+                 if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                 }
+                 
+                 const data = await response.json();
+                 
+                 if (data.authorization_url) {
+                     // Redirect to OAuth provider
+                     window.location.href = data.authorization_url;
+                 } else {
+                     throw new Error('No authorization URL received');
+                 }
+                 
+             } catch (error) {
+                 console.error('OAuth login error:', error);
+                 alert(`Помилка при авторизації через ${provider}. Спробуйте ще раз.`);
+                 
+                 // Restore button state
+                 const button = document.querySelector(`.${provider}-btn`);
+                 button.innerHTML = originalContent;
+                 button.disabled = false;
+             }
+         }
+         
+         // Check if there's an OAuth token in URL (for callback handling)
+         function checkOAuthCallback() {
+             const urlParams = new URLSearchParams(window.location.search);
+             const token = urlParams.get('token');
+             
+             if (token) {
+                 // Store token and redirect to dashboard
+                 localStorage.setItem('access_token', token);
+                 window.location.href = '/dashboard.html';
+             }
+         }
+         
+         // Show error message
+         function showErrorMessage(message) {
+             // Remove existing messages
+             const existingMessage = document.querySelector('.error-message');
+             if (existingMessage) {
+                 existingMessage.remove();
+             }
+             
+             const errorDiv = document.createElement('div');
+             errorDiv.className = 'error-message';
+             errorDiv.textContent = message;
+             errorDiv.style.cssText = `
+                 position: fixed;
+                 top: 20px;
+                 right: 20px;
+                 background: rgba(239, 68, 68, 0.9);
+                 color: white;
+                 padding: 15px 25px;
+                 border-radius: 8px;
+                 font-size: 14px;
+                 font-weight: 500;
+                 z-index: 10000;
+                 box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+                 transform: translateX(100%);
+                 transition: transform 0.3s ease;
+             `;
+             
+             document.body.appendChild(errorDiv);
+             
+             // Animate in
+             setTimeout(() => {
+                 errorDiv.style.transform = 'translateX(0)';
+             }, 100);
+             
+             // Auto remove after 5 seconds
+             setTimeout(() => {
+                 errorDiv.style.transform = 'translateX(100%)';
+                 setTimeout(() => {
+                     if (document.body.contains(errorDiv)) {
+                         document.body.removeChild(errorDiv);
+                     }
+                 }, 300);
+             }, 5000);
+         }
+         
+         // Show success message
+         function showSuccessMessage(message) {
+             const successDiv = document.createElement('div');
+             successDiv.className = 'success-message';
+             successDiv.textContent = message;
+             successDiv.style.cssText = `
+                 position: fixed;
+                 top: 20px;
+                 right: 20px;
+                 background: rgba(34, 197, 94, 0.9);
+                 color: white;
+                 padding: 15px 25px;
+                 border-radius: 8px;
+                 font-size: 14px;
+                 font-weight: 500;
+                 z-index: 10000;
+                 box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+                 transform: translateX(100%);
+                 transition: transform 0.3s ease;
+             `;
+             
+             document.body.appendChild(successDiv);
+             
+             // Animate in
+             setTimeout(() => {
+                 successDiv.style.transform = 'translateX(0)';
+             }, 100);
+             
+             // Auto remove after 3 seconds
+             setTimeout(() => {
+                 successDiv.style.transform = 'translateX(100%)';
+                 setTimeout(() => {
+                     if (document.body.contains(successDiv)) {
+                         document.body.removeChild(successDiv);
+                     }
+                 }, 300);
+             }, 3000);
+         }
+
+         // Initialize
+         document.addEventListener('DOMContentLoaded', () => {
+             createParticles();
+             animateLogin();
+             setupInteractions();
+             checkOAuthCallback();
+             checkIfAlreadyLoggedIn();
+         });
+         
+         // Check if user is already logged in
+         async function checkIfAlreadyLoggedIn() {
+             const token = localStorage.getItem('access_token');
+             if (!token) return;
+             
+             try {
+                 const response = await fetch('http://127.0.0.1:8080/verify-token', {
+                     method: 'POST',
+                     headers: {
+                         'Authorization': `Bearer ${token}`,
+                         'Content-Type': 'application/json'
+                     }
+                 });
+                 
+                 if (response.ok) {
+                     const data = await response.json();
+                     if (data.valid) {
+                         // User is already logged in, redirect to dashboard
+                         window.location.href = '/dashboard.html';
+                     }
+                 } else {
+                     // Token is invalid, remove it
+                     localStorage.removeItem('access_token');
+                     localStorage.removeItem('user_data');
+                 }
+             } catch (error) {
+                 console.error('Token verification error:', error);
+                 // If there's an error, remove potentially invalid token
+                 localStorage.removeItem('access_token');
+                 localStorage.removeItem('user_data');
+             }
+         }
+     </script>
+     
+     <!-- Loading Spinner CSS -->
+     <style>
+         .loading-spinner {
+             width: 20px;
+             height: 20px;
+             border: 2px solid #f3f3f3;
+             border-top: 2px solid #238636;
+             border-radius: 50%;
+             animation: spin 1s linear infinite;
+         }
+         
+         @keyframes spin {
+             0% { transform: rotate(0deg); }
+             100% { transform: rotate(360deg); }
+         }
+         
+         .social-btn:disabled {
+             opacity: 0.6;
+             cursor: not-allowed;
+         }
+     </style>
 </body>
 </html>

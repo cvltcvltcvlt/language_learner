@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Реєстрація - Майстер англійської з ШІ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <style>
+    :root {
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-border: #30363d;
+      --github-text: #f0f6fc;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #1f6feb;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-pink: #d63384;
+      --github-red: #f85149;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    /* Animated particles background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--github-blue);
+      border-radius: 50%;
+      animation: floatRegister 8s infinite ease-in-out;
+      opacity: 0.4;
+    }
+
+    @keyframes floatRegister {
+      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 0.4; }
+      33% { transform: translateY(-80px) rotate(120deg) scale(1.2); opacity: 0.8; }
+      66% { transform: translateY(-40px) rotate(240deg) scale(0.8); opacity: 0.6; }
+    }
+
+    /* Register Container */
+    .register-container {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      margin: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+      z-index: 1;
+    }
+    
+    /* Animation start state - will be applied by JS */
+    .register-container.animate-start {
+      transform: translateY(100vh) rotate(15deg) scale(0.3);
+      opacity: 0;
+    }
+
+    .register-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(31, 111, 235, 0.1), transparent);
+      transition: left 1s ease;
+    }
+
+    .register-container:hover::before {
+      left: 100%;
+    }
+
+    /* Header */
+    .register-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .register-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-blue), var(--github-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .register-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.1rem;
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Form */
+    .register-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-group {
+      position: relative;
+      transform: translateY(0);
+      opacity: 1;
+      flex: 1;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--github-text);
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1.2rem;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid var(--github-border);
+      border-radius: 10px;
+      color: var(--github-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--github-blue);
+      box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1);
+      transform: translateY(-3px);
+      background: rgba(22, 27, 34, 1);
+    }
+
+    .form-input:focus + .input-glow {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .input-glow {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--github-blue), var(--github-purple));
+      transform: scaleX(0);
+      transition: all 0.4s ease;
+      opacity: 0;
+      border-radius: 1px;
+    }
+
+    /* Password Strength */
+    .password-strength {
+      margin-top: 0.5rem;
+      height: 4px;
+      background: var(--github-border);
+      border-radius: 2px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .password-strength.show {
+      opacity: 1;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .strength-weak { background: var(--github-red); width: 25%; }
+    .strength-fair { background: var(--github-orange); width: 50%; }
+    .strength-good { background: var(--github-blue); width: 75%; }
+    .strength-strong { background: var(--github-accent); width: 100%; }
+
+    /* Buttons */
+    .btn {
+      padding: 1.2rem 2rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      color: white;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      padding: 1.3rem 2rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(31, 111, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--github-text-secondary);
+      border: 1px solid var(--github-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-surface);
+      color: var(--github-text);
+      border-color: var(--github-blue);
+      transform: translateY(-2px);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      transition: left 0.7s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    /* Terms */
+    .terms {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--github-text-secondary);
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .terms input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--github-blue);
+    }
+
+    .terms a {
+      color: var(--github-blue);
+      text-decoration: none;
+    }
+
+    .terms a:hover {
+      text-decoration: underline;
+    }
+
+    /* Social Login */
+    .social-login {
+      margin-top: 2rem;
+      text-align: center;
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .social-title {
+      color: var(--github-text-secondary);
+      margin-bottom: 1.5rem;
+      position: relative;
+      font-size: 0.95rem;
+    }
+
+    .social-title::before,
+    .social-title::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 35%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--github-border), transparent);
+    }
+
+    .social-title::before { left: 0; }
+    .social-title::after { right: 0; }
+
+    .social-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .social-btn {
+      width: 55px;
+      height: 55px;
+      border-radius: 12px;
+      border: 1px solid var(--github-border);
+      background: var(--github-surface);
+      color: var(--github-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-4px) scale(1.1);
+      border-color: var(--github-blue);
+      box-shadow: 0 8px 20px rgba(31, 111, 235, 0.3);
+    }
+
+    .social-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 12px;
+      z-index: -1;
+    }
+
+    .social-btn:hover::after {
+      opacity: 0.1;
+    }
+
+    /* Login Link */
+    .login-link {
+      text-align: center;
+      margin-top: 2.5rem;
+      color: var(--github-text-secondary);
+      transform: translateY(0);
+      opacity: 1;
+      font-size: 0.95rem;
+    }
+
+    .login-link a {
+      color: var(--github-blue);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .login-link a:hover {
+      color: var(--github-purple);
+      text-decoration: underline;
+    }
+
+    .back-home {
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      margin-top: 1rem;
+      display: inline-block;
+    }
+
+    .back-home:hover {
+      color: var(--github-text);
+    }
+
+    /* Mascots */
+    .register-mascot {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      opacity: 0;
+      animation: mascotFloat 5s ease-in-out infinite;
+      z-index: -10;
+      pointer-events: none;
+    }
+
+    .mascot-1 {
+      top: -50px;
+      left: -50px;
+      animation-delay: 0s;
+    }
+
+    .mascot-2 {
+      top: -40px;
+      right: -40px;
+      animation-delay: 1s;
+    }
+
+    .mascot-3 {
+      bottom: -30px;
+      left: -30px;
+      animation-delay: 2s;
+    }
+
+    @keyframes mascotFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-8px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(-4px) rotate(-2deg) scale(0.95); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .register-container {
+        padding: 2.5rem 2rem;
+        margin: 1rem;
+      }
+      
+      .register-title {
+        font-size: 2.2rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .social-buttons {
+        gap: 0.8rem;
+      }
+
+      .social-btn {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      position: relative;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 22px;
+      height: 22px;
+      margin: -11px 0 0 -11px;
+      border: 2px solid transparent;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .success-checkmark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--github-accent);
+      display: none;
+    }
+
+    .success-checkmark::after {
+      content: '✓';
+      color: white;
+      font-size: 30px;
+      font-weight: bold;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <!-- Particles Background -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Register Container -->
+  <div class="register-container">
+    <!-- Register Mascots -->
+    <svg class="register-mascot mascot-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="35" r="18" fill="#f0f6fc" stroke="#1f6feb" stroke-width="2"/>
+      <circle cx="45" cy="30" r="2" fill="#0d1117"/>
+      <circle cx="55" cy="30" r="2" fill="#0d1117"/>
+      <path d="M 42 40 Q 50 45 58 40" stroke="#1f6feb" stroke-width="2" fill="none"/>
+      <ellipse cx="50" cy="65" rx="15" ry="12" fill="#8b5cf6" stroke="#1f6feb" stroke-width="2"/>
+      <rect x="35" y="70" width="30" height="12" fill="#238636" stroke="#1f6feb" stroke-width="1" rx="2"/>
+    </svg>
+
+    <svg class="register-mascot mascot-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="35" r="18" fill="#f0f6fc" stroke="#238636" stroke-width="2"/>
+      <circle cx="45" cy="30" r="2" fill="#0d1117"/>
+      <circle cx="55" cy="30" r="2" fill="#0d1117"/>
+      <path d="M 42 40 Q 50 45 58 40" stroke="#238636" stroke-width="2" fill="none"/>
+      <ellipse cx="50" cy="65" rx="15" ry="12" fill="#1f6feb" stroke="#238636" stroke-width="2"/>
+      <circle cx="25" cy="20" r="1" fill="#1f6feb" opacity="0.6">
+        <animate attributeName="cy" values="20;10;20" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+
+    <svg class="register-mascot mascot-3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="35" r="18" fill="#f0f6fc" stroke="#8b5cf6" stroke-width="2"/>
+      <circle cx="45" cy="30" r="2" fill="#0d1117"/>
+      <circle cx="55" cy="30" r="2" fill="#0d1117"/>
+      <path d="M 42 40 Q 50 45 58 40" stroke="#8b5cf6" stroke-width="2" fill="none"/>
+      <ellipse cx="50" cy="65" rx="15" ry="12" fill="#238636" stroke="#8b5cf6" stroke-width="2"/>
+      <circle cx="75" cy="25" r="1" fill="#8b5cf6" opacity="0.5">
+        <animate attributeName="cy" values="25;15;25" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+
+    <!-- Header -->
+    <div class="register-header">
+      <h1 class="register-title">Приєднуйтесь!</h1>
+      <p class="register-subtitle">Створіть свій обліковий запис та почніть навчання</p>
+    </div>
+
+    <!-- Register Form -->
+    <form class="register-form" id="registerForm">
+      <div class="form-group">
+        <label class="form-label" for="login">Логін</label>
+        <input type="text" id="login" name="login" class="form-input" required placeholder="Введіть ваш логін">
+        <div class="input-glow"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" id="email" name="email" class="form-input" required placeholder="Введіть email адресу">
+        <div class="input-glow"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Пароль</label>
+        <input type="password" id="password" name="password" class="form-input" required placeholder="Введіть пароль">
+        <div class="input-glow"></div>
+        <div class="password-strength" id="passwordStrength">
+          <div class="strength-bar"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Підтвердіть пароль</label>
+        <input type="password" id="confirmPassword" name="confirm-password" class="form-input" required placeholder="Підтвердіть пароль">
+        <div class="input-glow"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="languageLevel">Рівень англійської</label>
+        <select id="languageLevel" name="language_level" class="form-input" required>
+          <option value="">Оберіть рівень</option>
+          <option value="A1">A1 - Початковий</option>
+          <option value="A2">A2 - Базовий</option>
+          <option value="B1">B1 - Середній</option>
+          <option value="B2">B2 - Вище середнього</option>
+          <option value="C1">C1 - Просунутий</option>
+          <option value="C2">C2 - Досконалий</option>
+        </select>
+        <div class="input-glow"></div>
+      </div>
+
+      <div class="terms">
+        <input type="checkbox" id="terms" required>
+        <label for="terms">Я погоджуюсь з <a href="#">Умовами використання</a> та <a href="#">Політикою конфіденційності</a></label>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        Створити акаунт
+        <div class="success-checkmark"></div>
+      </button>
+    </form>
+
+    <!-- Social Login -->
+    <div class="social-login">
+      <p class="social-title">Або зареєструйтесь через</p>
+      <div class="social-buttons">
+        <button class="social-btn google-btn" onclick="loginWithOAuth('google')" title="Зареєструватися через Google">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        </button>
+        <button class="social-btn facebook-btn" onclick="loginWithOAuth('facebook')" title="Зареєструватися через Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </button>
+        <button class="social-btn github-btn" onclick="loginWithOAuth('github')" title="Зареєструватися через GitHub">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Link -->
+    <div class="login-link">
+      <p>Вже маєте акаунт? <a href="login.html">Увійти</a></p>
+      <a href="index.html" class="back-home">← Повернутися на головну</a>
+    </div>
+  </div>
+
+  <script>
+    // Create particles
+    function createParticles() {
+      const particles = document.getElementById('particles');
+      const particleCount = 25;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+        
+        // Random colors
+        const colors = ['var(--github-blue)', 'var(--github-purple)', 'var(--github-accent)'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        particles.appendChild(particle);
+      }
+    }
+
+             // Animate register container
+         function animateRegister() {
+             const container = document.querySelector('.register-container');
+             const title = document.querySelector('.register-title');
+             const subtitle = document.querySelector('.register-subtitle');
+             const formGroups = document.querySelectorAll('.form-group, .terms');
+             const buttons = document.querySelectorAll('.btn');
+             const socialLogin = document.querySelector('.social-login');
+             const loginLink = document.querySelector('.login-link');
+
+             // Add animation start class and animate
+             container.classList.add('animate-start');
+             
+             // Small delay to ensure class is applied
+             setTimeout(() => {
+                 // Epic container entrance from bottom
+                 anime({
+                     targets: container,
+                     translateY: ['100vh', 0],
+                     rotate: [15, 0],
+                     scale: [0.3, 1],
+                     opacity: [0, 1],
+                     duration: 1400,
+                     easing: 'easeOutCubic',
+                     complete: () => {
+                         // Remove animation class
+                         container.classList.remove('animate-start');
+                         
+                         // Wiggle effect after landing
+                         anime({
+                             targets: container,
+                             rotate: [0, -2, 2, 0],
+                             duration: 600,
+                             easing: 'easeInOutSine'
+                         });
+                         
+                         // Create rainbow particles effect
+                         createRainbowParticles();
+                     }
+                 });
+             }, 100);
+
+      // Title animation
+      anime({
+        targets: title,
+        translateY: [-30, 0],
+        scale: [0.8, 1],
+        opacity: [0, 1],
+        duration: 800,
+        delay: 300,
+        easing: 'easeOutBack'
+      });
+
+      // Subtitle
+      anime({
+        targets: subtitle,
+        translateY: [-20, 0],
+        opacity: [0, 1],
+        duration: 600,
+        delay: 500,
+        easing: 'easeOutExpo'
+      });
+
+      // Form groups
+      anime({
+        targets: formGroups,
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 600,
+        delay: anime.stagger(80, {start: 700}),
+        easing: 'easeOutExpo'
+      });
+
+      // Buttons
+      anime({
+        targets: buttons,
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 600,
+        delay: anime.stagger(50, {start: 1200}),
+        easing: 'easeOutExpo'
+      });
+
+      // Social login
+      anime({
+        targets: socialLogin,
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 500,
+        delay: 1400,
+        easing: 'easeOutExpo'
+      });
+
+      // Login link
+      anime({
+        targets: loginLink,
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 500,
+        delay: 1500,
+        easing: 'easeOutExpo'
+      });
+    }
+
+    // Form interactions
+    function setupInteractions() {
+      const inputs = document.querySelectorAll('.form-input');
+      const socialBtns = document.querySelectorAll('.social-btn');
+      const form = document.getElementById('registerForm');
+      const passwordInput = document.getElementById('password');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+      const strengthIndicator = document.getElementById('passwordStrength');
+
+      // Input focus animations
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          anime({
+            targets: input.previousElementSibling,
+            color: '#1f6feb',
+            scale: [1, 1.05, 1],
+            duration: 400
+          });
+        });
+
+        input.addEventListener('blur', () => {
+          if (!input.value) {
+            anime({
+              targets: input.previousElementSibling,
+              color: '#f0f6fc',
+              duration: 300
+            });
+          }
+        });
+      });
+
+      // Password strength checker
+      passwordInput.addEventListener('input', () => {
+        const password = passwordInput.value;
+        const strengthBar = strengthIndicator.querySelector('.strength-bar');
+        
+        if (password.length > 0) {
+          strengthIndicator.classList.add('show');
+          
+          let strength = 0;
+          if (password.length >= 8) strength++;
+          if (/[A-Z]/.test(password)) strength++;
+          if (/[0-9]/.test(password)) strength++;
+          if (/[^A-Za-z0-9]/.test(password)) strength++;
+          
+          strengthBar.className = 'strength-bar';
+          
+          if (strength === 1) strengthBar.classList.add('strength-weak');
+          else if (strength === 2) strengthBar.classList.add('strength-fair');
+          else if (strength === 3) strengthBar.classList.add('strength-good');
+          else if (strength === 4) strengthBar.classList.add('strength-strong');
+        } else {
+          strengthIndicator.classList.remove('show');
+        }
+      });
+
+      // Password confirmation validation
+      confirmPasswordInput.addEventListener('input', () => {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword.length > 0) {
+          if (password === confirmPassword) {
+            confirmPasswordInput.style.borderColor = 'var(--github-accent)';
+          } else {
+            confirmPasswordInput.style.borderColor = 'var(--github-red)';
+          }
+        } else {
+          confirmPasswordInput.style.borderColor = 'var(--github-border)';
+        }
+      });
+
+      // Social button animations
+      socialBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          anime({
+            targets: btn,
+            scale: [1, 1.3, 1],
+            rotate: [0, 15, 0],
+            duration: 500,
+            easing: 'easeOutBack'
+          });
+        });
+      });
+
+      // Form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = form.querySelector('.btn-primary');
+        const checkmark = submitBtn.querySelector('.success-checkmark');
+        const originalText = submitBtn.textContent;
+        
+        // Get form data
+        const formData = new FormData(form);
+        const data = {
+          login: formData.get('login'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+          'confirm-password': formData.get('confirm-password'),
+          language_level: formData.get('language_level') || 'A1'
+        };
+        
+        // Basic validation
+        if (!data.login || !data.email || !data.password || !data['confirm-password']) {
+          showErrorMessage('Будь ласка, заповніть всі поля');
+          return;
+        }
+        
+        if (data.password !== data['confirm-password']) {
+          showErrorMessage('Паролі не співпадають');
+          return;
+        }
+        
+        if (data.password.length < 6) {
+          showErrorMessage('Пароль має бути не менше 6 символів');
+          return;
+        }
+        
+        // Show loading state
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = '';
+        submitBtn.disabled = true;
+        
+        try {
+          const response = await fetch('http://127.0.0.1:8080/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            // Success! Show success animation
+            submitBtn.classList.remove('loading');
+            checkmark.style.display = 'block';
+            
+            anime({
+              targets: checkmark,
+              scale: [0, 1.2, 1],
+              duration: 600,
+              easing: 'easeOutBack'
+            });
+            
+            showSuccessMessage('Успішна реєстрація!');
+            createRainbowParticles();
+            
+            // Redirect to login after animation
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 2000);
+            
+          } else {
+            // Error handling
+            const errorMessage = result.error || 'Помилка реєстрації';
+            showErrorMessage(errorMessage);
+          }
+          
+        } catch (error) {
+          console.error('Registration error:', error);
+          showErrorMessage('Помилка мережі. Перевірте підключення та спробуйте ще раз.');
+        } finally {
+          // Reset button state if not successful
+          if (!checkmark.style.display || checkmark.style.display === 'none') {
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+          }
+        }
+      });
+    }
+
+             // Create rainbow particles effect
+         function createRainbowParticles() {
+             const container = document.querySelector('.register-container');
+             const rect = container.getBoundingClientRect();
+             const centerX = rect.left + rect.width / 2;
+             const centerY = rect.bottom - 50;
+             
+             const colors = ['#238636', '#1f6feb', '#8b5cf6', '#fb8500', '#d63384'];
+             
+             for (let i = 0; i < 25; i++) {
+                 const particle = document.createElement('div');
+                 particle.style.position = 'fixed';
+                 particle.style.left = centerX + (Math.random() - 0.5) * 100 + 'px';
+                 particle.style.top = centerY + 'px';
+                 particle.style.width = Math.random() * 6 + 3 + 'px';
+                 particle.style.height = particle.style.width;
+                 particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                 particle.style.borderRadius = '50%';
+                 particle.style.pointerEvents = 'none';
+                 particle.style.zIndex = '1000';
+                 
+                 document.body.appendChild(particle);
+                 
+                 anime({
+                     targets: particle,
+                     translateY: [0, -150 - Math.random() * 100],
+                     translateX: [(Math.random() - 0.5) * 200],
+                     rotate: [0, Math.random() * 720],
+                     scale: [1, 0],
+                     opacity: [1, 0],
+                     duration: 1500,
+                     easing: 'easeOutQuad',
+                     complete: () => {
+                         document.body.removeChild(particle);
+                     }
+                 });
+             }
+         }
+
+         // OAuth Login Function (same as login page)
+         async function loginWithOAuth(provider) {
+             try {
+                 // Show loading state
+                 const button = document.querySelector(`.${provider}-btn`);
+                 const originalContent = button.innerHTML;
+                 button.innerHTML = '<div class="loading-spinner"></div>';
+                 button.disabled = true;
+                 
+                 // Request OAuth URL from backend
+                 const response = await fetch(`http://localhost:8080/auth/oauth/${provider}/login`, {
+                     method: 'GET',
+                     credentials: 'include'
+                 });
+                 
+                 if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                 }
+                 
+                 const data = await response.json();
+                 
+                 if (data.authorization_url) {
+                     // Redirect to OAuth provider
+                     window.location.href = data.authorization_url;
+                 } else {
+                     throw new Error('No authorization URL received');
+                 }
+                 
+             } catch (error) {
+                 console.error('OAuth login error:', error);
+                 alert(`Помилка при авторизації через ${provider}. Спробуйте ще раз.`);
+                 
+                 // Restore button state
+                 const button = document.querySelector(`.${provider}-btn`);
+                 button.innerHTML = originalContent;
+                 button.disabled = false;
+             }
+         }
+         
+         // Check if there's an OAuth token in URL (for callback handling)
+         function checkOAuthCallback() {
+             const urlParams = new URLSearchParams(window.location.search);
+             const token = urlParams.get('token');
+             
+             if (token) {
+                 // Store token and redirect to dashboard
+                 localStorage.setItem('access_token', token);
+                 window.location.href = '/dashboard.html';
+             }
+         }
+
+         // Show error message
+         function showErrorMessage(message) {
+             // Remove existing messages
+             const existingMessage = document.querySelector('.error-message');
+             if (existingMessage) {
+                 existingMessage.remove();
+             }
+             
+             const errorDiv = document.createElement('div');
+             errorDiv.className = 'error-message';
+             errorDiv.textContent = message;
+             errorDiv.style.cssText = `
+                 position: fixed;
+                 top: 20px;
+                 right: 20px;
+                 background: rgba(239, 68, 68, 0.9);
+                 color: white;
+                 padding: 15px 25px;
+                 border-radius: 8px;
+                 font-size: 14px;
+                 font-weight: 500;
+                 z-index: 10000;
+                 box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+                 transform: translateX(100%);
+                 transition: transform 0.3s ease;
+             `;
+             
+             document.body.appendChild(errorDiv);
+             
+             // Animate in
+             setTimeout(() => {
+                 errorDiv.style.transform = 'translateX(0)';
+             }, 100);
+             
+             // Auto remove after 5 seconds
+             setTimeout(() => {
+                 errorDiv.style.transform = 'translateX(100%)';
+                 setTimeout(() => {
+                     if (document.body.contains(errorDiv)) {
+                         document.body.removeChild(errorDiv);
+                     }
+                 }, 300);
+             }, 5000);
+         }
+         
+         // Show success message
+         function showSuccessMessage(message) {
+             const successDiv = document.createElement('div');
+             successDiv.className = 'success-message';
+             successDiv.textContent = message;
+             successDiv.style.cssText = `
+                 position: fixed;
+                 top: 20px;
+                 right: 20px;
+                 background: rgba(34, 197, 94, 0.9);
+                 color: white;
+                 padding: 15px 25px;
+                 border-radius: 8px;
+                 font-size: 14px;
+                 font-weight: 500;
+                 z-index: 10000;
+                 box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+                 transform: translateX(100%);
+                 transition: transform 0.3s ease;
+             `;
+             
+             document.body.appendChild(successDiv);
+             
+             // Animate in
+             setTimeout(() => {
+                 successDiv.style.transform = 'translateX(0)';
+             }, 100);
+             
+             // Auto remove after 3 seconds
+             setTimeout(() => {
+                 successDiv.style.transform = 'translateX(100%)';
+                 setTimeout(() => {
+                     if (document.body.contains(successDiv)) {
+                         document.body.removeChild(successDiv);
+                     }
+                 }, 300);
+             }, 3000);
+         }
+         
+         // Check if user is already logged in
+         async function checkIfAlreadyLoggedIn() {
+             const token = localStorage.getItem('access_token');
+             if (!token) return;
+             
+             try {
+                 const response = await fetch('http://127.0.0.1:8080/verify-token', {
+                     method: 'POST',
+                     headers: {
+                         'Authorization': `Bearer ${token}`,
+                         'Content-Type': 'application/json'
+                     }
+                 });
+                 
+                 if (response.ok) {
+                     const data = await response.json();
+                     if (data.valid) {
+                         // User is already logged in, redirect to dashboard
+                         window.location.href = '/dashboard.html';
+                     }
+                 } else {
+                     // Token is invalid, remove it
+                     localStorage.removeItem('access_token');
+                     localStorage.removeItem('user_data');
+                 }
+             } catch (error) {
+                 console.error('Token verification error:', error);
+                 // If there's an error, remove potentially invalid token
+                 localStorage.removeItem('access_token');
+                 localStorage.removeItem('user_data');
+             }
+         }
+
+         // Initialize
+         document.addEventListener('DOMContentLoaded', () => {
+             checkIfAlreadyLoggedIn();
+             createParticles();
+             animateRegister();
+             setupInteractions();
+             checkOAuthCallback();
+         });
+  </script>
+  
+  <!-- Loading Spinner CSS -->
+  <style>
+      .loading-spinner {
+          width: 20px;
+          height: 20px;
+          border: 2px solid #f3f3f3;
+          border-top: 2px solid #1f6feb;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+      
+      .social-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+      }
+  </style>
+</body>
+</html> 

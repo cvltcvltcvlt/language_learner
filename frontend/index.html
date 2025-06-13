@@ -1,144 +1,1292 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Language Learner — Ласкаво просимо</title>
+  <title>Вивчай англійську - Майстер англійської з ШІ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/animejs@4.0.0/lib/anime.min.js"></script>
   <style>
-    body {
+    :root {
+      --neon-pink: #ff006e;
+      --neon-blue: #00b4d8;
+      --neon-purple: #7209b7;
+      --neon-green: #a4ff00;
+      --neon-orange: #ff8500;
+      --cyber-dark: #0a0a0f;
+      --cyber-light: #1a1a2e;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glow-primary: 0 0 20px rgba(255, 0, 110, 0.5);
+      --glow-secondary: 0 0 20px rgba(0, 180, 216, 0.5);
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-border: #30363d;
+      --github-text: #f0f6fc;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #1f6feb;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-pink: #d63384;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      font-family: 'Roboto', sans-serif;
-      color: white;
-      text-align: center;
-      overflow: hidden;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
+      box-sizing: border-box;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Animated particles background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--github-accent);
+      border-radius: 50%;
+      animation: float 6s infinite ease-in-out;
+      opacity: 0.3;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-100px) rotate(180deg); opacity: 0.8; }
+    }
+
+         /* Hero Section */
+     .hero {
+       min-height: 100vh;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       position: relative;
+       padding: 2rem;
+     }
+
+     .hero-content {
+       text-align: center;
+       max-width: 1400px;
+       position: relative;
+       z-index: 2;
+     }
+
+     /* Enhanced 3D Environment */
+     .hero::before {
+       content: '';
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: 
+         radial-gradient(circle at 30% 30%, rgba(35, 134, 54, 0.08) 0%, transparent 50%),
+         radial-gradient(circle at 70% 70%, rgba(31, 111, 235, 0.08) 0%, transparent 50%),
+         radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+       z-index: -1;
+     }
+
+         .main-title {
+       font-size: clamp(4rem, 12vw, 10rem);
+       font-weight: 900;
+       color: var(--github-text);
+       margin-bottom: 2rem;
+       letter-spacing: -0.02em;
+       position: relative;
+       z-index: 10;
+       backface-visibility: hidden;
+       -webkit-backface-visibility: hidden;
+       -webkit-font-smoothing: antialiased;
+       -moz-osx-font-smoothing: grayscale;
+     }
+
+     /* Fallback for browsers that don't support background-clip: text */
+     @supports not (-webkit-background-clip: text) {
+       .main-title {
+         color: var(--github-accent);
+         background: none;
+       }
+     }
+
+     .main-title .char {
+       display: inline-block;
+       transform: translateY(100px);
+       opacity: 0;
+       will-change: transform, opacity;
+     }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
-    .welcome-container {
-      animation: fadeIn 1s ease;
+         @keyframes titleSlideIn {
+       0% { transform: translateY(-100px) scale(0.8) rotateX(-30deg) rotateY(-15deg); opacity: 0; }
+       100% { transform: translateY(0) scale(1) rotateX(0deg) rotateY(0deg); opacity: 1; }
+     }
+
+     @keyframes complex3D {
+       0%, 100% { 
+         transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+         filter: drop-shadow(0 0 20px rgba(35, 134, 54, 0.5));
+       }
+       25% { 
+         transform: rotateX(5deg) rotateY(10deg) rotateZ(2deg) scale(1.05);
+         filter: drop-shadow(0 15px 30px rgba(31, 111, 235, 0.6));
+       }
+       50% { 
+         transform: rotateX(-3deg) rotateY(-8deg) rotateZ(-1deg) scale(1.1);
+         filter: drop-shadow(0 25px 40px rgba(139, 92, 246, 0.7));
+       }
+       75% { 
+         transform: rotateX(7deg) rotateY(-5deg) rotateZ(3deg) scale(1.05);
+         filter: drop-shadow(0 20px 35px rgba(35, 134, 54, 0.6));
+       }
+     }
+
+     /* Simplified Title Enhancement - removed to prevent blur */
+
+         .motivational-text {
+       font-size: clamp(1.2rem, 3vw, 1.8rem);
+       color: var(--github-text-secondary);
+       margin-bottom: 3rem;
+       font-weight: 400;
+       opacity: 0;
+       transform: translateY(30px);
+     }
+
+    @keyframes fadeInUp {
+      0% { transform: translateY(30px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
-    .ml16 {
-      font-weight: 800;
-      font-size: 3em;
+         /* Mascots */
+     .mascot {
+       position: absolute;
+       width: 400px;
+       height: 400px;
+       animation: float3D 4s ease-in-out infinite;
+       user-select: none;
+       cursor: pointer;
+       transition: all 0.3s ease;
+       z-index: 5;
+       border: none;
+       box-shadow: none;
+       background: none;
+     }
+
+     .mascot img {
+       width: 100%;
+       height: 100%;
+       object-fit: contain;
+       border: none;
+       border-radius: 0;
+       background: transparent;
+     }
+
+     .mascot:hover {
+       transform: scale(1.05) rotateY(3deg);
+       filter: drop-shadow(0 15px 30px rgba(35, 134, 54, 0.3));
+     }
+
+     .mascot-left {
+       left: 3%;
+       top: 50%;
+       transform: translateY(-50%) translateX(-150%);
+       animation: slideInFromLeft 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1s forwards,
+                  float3D 4s ease-in-out 3s infinite;
+     }
+
+     @keyframes slideInFromLeft {
+       0% { 
+         transform: translateY(-50%) translateX(-150%) rotate(-15deg);
+         opacity: 0;
+       }
+       50% {
+         transform: translateY(-50%) translateX(-20%) rotate(-5deg);
+         opacity: 0.7;
+       }
+       100% { 
+         transform: translateY(-50%) translateX(10%) rotate(0deg);
+         opacity: 1;
+       }
+     }
+
+     .mascot-right {
+       right: 3%;
+       top: 50%;
+       transform: translateY(-50%);
+       opacity: 0;
+       animation: fadeInRight 1.5s ease-out 2s forwards,
+                  float3D 4s ease-in-out 4s infinite;
+     }
+
+     @keyframes fadeInRight {
+       0% { 
+         transform: translateY(-50%) scale(0.8);
+         opacity: 0;
+       }
+       100% { 
+         transform: translateY(-50%) scale(1);
+         opacity: 1;
+       }
+     }
+
+     @keyframes float3D {
+       0%, 100% { 
+         transform: translateY(-50%) rotateX(0deg) rotateY(0deg) scale(1);
+         filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+       }
+       33% { 
+         transform: translateY(-60%) rotateX(5deg) rotateY(-5deg) scale(1.05);
+         filter: drop-shadow(0 15px 30px rgba(35, 134, 54, 0.4));
+       }
+       66% { 
+         transform: translateY(-45%) rotateX(-3deg) rotateY(3deg) scale(0.98);
+         filter: drop-shadow(0 5px 15px rgba(31, 111, 235, 0.3));
+       }
+     }
+
+
+
+    /* Features Section */
+    .features {
+      padding: 5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: var(--github-text);
+      animation: fadeInUp 1s ease both;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 5rem;
+    }
+
+         .feature-card {
+       background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.9));
+       border: 1px solid var(--github-border);
+       border-radius: 12px;
+       padding: 2rem;
+       transition: all 0.3s ease;
+       position: relative;
+       overflow: hidden;
+       opacity: 0;
+       transform: translateY(50px) scale(0.8) rotateX(30deg);
+     }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(35, 134, 54, 0.1), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .feature-card:hover::before {
+      left: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--github-accent);
+      box-shadow: 0 20px 40px rgba(35, 134, 54, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .feature-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--github-text);
+    }
+
+    .feature-description {
+      color: var(--github-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Scroll Sections */
+    .scroll-section {
+      min-height: 100vh;
+      padding: 5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-top: 1px solid var(--github-border);
+    }
+
+    .section-content {
+      max-width: 800px;
+      text-align: center;
+      animation: fadeInUp 1s ease both;
+    }
+
+    .section-number {
+      font-size: 1rem;
+      color: var(--github-accent);
+      font-weight: 600;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      letter-spacing: 0.5em;
+    }
+
+    .section-title {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-description {
+      font-size: 1.2rem;
+      color: var(--github-text-secondary);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .demo-visual {
+      width: 100%;
+      height: 300px;
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--github-text-secondary);
+      margin-top: 2rem;
+      position: relative;
       overflow: hidden;
-      margin-bottom: 20px;
-      text-shadow: 4px 4px 12px rgba(0,0,0,0.8);
     }
-    .ml16 .letter {
+
+    .demo-visual::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(35, 134, 54, 0.1) 50%, transparent 70%);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* CTA Button */
+    .cta-button {
       display: inline-block;
-      line-height: 1em;
-    }
-
-    .ml3 {
-      font-weight: 900;
-      font-size: 1.5em;
-      margin-bottom: 40px;
-      text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
-    }
-    .ml3 .letter {
-      display: inline-block;
-      line-height: 1em;
-    }
-
-    .welcome-buttons {
-      opacity: 0;
-      animation: fadeInButtons 1s ease forwards;
-      animation-delay: 1.5s;
-    }
-
-    @keyframes fadeInButtons {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .btn {
-      text-decoration: none;
-      padding: 15px 30px;
-      background: white;
-      color: #2575fc;
-      border-radius: 30px;
-      font-size: 20px;
-      margin: 10px;
-      transition: all 0.3s ease;
-      box-shadow: 0px 8px 20px rgba(0,0,0,0.4);
-    }
-
-    .btn:hover {
-      background: #2575fc;
+      padding: 1rem 2rem;
+      background: var(--github-accent);
       color: white;
-      transform: scale(1.08);
-      box-shadow: 0px 12px 30px rgba(0,0,0,0.5);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 2rem;
+      animation: pulse 2s infinite;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .cta-button:hover {
+      background: var(--github-accent-emphasis);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(35, 134, 54, 0.3);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(35, 134, 54, 0.7); }
+      50% { box-shadow: 0 0 0 10px rgba(35, 134, 54, 0); }
+    }
+
+         /* Interactive 3D Particles */
+     .particle3d {
+       position: absolute;
+       width: 6px;
+       height: 6px;
+       background: var(--github-accent);
+       border-radius: 50%;
+       animation: float3DParticle 8s infinite ease-in-out;
+       opacity: 0.4;
+     }
+
+     @keyframes float3DParticle {
+       0%, 100% { 
+         transform: translateX(0) translateY(0) scale(1);
+         opacity: 0.4;
+       }
+       25% { 
+         transform: translateX(30px) translateY(-20px) scale(1.2);
+         opacity: 0.8;
+       }
+       50% { 
+         transform: translateX(-20px) translateY(-30px) scale(0.8);
+         opacity: 0.6;
+       }
+       75% { 
+         transform: translateX(-30px) translateY(15px) scale(1.1);
+         opacity: 0.9;
+       }
+     }
+
+     /* Enhanced Text Effects */
+     .main-title {
+       position: relative;
+     }
+
+     .main-title .letter {
+       display: inline-block;
+       animation: letterFloat 3s ease-in-out infinite;
+       transform-origin: center;
+     }
+
+     @keyframes letterFloat {
+       0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+       50% { transform: translateY(-10px) rotateZ(2deg); }
+     }
+
+     /* Glowing Orbs around title */
+     .title-orb {
+       position: absolute;
+       width: 20px;
+       height: 20px;
+       border-radius: 50%;
+       background: radial-gradient(circle, var(--github-accent), transparent);
+       animation: orbitTitle 10s linear infinite;
+       opacity: 0.6;
+     }
+
+     .title-orb:nth-child(1) { animation-delay: 0s; }
+     .title-orb:nth-child(2) { animation-delay: -2.5s; }
+     .title-orb:nth-child(3) { animation-delay: -5s; }
+     .title-orb:nth-child(4) { animation-delay: -7.5s; }
+
+     @keyframes orbitTitle {
+       0% { transform: rotate(0deg) translateX(300px) rotate(0deg); }
+       100% { transform: rotate(360deg) translateX(300px) rotate(-360deg); }
+     }
+
+     /* Responsive Design */
+     @media (max-width: 768px) {
+       .mascot {
+         width: 250px;
+         height: 250px;
+       }
+       
+       .mascot-left, .mascot-right {
+         position: relative;
+         left: auto;
+         right: auto;
+         top: auto;
+         transform: none;
+         display: inline-block;
+         margin: 1rem;
+         opacity: 1;
+         animation: none;
+       }
+
+       .hero-content {
+         margin-top: 2rem;
+       }
+
+       .title-orb {
+         display: none;
+       }
+
+       .main-title {
+         font-size: clamp(2.5rem, 10vw, 6rem);
+       }
+
+       .particle3d {
+         display: none;
+       }
+
+       @keyframes orbitTitle {
+         0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+         100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+       }
+     }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--github-surface);
+      z-index: 1000;
+    }
+
+    .scroll-progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue));
+      width: 0%;
+      transition: width 0.1s ease;
     }
   </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 <body>
-  <div class="welcome-container">
-    <h1 class="ml16">Language Learner</h1>
-
-    <h2 class="ml3">Почни вивчати нові слова та проходити захопливі уроки!</h2>
-
-    <div class="welcome-buttons">
-      <a href="login.html" class="btn">Увійти</a>
-      <a href="registration.html" class="btn">Реєстрація</a>
-    </div>
+  <!-- Scroll Progress Indicator -->
+  <div class="scroll-indicator">
+    <div class="scroll-progress" id="scrollProgress"></div>
   </div>
 
+  <!-- Animated Particles Background -->
+  <div class="particles" id="particles"></div>
+
+     <!-- Hero Section -->
+   <section class="hero">
+     <div class="mascot mascot-left">
+       <img src="assets/images/learning-mascot.gif" alt="Learning Animation" onerror="this.src='assets/images/learning-mascot.svg'; this.onerror=null;" />
+     </div>
+     <div class="hero-content">
+       <h1 class="main-title">English Learner</h1>
+       <p class="motivational-text">"Кожне слово, яке ви вивчаєте, наближає вас до ваших мрій. Почніть свою подорож сьогодні!"</p>
+      
+      <!-- Features Preview -->
+      <div class="features">
+        <h2 class="features-title">Потужні навчальні функції</h2>
+        <div class="features-grid">
+          <div class="feature-card" style="animation-delay: 0.2s;">
+            <span class="feature-icon">🤖</span>
+            <h3 class="feature-title">Уроки з ШІ</h3>
+            <p class="feature-description">Персоналізовані навчальні шляхи, адаптовані до вашого рівня навичок та темпу навчання.</p>
+          </div>
+          <div class="feature-card" style="animation-delay: 0.4s;">
+            <span class="feature-icon">💬</span>
+            <h3 class="feature-title">Інтерактивний чат</h3>
+            <p class="feature-description">Практикуйте розмови з ШІ-репетиторами в реальних сценаріях.</p>
+          </div>
+          <div class="feature-card" style="animation-delay: 0.6s;">
+            <span class="feature-icon">📊</span>
+            <h3 class="feature-title">Відстеження прогресу</h3>
+            <p class="feature-description">Слідкуйте за своїм покращенням з детальною аналітикою та досягненнями.</p>
+          </div>
+          <div class="feature-card" style="animation-delay: 0.8s;">
+            <span class="feature-icon">🎯</span>
+            <h3 class="feature-title">Будівник словника</h3>
+            <p class="feature-description">Розумні пропозиції слів та інтервальне повторення для кращого запам'ятовування.</p>
+          </div>
+          <div class="feature-card" style="animation-delay: 1.0s;">
+            <span class="feature-icon">🏆</span>
+            <h3 class="feature-title">Ігрофікація</h3>
+            <p class="feature-description">Заробляйте очки, значки та змагайтеся з друзями, щоб залишатися мотивованими.</p>
+          </div>
+          <div class="feature-card" style="animation-delay: 1.2s;">
+            <span class="feature-icon">📱</span>
+            <h3 class="feature-title">Мобільна версія</h3>
+            <p class="feature-description">Вчіться будь-де, будь-коли з нашим адаптивним дизайном та офлайн режимом.</p>
+          </div>
+                 </div>
+       </div>
+     </div>
+     <div class="mascot mascot-right">
+       <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="reading-character-svg">
+         <defs>
+           <style>
+             .reading-character-svg .character { 
+               animation: readingBounce 3s ease-in-out infinite;
+               transform-origin: center bottom;
+             }
+             .reading-character-svg .book { 
+               animation: bookSway 4s ease-in-out infinite;
+               transform-origin: center;
+             }
+             .reading-character-svg .eyes { 
+               animation: readingEyes 8s ease-in-out infinite;
+             }
+             .reading-character-svg .head {
+               animation: headNod 6s ease-in-out infinite;
+               transform-origin: center bottom;
+             }
+             .reading-character-svg .coffee-steam { 
+               animation: steamRise 2s ease-in-out infinite;
+               opacity: 0.6;
+             }
+             .reading-character-svg .pages {
+               animation: pageFlip 5s ease-in-out infinite;
+             }
+             @keyframes readingBounce {
+               0%, 100% { transform: translateY(0) rotate(0deg); }
+               50% { transform: translateY(-3px) rotate(0.5deg); }
+             }
+             @keyframes bookSway {
+               0%, 100% { transform: rotate(-2deg); }
+               50% { transform: rotate(2deg); }
+             }
+             @keyframes readingEyes {
+               0%, 25% { transform: translateY(2px); }
+               30%, 70% { transform: translateY(-2px); }
+               75%, 100% { transform: translateY(2px); }
+             }
+             @keyframes headNod {
+               0%, 30% { transform: rotate(2deg); }
+               35%, 65% { transform: rotate(-1deg); }
+               70%, 100% { transform: rotate(2deg); }
+             }
+             @keyframes steamRise {
+               0% { transform: translateY(0) scale(1); opacity: 0.6; }
+               50% { transform: translateY(-8px) scale(1.1); opacity: 0.3; }
+               100% { transform: translateY(-15px) scale(0.8); opacity: 0; }
+             }
+             @keyframes pageFlip {
+               0%, 70% { opacity: 1; }
+               75%, 85% { opacity: 0.3; }
+               90%, 100% { opacity: 1; }
+             }
+           </style>
+         </defs>
+         
+         <!-- Character -->
+         <g class="character">
+           <!-- Head -->
+           <g class="head">
+             <circle cx="100" cy="70" r="28" fill="#f0f6fc" stroke="#238636" stroke-width="2"/>
+             
+             <!-- Eyes -->
+             <g class="eyes">
+               <circle cx="90" cy="65" r="3" fill="#0d1117"/>
+               <circle cx="110" cy="65" r="3" fill="#0d1117"/>
+             </g>
+             
+             <!-- Smile -->
+             <path d="M 88 78 Q 100 85 112 78" stroke="#238636" stroke-width="2" fill="none"/>
+           </g>
+           
+           <!-- Body -->
+           <ellipse cx="100" cy="130" rx="32" ry="30" fill="#1f6feb" stroke="#238636" stroke-width="2"/>
+           
+           <!-- Arms -->
+           <ellipse cx="72" cy="115" rx="10" ry="18" fill="#f0f6fc" stroke="#238636" stroke-width="2" transform="rotate(-15 72 115)"/>
+           <ellipse cx="128" cy="115" rx="10" ry="18" fill="#f0f6fc" stroke="#238636" stroke-width="2" transform="rotate(15 128 115)"/>
+         </g>
+         
+         <!-- Book -->
+         <g class="book">
+           <rect x="75" y="140" width="50" height="35" fill="#8b5cf6" stroke="#238636" stroke-width="2" rx="4"/>
+           <rect x="78" y="143" width="44" height="29" fill="#f0f6fc" stroke="#7d8590" stroke-width="1" rx="2"/>
+           
+           <!-- Pages content -->
+           <g class="pages">
+             <line x1="82" y1="150" x2="118" y2="150" stroke="#0d1117" stroke-width="1" opacity="0.8"/>
+             <line x1="82" y1="155" x2="115" y2="155" stroke="#0d1117" stroke-width="1" opacity="0.8"/>
+             <line x1="82" y1="160" x2="120" y2="160" stroke="#0d1117" stroke-width="1" opacity="0.8"/>
+             <line x1="82" y1="165" x2="112" y2="165" stroke="#0d1117" stroke-width="1" opacity="0.8"/>
+           </g>
+         </g>
+         
+         <!-- Coffee Cup -->
+         <g>
+           <rect x="135" y="150" width="20" height="25" fill="#238636" stroke="#0d1117" stroke-width="2" rx="2"/>
+           <rect x="137" y="152" width="16" height="8" fill="#8B4513" rx="1"/>
+           
+           <!-- Handle -->
+           <path d="M 155 160 Q 165 160 165 170 Q 165 175 155 175" stroke="#0d1117" stroke-width="2" fill="none"/>
+           
+           <!-- Steam -->
+           <g class="coffee-steam">
+             <line x1="140" y1="145" x2="140" y2="135" stroke="#f0f6fc" stroke-width="2" opacity="0.6"/>
+             <line x1="145" y1="145" x2="145" y2="135" stroke="#f0f6fc" stroke-width="2" opacity="0.4"/>
+             <line x1="150" y1="145" x2="150" y2="135" stroke="#f0f6fc" stroke-width="2" opacity="0.5"/>
+           </g>
+         </g>
+         
+         <!-- Floating particles -->
+         <g>
+           <circle cx="40" cy="50" r="2" fill="#238636" opacity="0.6">
+             <animate attributeName="cy" values="50;40;50" dur="3s" repeatCount="indefinite"/>
+             <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+           </circle>
+           <circle cx="160" cy="40" r="1.5" fill="#1f6feb" opacity="0.4">
+             <animate attributeName="cy" values="40;30;40" dur="2.5s" repeatCount="indefinite"/>
+             <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+           </circle>
+           <circle cx="170" cy="120" r="2" fill="#8b5cf6" opacity="0.5">
+             <animate attributeName="cy" values="120;110;120" dur="4s" repeatCount="indefinite"/>
+             <animate attributeName="opacity" values="0.5;0.9;0.5" dur="4s" repeatCount="indefinite"/>
+           </circle>
+         </g>
+         
+         <!-- Text -->
+         <text x="100" y="190" font-family="Arial, sans-serif" font-size="12" fill="#7d8590" text-anchor="middle">Читаю...</text>
+       </svg>
+     </div>
+   </section>
+
+  <!-- Detailed Sections -->
+  <section class="scroll-section" data-section="1">
+    <div class="section-content">
+      <div class="section-number">Крок 01</div>
+      <h2 class="section-title">Персоналізоване оцінювання</h2>
+      <p class="section-description">
+        Почніть свою подорож з нашого комплексного оцінювання англійської мови. Наш ШІ аналізує ваш поточний рівень, 
+        визначає сильні та слабкі сторони та створює індивідуальний навчальний шлях спеціально для вас. 
+        Більше ніяких універсальних підходів – ваш навчальний досвід унікальний.
+      </p>
+      <div class="demo-visual">
+        <span>📋 Демо інтерактивного оцінювання</span>
+      </div>
+      <a href="login.html" class="cta-button">Пройти оцінювання</a>
+    </div>
+  </section>
+
+  <section class="scroll-section" data-section="2">
+    <div class="section-content">
+      <div class="section-number">Крок 02</div>
+      <h2 class="section-title">Розумні навчальні модулі</h2>
+      <p class="section-description">
+        Зануртеся в інтерактивні уроки з граматики, словника, вимови та навичок розмови. 
+        Кожен модуль адаптується до вашого прогресу, забезпечуючи виклик, але не перевантажуючи. 
+        Вчіться через ігри, вікторини та реальні сценарії.
+      </p>
+      <div class="demo-visual">
+        <span>🎓 Інтерактивний інтерфейс навчання</span>
+      </div>
+      <a href="login.html" class="cta-button">Почати навчання</a>
+    </div>
+  </section>
+
+  <section class="scroll-section" data-section="3">
+    <div class="section-content">
+      <div class="section-number">Крок 03</div>
+      <h2 class="section-title">ШІ-практика розмови</h2>
+      <p class="section-description">
+        Практикуйте справжні розмови з нашими просунутими ШІ-репетиторами. Від замовлення кави до співбесід, 
+        наш ШІ адаптується до різних сценаріїв і дає миттєвий зворотний зв'язок щодо граматики, вимови 
+        та плавності мовлення. Розвивайте впевненість у природному спілкуванні англійською.
+      </p>
+      <div class="demo-visual">
+        <span>💭 Попередній перегляд ШІ-чату</span>
+      </div>
+      <a href="login.html" class="cta-button">Спробувати чат</a>
+    </div>
+  </section>
+
+  <section class="scroll-section" data-section="4">
+    <div class="section-content">
+      <div class="section-number">Крок 04</div>
+      <h2 class="section-title">Відстежуйте свій прогрес</h2>
+      <p class="section-description">
+        Контролюйте своє покращення за допомогою детальної аналітики, значків досягнень та звітів про прогрес. 
+        Дивіться, як далеко ви просунулися, визначайте сфери для покращення та святкуйте свої віхи. 
+        Діліться своїми досягненнями з друзями та родиною.
+      </p>
+      <div class="demo-visual">
+        <span>📈 Попередній перегляд панелі прогресу</span>
+      </div>
+      <a href="login.html" class="cta-button">Переглянути панель</a>
+    </div>
+  </section>
+
   <script>
-    // Анімація заголовка Language Learner
-    var textWrapper16 = document.querySelector('.ml16');
-    textWrapper16.innerHTML = textWrapper16.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+         // Create floating particles
+     function createParticles() {
+       const particles = document.getElementById('particles');
+       const particleCount = 50;
 
-    anime.timeline({loop: false})
-      .add({
-        targets: '.ml16 .letter',
-        translateY: [-100,0],
-        easing: "easeOutExpo",
-        duration: 1400,
-        delay: (el, i) => 30 * i
+       for (let i = 0; i < particleCount; i++) {
+         const particle = document.createElement('div');
+         particle.className = 'particle';
+         particle.style.left = Math.random() * 100 + '%';
+         particle.style.top = Math.random() * 100 + '%';
+         particle.style.animationDelay = Math.random() * 6 + 's';
+         particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+         particles.appendChild(particle);
+       }
+     }
+
+     // Create 3D particles around title
+     function create3DParticles() {
+       const hero = document.querySelector('.hero');
+       const particleCount = 20;
+
+       for (let i = 0; i < particleCount; i++) {
+         const particle = document.createElement('div');
+         particle.className = 'particle3d';
+         particle.style.left = Math.random() * 100 + '%';
+         particle.style.top = Math.random() * 100 + '%';
+         particle.style.animationDelay = Math.random() * 8 + 's';
+         particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+         
+         // Random colors
+         const colors = ['var(--github-accent)', 'var(--github-blue)', 'var(--github-purple)'];
+         particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+         
+         hero.appendChild(particle);
+       }
+     }
+
+     // Create orbiting elements around title
+     function createTitleOrbs() {
+       const title = document.querySelector('.main-title');
+       const orbCount = 4;
+
+       for (let i = 0; i < orbCount; i++) {
+         const orb = document.createElement('div');
+         orb.className = 'title-orb';
+         orb.style.animationDelay = `${-i * 2.5}s`;
+         title.appendChild(orb);
+       }
+     }
+
+     // Split text into characters for Anime.js animation
+     function splitTextToChars() {
+       const title = document.querySelector('.main-title');
+       const text = title.textContent;
+       title.innerHTML = '';
+       
+       [...text].forEach((char) => {
+         const span = document.createElement('span');
+         span.className = 'char';
+         span.textContent = char === ' ' ? '\u00A0' : char;
+         title.appendChild(span);
+       });
+       
+       return title.querySelectorAll('.char');
+     }
+
+     // Anime.js title animation with spectacular effects
+     function animateTitle() {
+       const chars = splitTextToChars();
+       
+       // Hide all characters initially
+       anime.set(chars, {
+         translateY: 200,
+         rotateZ: 45,
+         opacity: 0,
+         scale: 0.3
+       });
+       
+       // First phase: Explosive entrance
+       anime({
+         targets: chars,
+         translateY: 0,
+         rotateZ: 0,
+         opacity: 1,
+         scale: 1,
+         duration: 1500,
+         delay: anime.stagger(80, {start: 300}),
+         easing: 'easeOutElastic(1, .8)',
+         complete: () => {
+           // Second phase: Morphing wave effect
+           anime({
+             targets: chars,
+             translateY: (el, i) => [-30 + Math.sin(i * 0.5) * 20, 30 + Math.sin(i * 0.5) * 20],
+             rotateZ: (el, i) => [-5 + Math.sin(i * 0.3) * 3, 5 + Math.sin(i * 0.3) * 3],
+             scale: (el, i) => [0.9 + Math.sin(i * 0.4) * 0.1, 1.1 + Math.sin(i * 0.4) * 0.1],
+             duration: 4000,
+             direction: 'alternate',
+             loop: true,
+             easing: 'easeInOutSine',
+             delay: anime.stagger(50, {direction: 'reverse'})
+           });
+           
+           // Third phase: Glowing pulsation
+           anime({
+             targets: chars,
+             textShadow: [
+               '0 0 5px rgba(35, 134, 54, 0.5)',
+               '0 0 20px rgba(35, 134, 54, 0.8), 0 0 40px rgba(31, 111, 235, 0.6)',
+               '0 0 5px rgba(35, 134, 54, 0.5)'
+             ],
+             duration: 3000,
+             direction: 'alternate',
+             loop: true,
+             easing: 'easeInOutQuad',
+             delay: anime.stagger(100, {from: 'center'})
+           });
+           
+           // Fourth phase: Rotating characters on hover
+           chars.forEach((char, i) => {
+             char.addEventListener('mouseenter', () => {
+               anime({
+                 targets: char,
+                 rotateY: [0, 360],
+                 scale: [1, 1.3, 1],
+                 color: [
+                   '#f0f6fc',
+                   '#238636',
+                   '#1f6feb',
+                   '#8b5cf6',
+                   '#f0f6fc'
+                 ],
+                 duration: 800,
+                 easing: 'easeOutBack'
+               });
+             });
+           });
+         }
+       });
+       
+       // Parallel animation: Background particles explosion
+       setTimeout(() => {
+         createTitleParticleExplosion();
+       }, 1000);
+     }
+     
+     // New function for particle explosion behind title
+     function createTitleParticleExplosion() {
+       const title = document.querySelector('.main-title');
+       const rect = title.getBoundingClientRect();
+       const centerX = rect.left + rect.width / 2;
+       const centerY = rect.top + rect.height / 2;
+       
+       const colors = ['#238636', '#1f6feb', '#8b5cf6', '#fb8500', '#d63384'];
+       
+       for (let i = 0; i < 50; i++) {
+         const particle = document.createElement('div');
+         particle.style.position = 'fixed';
+         particle.style.left = centerX + 'px';
+         particle.style.top = centerY + 'px';
+         particle.style.width = Math.random() * 8 + 4 + 'px';
+         particle.style.height = particle.style.width;
+         particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+         particle.style.borderRadius = '50%';
+         particle.style.pointerEvents = 'none';
+         particle.style.zIndex = '5';
+         particle.style.boxShadow = `0 0 20px ${colors[Math.floor(Math.random() * colors.length)]}`;
+         
+         document.body.appendChild(particle);
+         
+         const angle = (Math.PI * 2 * i) / 50;
+         const velocity = 150 + Math.random() * 200;
+         const endX = centerX + Math.cos(angle) * velocity;
+         const endY = centerY + Math.sin(angle) * velocity;
+         
+         anime({
+           targets: particle,
+           left: endX + 'px',
+           top: endY + 'px',
+           scale: [1, 0],
+           opacity: [1, 0],
+           rotate: Math.random() * 720,
+           duration: 2000,
+           easing: 'easeOutCubic',
+           complete: () => {
+             if (document.body.contains(particle)) {
+               document.body.removeChild(particle);
+             }
+           }
+         });
+       }
+     }
+
+    // Update scroll progress
+    function updateScrollProgress() {
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollProgress = (scrollTop / scrollHeight) * 100;
+      document.getElementById('scrollProgress').style.width = scrollProgress + '%';
+    }
+
+         // Animate elements on scroll with Anime.js
+     function animateOnScroll() {
+       const elements = document.querySelectorAll('.section-content');
+       elements.forEach(element => {
+         const elementTop = element.getBoundingClientRect().top;
+         const windowHeight = window.innerHeight;
+         
+         if (elementTop < windowHeight * 0.8 && element.style.opacity === '0') {
+           if (typeof anime !== 'undefined') {
+             anime({
+               targets: element,
+               opacity: [0, 1],
+               translateY: [50, 0],
+               scale: [0.9, 1],
+               duration: 800,
+               easing: 'easeOutExpo'
+             });
+           } else {
+             element.style.opacity = '1';
+             element.style.transform = 'translateY(0)';
+           }
+         }
+       });
+     }
+
+    // Mascot interaction
+    function addMascotInteraction() {
+      const mascots = document.querySelectorAll('.mascot');
+      mascots.forEach(mascot => {
+        mascot.addEventListener('click', () => {
+          mascot.style.transform += ' scale(1.2)';
+          setTimeout(() => {
+            mascot.style.transform = mascot.style.transform.replace(' scale(1.2)', '');
+          }, 200);
+        });
       });
+    }
 
-    // Анімація підзаголовка
-    var textWrapper3 = document.querySelector('.ml3');
-    textWrapper3.innerHTML = textWrapper3.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+         // Anime.js motivational text animation
+     function animateMotivationalText() {
+       anime({
+         targets: '.motivational-text',
+         opacity: [0, 1],
+         translateY: [30, 0],
+         scale: [0.9, 1],
+         duration: 1000,
+         delay: 1500,
+         easing: 'easeOutElastic(1, .8)'
+       });
+     }
 
-    anime.timeline({loop: false})
-      .add({
-        targets: '.ml3 .letter',
-        opacity: [0,1],
-        easing: "easeInOutQuad",
-        duration: 1200,
-        delay: (el, i) => 70 * (i+1)
-      });
+     // Anime.js feature cards animation
+     function animateFeatureCards() {
+       anime({
+         targets: '.feature-card',
+         opacity: [0, 1],
+         translateY: [50, 0],
+         scale: [0.8, 1],
+         rotateX: [30, 0],
+         duration: 800,
+         delay: anime.stagger(100, {start: 2000}),
+         easing: 'easeOutExpo'
+       });
+     }
+
+     // Enhanced mascot interactions with Anime.js
+     function enhancedMascotInteraction() {
+       const mascots = document.querySelectorAll('.mascot');
+       mascots.forEach(mascot => {
+         // Skip reading character special handling
+         if (mascot.querySelector('.reading-character')) {
+           return;
+         }
+         
+         mascot.addEventListener('mouseenter', () => {
+           anime({
+             targets: mascot,
+             scale: 1.15,
+             rotateY: 10,
+             duration: 300,
+             easing: 'easeOutExpo'
+           });
+         });
+         
+         mascot.addEventListener('mouseleave', () => {
+           anime({
+             targets: mascot,
+             scale: 1,
+             rotateY: 0,
+             duration: 300,
+             easing: 'easeOutExpo'
+           });
+         });
+         
+         mascot.addEventListener('click', () => {
+           anime({
+             targets: mascot,
+             scale: [1, 1.3, 1],
+             rotateZ: [0, 360, 0],
+             duration: 600,
+             easing: 'easeInOutBack'
+           });
+         });
+       });
+     }
+
+     // Reading character special interactions
+     function readingCharacterInteraction() {
+       const readingCharacterSvg = document.querySelector('.reading-character-svg');
+       if (!readingCharacterSvg) return;
+
+       const eyes = readingCharacterSvg.querySelector('.eyes');
+       const head = readingCharacterSvg.querySelector('.head');
+       const character = readingCharacterSvg.querySelector('.character');
+       const mascot = readingCharacterSvg.closest('.mascot');
+
+       mascot.addEventListener('mouseenter', () => {
+         // Eyes look at user - move them up
+         if (eyes) {
+           eyes.style.animation = 'none';
+           eyes.style.transform = 'translateY(-3px)';
+         }
+         
+         // Head turns slightly toward user
+         if (typeof anime !== 'undefined' && head) {
+           anime({
+             targets: head,
+             rotate: -5,
+             duration: 500,
+             easing: 'easeOutBack'
+           });
+         }
+         
+         // Gentle character scale
+         if (typeof anime !== 'undefined') {
+           anime({
+             targets: readingCharacterSvg,
+             scale: 1.05,
+             duration: 300,
+             easing: 'easeOutExpo'
+           });
+         }
+       });
+
+       mascot.addEventListener('mouseleave', () => {
+         // Eyes return to book
+         if (eyes) {
+           eyes.style.animation = 'readingEyes 8s ease-in-out infinite';
+           eyes.style.transform = '';
+         }
+         
+         // Head returns to normal position
+         if (typeof anime !== 'undefined' && head) {
+           anime({
+             targets: head,
+             rotate: 0,
+             duration: 800,
+             easing: 'easeOutElastic(1, .5)'
+           });
+         }
+         
+         // Character returns to normal size
+         if (typeof anime !== 'undefined') {
+           anime({
+             targets: readingCharacterSvg,
+             scale: 1,
+             duration: 300,
+             easing: 'easeOutExpo'
+           });
+         }
+       });
+
+       mascot.addEventListener('click', () => {
+         // Character waves by scaling up and rotating slightly
+         if (typeof anime !== 'undefined' && character) {
+           anime({
+             targets: character,
+             scale: [1, 1.1, 1],
+             rotate: [0, 5, -3, 0],
+             duration: 800,
+             easing: 'easeInOutBack'
+           });
+         }
+         
+         // Happy expression - make eyes bigger temporarily
+         if (eyes) {
+           eyes.style.animation = 'none';
+           eyes.style.transform = 'translateY(-2px) scale(1.3)';
+         }
+         
+         setTimeout(() => {
+           if (eyes) {
+             eyes.style.animation = 'readingEyes 8s ease-in-out infinite';
+             eyes.style.transform = '';
+           }
+         }, 1200);
+       });
+     }
+
+     // Initialize everything
+     document.addEventListener('DOMContentLoaded', () => {
+       // Wait for Anime.js to load
+       if (typeof anime !== 'undefined') {
+         animateTitle();
+         animateMotivationalText();
+         animateFeatureCards();
+         enhancedMascotInteraction();
+         readingCharacterInteraction();
+       } else {
+         console.warn('Anime.js not loaded, falling back to CSS animations');
+       }
+       
+       createParticles();
+       create3DParticles();
+       createTitleOrbs();
+       
+       // Set initial opacity for animated elements
+       const animatedElements = document.querySelectorAll('.section-content');
+       animatedElements.forEach(element => {
+         element.style.opacity = '0';
+         element.style.transform = 'translateY(30px)';
+         element.style.transition = 'all 0.8s ease';
+       });
+       
+       // Initial animation check
+       setTimeout(animateOnScroll, 100);
+       
+       // Simplified mouse interaction
+       const hero = document.querySelector('.hero');
+       const title = document.querySelector('.main-title');
+       
+       hero.addEventListener('mousemove', (e) => {
+         const rect = hero.getBoundingClientRect();
+         const x = (e.clientX - rect.left) / rect.width - 0.5;
+         
+         anime({
+           targets: title,
+           translateX: x * 10,
+           duration: 300,
+           easing: 'easeOutQuad'
+         });
+       });
+       
+       hero.addEventListener('mouseleave', () => {
+         anime({
+           targets: title,
+           translateX: 0,
+           duration: 600,
+           easing: 'easeOutElastic(1, .8)'
+         });
+       });
+     });
+
+    // Event listeners
+    window.addEventListener('scroll', () => {
+      updateScrollProgress();
+      animateOnScroll();
+    });
+
+    // CTA buttons now lead to login page - no need for preventDefault
   </script>
 </body>
 </html>

@@ -3,127 +3,443 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Додати слово – Додаток для вивчення англійської</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Додати слово – Language Learner</title>
   <style>
+    :root {
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-border: #30363d;
+      --github-text: #e6edf3;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #2f81f7;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-danger: #da3633;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fc;
-      margin: 0;
-      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      line-height: 1.6;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      animation: fadeIn 1s ease-out;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Navigation */
+    .nav {
+      background: var(--github-surface);
+      border-bottom: 1px solid var(--github-border);
+      padding: 1rem 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
+    }
+
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 10px;
+    }
+
+    .nav-user:hover {
+      background: var(--github-surface-hover);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .user-name {
+      color: var(--github-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    /* Main Container */
+    .main-container {
+      margin-top: 5rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .form-container {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
       overflow: hidden;
     }
 
-    /* Фон з розмиванням */
-    .background {
+    .form-container::before {
+      content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px);
-      z-index: -1;
+      height: 4px;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue), var(--github-purple));
     }
 
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    .container {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 500px;
+    .form-header {
       text-align: center;
-      animation: slideIn 0.5s ease-out;
+      margin-bottom: 2.5rem;
     }
 
-    @keyframes slideIn {
-      0% { transform: translateY(50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+    .form-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
     }
 
-    h2 {
-      margin-bottom: 20px;
+    .form-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.1rem;
     }
 
-    input, button, select {
-      padding: 12px;
-      margin-top: 10px;
-      width: 90%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 2rem;
     }
 
-    button {
-      background: #28a745;
-      color: white;
+    .form-label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: var(--github-text);
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: var(--github-bg);
+      border: 2px solid var(--github-border);
+      border-radius: 12px;
+      color: var(--github-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 4px rgba(35, 134, 54, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-input::placeholder {
+      color: var(--github-text-secondary);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: var(--github-bg);
+      border: 2px solid var(--github-border);
+      border-radius: 12px;
+      color: var(--github-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
       cursor: pointer;
-      margin-top: 20px;
     }
 
-    button:hover {
-      background: #218838;
+    .form-select:focus {
+      outline: none;
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 4px rgba(35, 134, 54, 0.1);
     }
 
-    .back-button {
-      background: #6c757d;
-      color: white;
-      padding: 12px;
+    /* Buttons */
+    .btn {
+      padding: 1rem 2rem;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
-      margin-top: 20px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      margin: 0.5rem 0;
     }
 
-    .back-button:hover {
-      background: #5a6268;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      border: 2px solid var(--github-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-border);
+      border-color: var(--github-text-secondary);
+    }
+
+    /* Success/Error Messages */
+    .notification {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, var(--github-danger), #ff6b6b);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+
+      .form-title {
+        font-size: 2rem;
+      }
+
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     }
   </style>
-  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="dashboard.html" class="nav-brand">
+        <div class="nav-brand-icon">📖</div>
+        <span>Додати слово</span>
+      </a>
+      <div class="nav-user" onclick="goToProfile()">
+        <div class="user-avatar" id="navAvatar">👤</div>
+        <span class="user-name" id="navUserName">Вчитель</span>
+      </div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+        <a href="admin_panel.html" class="nav-link">🔧 Адмін-панель</a>
+        <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+      </div>
+    </div>
+  </nav>
 
-  <div class="background"></div>
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="form-container">
+      <div class="form-header">
+        <h1 class="form-title">Додати слово</h1>
+        <p class="form-subtitle">Додайте нове слово до словника</p>
+      </div>
 
-  <div class="container">
-    <h2>Додати нове слово</h2>
-    <form id="add-word-form">
-      <input type="text" id="word" placeholder="Слово" required>
-      <input type="text" id="translation" placeholder="Переклад" required>
-      <select id="language-level" required>
-        <option value="A1">A1</option>
-        <option value="A2">A2</option>
-        <option value="B1">B1</option>
-        <option value="B2">B2</option>
-        <option value="C1">C1</option>
-        <option value="C2">C2</option>
-      </select>
-      <button type="submit">Додати слово</button>
-    </form>
-    <button class="back-button" onclick="backToDashboard()">Назад</button>
+      <form id="add-word-form">
+        <div class="form-group">
+          <label class="form-label" for="word">Англійське слово</label>
+          <input type="text" id="word" class="form-input" placeholder="Введіть слово англійською" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="translation">Переклад українською</label>
+          <input type="text" id="translation" class="form-input" placeholder="Введіть переклад" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="language-level">Рівень складності</label>
+          <select id="language-level" class="form-select" required>
+            <option value="">Оберіть рівень</option>
+            <option value="A1">A1 - Початковий</option>
+            <option value="A2">A2 - Елементарний</option>
+            <option value="B1">B1 - Середній</option>
+            <option value="B2">B2 - Вище середнього</option>
+            <option value="C1">C1 - Просунутий</option>
+            <option value="C2">C2 - Професійний</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          📝 Додати слово
+        </button>
+        
+        <button type="button" class="btn btn-secondary" onclick="backToDashboard()">
+          🔙 Назад до дашборду
+        </button>
+      </form>
+    </div>
   </div>
 
   <script>
     const API_URL = 'http://127.0.0.1:8080';
 
-    if (!localStorage.getItem('token')) {
+    // Check authentication
+    const token = localStorage.getItem('access_token');
+    if (!token) {
       window.location.href = 'login.html';
     }
 
+    // Load user info
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCurrentUser();
+    });
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          updateNavbarUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
+
+    function updateNavbarUserInfo(userData) {
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      
+      if (navAvatar) {
+        const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+        if (avatarUrl) {
+          navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+          navAvatar.textContent = '';
+        }
+      }
+      
+      if (navUserName) {
+        navUserName.textContent = userData.name || userData.login || 'Вчитель';
+      }
+    }
+
+    // Form submission
     document.getElementById('add-word-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -132,28 +448,88 @@
       const languageLevel = document.getElementById('language-level').value;
       const teacherId = localStorage.getItem('userId');
 
-      const res = await fetch(`${API_URL}/add_word`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, translation, language_level: languageLevel, teacher_id: teacherId })
-      });
+      if (!word || !translation || !languageLevel) {
+        showNotification('Будь ласка, заповніть всі поля', 'error');
+        return;
+      }
 
-      const data = await res.json();
+      try {
+        const response = await fetch(`${API_URL}/add_word`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ 
+            word, 
+            translation, 
+            language_level: languageLevel, 
+            teacher_id: teacherId 
+          })
+        });
 
-      if (res.ok) {
-        alert('Слово успішно додано!');
-        document.getElementById('word').value = '';
-        document.getElementById('translation').value = '';
-        document.getElementById('language-level').value = 'A1';
-      } else {
-        alert(`Помилка: ${data.error}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          showNotification('Слово успішно додано!', 'success');
+          // Clear form
+          document.getElementById('word').value = '';
+          document.getElementById('translation').value = '';
+          document.getElementById('language-level').value = '';
+        } else {
+          showNotification(`Помилка: ${data.error}`, 'error');
+        }
+      } catch (error) {
+        showNotification('Помилка мережі', 'error');
+        console.error('Error:', error);
       }
     });
+
+    function showNotification(message, type = 'info') {
+      // Remove existing notifications
+      const existingNotifications = document.querySelectorAll('.notification');
+      existingNotifications.forEach(notification => {
+        notification.remove();
+      });
+
+      // Create new notification
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }, 4000);
+    }
+
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
 
     function backToDashboard() {
       window.location.href = 'dashboard.html';
     }
-  </script>
 
+    function logout() {
+      if (confirm('Ви впевнені, що хочете вийти?')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 </body>
 </html>

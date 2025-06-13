@@ -1,305 +1,1653 @@
 <!DOCTYPE html>
+<!--
+  Profile Page - Language Learning Platform
+  
+  Features:
+  - User profile with achievements system
+  - Profile editing functionality
+  - Leaderboard with top users
+  - Progress tracking and statistics
+  - GitHub dark theme consistent with other pages
+  
+  API Integration:
+  - GET /profile - Get current user profile
+  - PUT /profile - Update user profile
+  - GET /achievements - Get user achievements
+  - GET /progress - Get user progress
+  - GET /top_users - Get leaderboard
+  - GET /profile/{user_id} - Get other user's profile
+  
+  Dependencies:
+  - anime.js for animations
+  - Google Fonts (Inter, Poppins)
+  - Backend API running on port 8080
+-->
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Профіль — Language Learner</title>
+  <title>Профіль — Майстер англійської з ШІ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <style>
-    /* === Загальні стилі === */
-    body {
+    :root {
+      /* GitHub Theme Variables */
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-surface-active: #30363d;
+      --github-border: #30363d;
+      --github-border-hover: #40464e;
+      --github-text: #f0f6fc;
+      --github-text-secondary: #7d8590;
+      --github-text-tertiary: #656d76;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #1f6feb;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-pink: #d63384;
+      --github-red: #f85149;
+      --github-yellow: #f0c814;
+      
+      /* Animation Variables */
+      --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      font-family: 'Roboto', sans-serif;
-      height: 100vh;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
       overflow-x: hidden;
-      color: white;
-      position: relative;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .background-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
-
-    .navbar {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
+    /* Animated particles background */
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
     }
 
-    .nav-item {
-      margin: 0 15px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid transparent;
-      border-radius: 8px;
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--github-accent);
+      border-radius: 50%;
+      animation: float 6s infinite ease-in-out;
+      opacity: 0.4;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+      50% { transform: translateY(-120px) rotate(180deg); opacity: 0.8; }
+    }
+
+    .profile-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    .profile-nav {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      margin: 1.5rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: slideInDown 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    @keyframes slideInDown {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 10px;
+    }
+
+    .nav-user:hover {
+      background: var(--github-surface-hover);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
       transition: all 0.3s ease;
     }
 
-    .nav-item:hover {
-      background: #2575fc;
-      border-color: #2575fc;
-      color: white;
+    .user-avatar:hover {
       transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
     }
 
-    .content {
-      margin-top: 120px;
-      padding: 20px;
+    .user-name {
+      color: var(--github-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-brand {
       display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-brand:hover {
+      transform: scale(1.05);
+      color: var(--github-accent);
+    }
+
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      font-size: 1.5rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
       align-items: center;
     }
 
-    .profile-box {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 40px;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 600px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      color: #333;
-      animation: fadeInUp 1s ease forwards;
-      text-align: center;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 28px;
-      color: #333;
-    }
-
-    p {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #2575fc;
-      background: transparent;
-      border: 2px solid #2575fc;
-      border-radius: 8px;
-      cursor: pointer;
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
       transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      background: #2575fc;
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .progress-container {
-      width: 100%;
-      background: #e9ecef;
-      height: 12px;
-      border-radius: 6px;
-      margin: 20px 0;
+      position: relative;
       overflow: hidden;
     }
 
-    .progress-bar {
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      transform: translateY(-2px);
+    }
+
+    /* Main Content */
+    .profile-main {
+      flex: 1;
+      padding: 0 1.5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      padding: 0.5rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--github-text-secondary);
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Profile Tab */
+    .profile-header {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-avatar-container {
+      position: relative;
+      display: inline-block;
+      margin: 0 auto 1.5rem;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      box-shadow: 0 10px 30px rgba(35, 134, 54, 0.3);
+      background-size: cover;
+      background-position: center;
+      color: white;
+    }
+
+    .avatar-upload-btn {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 35px;
+      height: 35px;
+      background: var(--github-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .avatar-upload-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(35, 134, 54, 0.5);
+    }
+
+    .profile-name {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .profile-level {
+      font-size: 1.2rem;
+      color: var(--github-text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      border-color: var(--github-border-hover);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--github-accent);
+    }
+
+    .stat-label {
+      color: var(--github-text-secondary);
+      font-weight: 600;
+    }
+
+    /* Edit Profile Form */
+    .edit-form {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--github-text);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 1rem;
+      background: var(--github-bg);
+      border: 1px solid var(--github-border);
+      border-radius: 8px;
+      color: var(--github-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.1);
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      color: var(--github-text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-surface-active);
+      color: var(--github-text);
+    }
+
+    /* Achievements */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .achievement-card {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .achievement-card.unlocked {
+      border-color: var(--github-accent);
+      box-shadow: 0 5px 20px rgba(35, 134, 54, 0.2);
+    }
+
+    .achievement-card.unlocked::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue));
+    }
+
+    .achievement-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .achievement-icon {
+      font-size: 2.5rem;
+      filter: grayscale(100%);
+      transition: filter 0.3s ease;
+    }
+
+    .achievement-card.unlocked .achievement-icon {
+      filter: none;
+    }
+
+    .achievement-info h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+      color: var(--github-text);
+    }
+
+    .achievement-info .xp {
+      color: var(--github-accent);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .achievement-description {
+      color: var(--github-text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .achievement-progress {
+      background: var(--github-bg);
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .achievement-progress-bar {
       height: 100%;
-      background: #2575fc;
-      width: 0%;
-      transition: width 0.5s ease-in-out;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue));
+      transition: width 0.5s ease;
     }
 
-    .medal {
-      margin-top: 20px;
-      font-size: 24px;
+    .achievement-progress-text {
+      font-size: 0.8rem;
+      color: var(--github-text-secondary);
+      text-align: center;
     }
 
-    #top-users-list {
-      margin-top: 30px;
-      text-align: left;
+    /* Leaderboard */
+    .leaderboard {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      overflow: hidden;
     }
 
-    .user-card {
+    .leaderboard-header {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      color: white;
+      text-align: center;
+    }
+
+    .leaderboard-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .leaderboard-subtitle {
+      opacity: 0.9;
+    }
+
+    .leaderboard-list {
+      padding: 1rem;
+    }
+
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .leaderboard-item:hover {
+      background: var(--github-surface-hover);
+      transform: translateX(5px);
+    }
+
+    .leaderboard-item.current-user {
+      background: rgba(35, 134, 54, 0.1);
+      border: 1px solid var(--github-accent);
+    }
+
+    .rank {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+    }
+
+    .rank.gold {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      color: #000;
+    }
+
+    .rank.silver {
+      background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+      color: #000;
+    }
+
+    .rank.bronze {
+      background: linear-gradient(135deg, #cd7f32, #daa520);
+      color: #000;
+    }
+
+    .rank.other {
+      background: var(--github-surface-active);
+      color: var(--github-text);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .user-level {
+      font-size: 0.9rem;
+      color: var(--github-text-secondary);
+    }
+
+    .user-xp {
+      font-weight: 700;
+      color: var(--github-accent);
+    }
+
+    /* Loading States */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--github-border);
+      border-top: 3px solid var(--github-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .profile-main {
+        padding: 0 1rem 2rem;
+      }
+      
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .profile-header {
+        padding: 2rem 1.5rem;
+      }
+      
+      .profile-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .tab-nav {
+        flex-direction: column;
+      }
+      
+      .achievements-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-0 { margin-bottom: 0; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
       display: flex;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      font-size: 16px;
-      color: #333;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--github-border);
     }
 
-    .error {
-      color: red;
-      font-weight: bold;
-      margin-top: 15px;
+    .modal-header h3 {
+      margin: 0;
+      color: var(--github-text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--github-text-secondary);
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid var(--github-border);
+      justify-content: flex-end;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--github-border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--github-bg);
+    }
+
+    .upload-area:hover {
+      border-color: var(--github-accent);
+      background: var(--github-surface-hover);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--github-accent);
+      background: rgba(35, 134, 54, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .preview-area {
+      text-align: center;
+      margin-top: 1rem;
     }
   </style>
-  <link rel="stylesheet" href="style.css?v=2">
 </head>
-
 <body>
+  <!-- Animated particles background -->
+  <div class="particles" id="particles"></div>
 
-<div class="background-image"></div>
-
-<!-- Навігаційна панель -->
-<div class="navbar">
-  <a href="profile.html" class="nav-item">Профіль 👤</a>
-  <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тести 📝</a>
-  <a href="chat.html" class="nav-item">Чат 🤖</a>
-  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
-</div>
-
-<!-- Контент -->
-<div class="content">
-  <div class="profile-box">
-    <h1>Профіль</h1>
-    <div id="profile-info">Завантаження...</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
-    <div class="medal" id="medal"></div>
-
-    <h2 style="margin-top: 30px;">🏆 Топ користувачів</h2>
-    <div id="top-users-list">Завантаження...</div>
-
-    <button class="btn" onclick="backDashboard()">⬅️ Назад</button>
-    <div id="error-message" class="error"></div>
-  </div>
-</div>
-
-<script>
-const API_URL = 'http://127.0.0.1:8080';
-
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
-
-async function loadProfile() {
-  const userId = localStorage.getItem('userId');
-
-  try {
-    const res = await fetch(`${API_URL}/profile/${userId}`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-
-    if (!res.ok) throw new Error('Помилка завантаження профілю.');
-
-    const data = await res.json();
-
-    const container = document.getElementById('profile-info');
-    container.innerHTML = `
-      <p><strong>Логін:</strong> ${data.login}</p>
-      <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
-      <p><strong>Рівень мови:</strong> ${data.language_level}</p>
-      <p><strong>Досвід:</strong> ${data.experience} XP</p>
-    `;
-
-    updateProgress(data.experience);
-    showMedal(data.experience);
-
-  } catch (error) {
-    document.getElementById('error-message').textContent = error.message;
-  }
-}
-
-function updateProgress(xp) {
-  const percent = Math.min((xp / 1000) * 100, 100);
-  document.getElementById('progress-bar').style.width = `${percent}%`;
-}
-
-function showMedal(xp) {
-  const medalEl = document.getElementById('medal');
-  if (xp >= 800) {
-    medalEl.innerHTML = '🥇 Золота медаль!';
-  } else if (xp >= 500) {
-    medalEl.innerHTML = '🥈 Срібна медаль!';
-  } else if (xp >= 200) {
-    medalEl.innerHTML = '🥉 Бронзова медаль!';
-  } else {
-    medalEl.innerHTML = '🎖️ Новачок';
-  }
-}
-
-async function loadTopUsers() {
-  try {
-    const res = await fetch(`${API_URL}/top_users`);
-    const users = await res.json();
-
-    const container = document.getElementById('top-users-list');
-    container.innerHTML = '';
-
-    users.slice(0, 10).forEach((user, index) => {
-      let medal = '';
-      if (index === 0) medal = '🥇';
-      else if (index === 1) medal = '🥈';
-      else if (index === 2) medal = '🥉';
-
-      container.innerHTML += `
-        <div class="user-card">
-          <span>${medal} ${user.login}</span>
-          <span>${user.experience} XP</span>
+  <div class="profile-container">
+    <!-- Navigation -->
+    <nav class="profile-nav">
+      <div class="nav-content">
+        <a href="#" class="nav-brand">
+          <div class="nav-brand-icon">👤</div>
+          <span>Профіль</span>
+        </a>
+        <div class="nav-user">
+          <div class="user-avatar" id="navAvatar">👤</div>
+          <span class="user-name" id="navUserName">Користувач</span>
         </div>
-      `;
+        <div class="nav-links">
+          <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+          <a href="lesson.html" class="nav-link">📚 Уроки</a>
+          <a href="test.html" class="nav-link">🎯 Тести</a>
+          <a href="chat.html" class="nav-link">💬 Чат</a>
+          <a href="profile.html" class="nav-link active">👤 Профіль</a>
+          <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="profile-main">
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('profile')">
+          <span>👤</span>
+          <span>Профіль</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('achievements')">
+          <span>🏆</span>
+          <span>Досягнення</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('leaderboard')">
+          <span>📊</span>
+          <span>Лідерборд</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('edit')">
+          <span>⚙️</span>
+          <span>Налаштування</span>
+        </button>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profile-tab" class="tab-content active">
+        <div class="profile-header">
+          <div class="profile-avatar-container">
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <div class="avatar-upload-btn" onclick="openAvatarUpload()">📷</div>
+          </div>
+          <h1 class="profile-name" id="profileName">Завантаження...</h1>
+          <p class="profile-level" id="profileLevel">Рівень: A1</p>
+          
+          <div class="profile-stats">
+            <div class="stat-card">
+              <div class="stat-number" id="experiencePoints">0</div>
+              <div class="stat-label">Очки досвіду</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="lessonsCompleted">0</div>
+              <div class="stat-label">Завершено уроків</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="wordsLearned">0</div>
+              <div class="stat-label">Вивчено слів</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="streakDays">0</div>
+              <div class="stat-label">Днів поспіль</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="edit-form">
+          <h2 class="mb-2">📈 Останні досягнення</h2>
+          <div id="recentActivity">
+            <div class="loading">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Achievements Tab -->
+      <div id="achievements-tab" class="tab-content">
+        <div class="achievements-grid" id="achievementsGrid">
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Tab -->
+      <div id="leaderboard-tab" class="tab-content">
+        <div class="leaderboard">
+          <div class="leaderboard-header">
+            <h2 class="leaderboard-title">🏆 Топ учнів</h2>
+            <p class="leaderboard-subtitle">Найкращі за кількістю досвіду</p>
+          </div>
+          <div class="leaderboard-list" id="leaderboardList">
+            <div class="loading">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Profile Tab -->
+      <div id="edit-tab" class="tab-content">
+        <div class="edit-form">
+          <h2 class="mb-2">⚙️ Налаштування профілю</h2>
+          <form id="editProfileForm">
+            <div class="form-group">
+              <label class="form-label" for="editName">Ім'я</label>
+              <input type="text" id="editName" class="form-input" placeholder="Введіть ваше ім'я">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="editEmail">Email</label>
+              <input type="email" id="editEmail" class="form-input" placeholder="Введіть ваш email">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="editLevel">Рівень англійської</label>
+              <select id="editLevel" class="form-select">
+                <option value="A1">A1 - Початковий</option>
+                <option value="A2">A2 - Елементарний</option>
+                <option value="B1">B1 - Середній</option>
+                <option value="B2">B2 - Вище середнього</option>
+                <option value="C1">C1 - Просунутий</option>
+                <option value="C2">C2 - Вільне володіння</option>
+              </select>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+              <button type="submit" class="btn btn-primary">
+                <span>💾</span>
+                <span>Зберегти зміни</span>
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                <span>❌</span>
+                <span>Скасувати</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Avatar Upload Modal -->
+  <div class="modal" id="avatarModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Завантажити аватар</h3>
+        <button class="modal-close" onclick="closeAvatarModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📷</div>
+          <p>Перетягніть файл сюди або натисніть для вибору</p>
+          <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+        </div>
+        <div class="preview-area" id="previewArea" style="display: none;">
+          <img id="avatarPreview" style="max-width: 200px; max-height: 200px; border-radius: 10px;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="uploadBtn" onclick="uploadAvatar()" disabled>
+          Завантажити
+        </button>
+        <button class="btn btn-secondary" onclick="closeAvatarModal()">
+          Скасувати
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8080';
+    let currentUser = null;
+    let currentTab = 'profile';
+
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Profile page loaded, initializing...');
+      
+      try {
+        console.log('🔐 Checking authentication...');
+        const isAuthenticated = await checkAuthentication();
+        
+        if (isAuthenticated) {
+          console.log('✅ Authentication successful');
+          
+          console.log('👤 Loading user profile...');
+          await loadUserProfile();
+          
+          console.log('🏆 Loading achievements...');
+          await loadAchievements();
+          
+          console.log('📊 Loading leaderboard...');
+          await loadLeaderboard();
+          
+          console.log('✨ Initializing particles...');
+          initializeParticles();
+          
+          console.log('🎉 Profile initialization complete!');
+        } else {
+          console.log('❌ Authentication failed');
+        }
+      } catch (error) {
+        console.error('💥 Profile initialization failed:', error);
+        showNotification('Помилка ініціалізації профілю', 'error');
+      }
     });
 
-    if (!users.length) {
-      container.innerHTML = '<p>Немає користувачів у топі.</p>';
+    async function checkAuthentication() {
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        redirectToLogin('Токен авторизації не знайдено');
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Токен недійсний або закінчився');
+          }
+          throw new Error(`Помилка перевірки токена: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.valid) {
+          currentUser = { id: result.user_id };
+          return true;
+        } else {
+          throw new Error('Токен недійсний');
+        }
+      } catch (error) {
+        console.error('Profile: Authentication check failed:', error);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        redirectToLogin(error.message);
+        return false;
+      }
     }
 
-  } catch (error) {
-    document.getElementById('top-users-list').innerText = 'Помилка завантаження топу.';
-  }
-}
+    function redirectToLogin(message = '') {
+      if (message) {
+        localStorage.setItem('login_message', message);
+      }
+      window.location.href = 'login.html';
+    }
 
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
+    async function loadUserProfile() {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-function backDashboard() {
-  window.location.href = 'dashboard.html';
-}
+        if (response.ok) {
+          const userData = await response.json();
+          currentUser = { ...currentUser, ...userData };
+          
+          // Update profile display
+          document.getElementById('profileName').textContent = userData.name || userData.login;
+          document.getElementById('profileLevel').textContent = `Рівень: ${userData.language_level}`;
+          document.getElementById('experiencePoints').textContent = userData.experience || 0;
+          document.getElementById('lessonsCompleted').textContent = userData.completedLessons || 0;
+          document.getElementById('wordsLearned').textContent = userData.totalWords || 0;
+          document.getElementById('streakDays').textContent = userData.streakDays || 0;
+          
+          // Update edit form
+          document.getElementById('editName').value = userData.name || userData.login;
+          document.getElementById('editEmail').value = userData.email || '';
+          document.getElementById('editLevel').value = userData.language_level || 'A1';
+          
+          // Update avatar
+          updateAvatar(userData.avatar_url || userData.profile_picture_s3_link);
+          
+          // Update navbar avatar and name
+          updateNavbarUserInfo(userData);
+          
+          console.log('User profile loaded:', currentUser);
+          
+          // Load progress data
+          await loadProgressData();
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+        showNotification('Помилка завантаження профілю', 'error');
+      }
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadProfile();
-  loadTopUsers();
-});
-</script>
+    async function loadProgressData() {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch(`${API_BASE}/progress`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
+        if (response.ok) {
+          const progressData = await response.json();
+          const progress = progressData.progress;
+          
+          // Update stats with real data
+          document.getElementById('experiencePoints').textContent = progress.experience || 0;
+          document.getElementById('lessonsCompleted').textContent = progress.lessons_completed || 0;
+          document.getElementById('wordsLearned').textContent = progress.words_learned || 0;
+          document.getElementById('streakDays').textContent = progress.streak_days || 0;
+          
+          // Display recent activity
+          displayRecentActivity(progress.recent_activity || []);
+        }
+      } catch (error) {
+        console.error('Failed to load progress data:', error);
+      }
+    }
+
+    function displayRecentActivity(activities) {
+      const container = document.getElementById('recentActivity');
+      
+      if (activities.length === 0) {
+        container.innerHTML = '<p style="color: var(--github-text-secondary); text-align: center;">Поки що немає активності</p>';
+        return;
+      }
+      
+      const activitiesHtml = activities.map(activity => `
+        <div class="leaderboard-item">
+          <div class="rank other">📚</div>
+          <div class="user-info">
+            <div class="user-name">${activity.title}</div>
+            <div class="user-level">${new Date(activity.completed_at).toLocaleDateString('uk-UA')}</div>
+          </div>
+          <div class="user-xp">+${activity.xp} XP</div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = activitiesHtml;
+    }
+
+    async function loadAchievements() {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch(`${API_BASE}/achievements`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          displayAchievements(data.achievements || []);
+        }
+      } catch (error) {
+        console.error('Failed to load achievements:', error);
+        document.getElementById('achievementsGrid').innerHTML = 
+          '<p style="color: var(--github-text-secondary); text-align: center;">Помилка завантаження досягнень</p>';
+      }
+    }
+
+    function displayAchievements(achievements) {
+      const container = document.getElementById('achievementsGrid');
+      
+      if (achievements.length === 0) {
+        container.innerHTML = '<p style="color: var(--github-text-secondary); text-align: center;">Досягнення не знайдено</p>';
+        return;
+      }
+      
+      const achievementsHtml = achievements.map(achievement => {
+        const progress = Math.min((achievement.current_progress / achievement.target_value) * 100, 100);
+        const isUnlocked = achievement.unlocked;
+        
+        return `
+          <div class="achievement-card ${isUnlocked ? 'unlocked' : ''}">
+            <div class="achievement-header">
+              <div class="achievement-icon">${achievement.icon}</div>
+              <div class="achievement-info">
+                <h3>${achievement.name}</h3>
+                <div class="xp">+${achievement.xp_reward} XP</div>
+              </div>
+            </div>
+            <div class="achievement-description">${achievement.description}</div>
+            <div class="achievement-progress">
+              <div class="achievement-progress-bar" style="width: ${progress}%"></div>
+            </div>
+            <div class="achievement-progress-text">
+              ${achievement.current_progress} / ${achievement.target_value}
+              ${isUnlocked ? '✅ Отримано' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = achievementsHtml;
+    }
+
+    async function loadLeaderboard() {
+      try {
+        const response = await fetch(`${API_BASE}/top_users?limit=20`);
+
+        if (response.ok) {
+          const data = await response.json();
+          displayLeaderboard(data.users || []);
+        }
+      } catch (error) {
+        console.error('Failed to load leaderboard:', error);
+        document.getElementById('leaderboardList').innerHTML = 
+          '<p style="color: var(--github-text-secondary); text-align: center;">Помилка завантаження лідерборду</p>';
+      }
+    }
+
+    function displayLeaderboard(users) {
+      const container = document.getElementById('leaderboardList');
+      
+      if (users.length === 0) {
+        container.innerHTML = '<p style="color: var(--github-text-secondary); text-align: center;">Користувачі не знайдені</p>';
+        return;
+      }
+      
+      const usersHtml = users.map(user => {
+        const isCurrentUser = currentUser && user.id === currentUser.id;
+        let rankClass = 'other';
+        
+        if (user.rank === 1) rankClass = 'gold';
+        else if (user.rank === 2) rankClass = 'silver';
+        else if (user.rank === 3) rankClass = 'bronze';
+        
+        return `
+          <div class="leaderboard-item ${isCurrentUser ? 'current-user' : ''}" onclick="viewUserProfile(${user.id})">
+            <div class="rank ${rankClass}">${user.rank}</div>
+            <div class="user-info">
+              <div class="user-name">${user.login} ${isCurrentUser ? '(Ви)' : ''}</div>
+              <div class="user-level">Активний користувач</div>
+            </div>
+            <div class="user-xp">${user.experience} XP</div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = usersHtml;
+    }
+
+    async function viewUserProfile(userId) {
+      if (userId === currentUser.id) {
+        switchTab('profile');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/profile/${userId}`);
+        
+        if (response.ok) {
+          const userData = await response.json();
+          
+          // Show user profile modal or navigate to user page
+          showNotification(`Профіль: ${userData.login} (${userData.experience} XP)`, 'info');
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+        showNotification('Помилка завантаження профілю користувача', 'error');
+      }
+    }
+
+    function switchTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      currentTab = tabName;
+    }
+
+    // Edit Profile Form
+    document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('editName').value,
+        email: document.getElementById('editEmail').value,
+        level: document.getElementById('editLevel').value
+      };
+      
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          showNotification('Профіль успішно оновлено!', 'success');
+          await loadUserProfile(); // Reload profile data
+          switchTab('profile'); // Switch back to profile tab
+        } else {
+          throw new Error('Failed to update profile');
+        }
+      } catch (error) {
+        console.error('Failed to update profile:', error);
+        showNotification('Помилка оновлення профілю', 'error');
+      }
+    });
+
+    function cancelEdit() {
+      // Reset form to original values
+      loadUserProfile();
+      switchTab('profile');
+    }
+
+    function initializeParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random positioning
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+        
+        particlesContainer.appendChild(particle);
+      }
+      
+      console.log(`Created ${particleCount} particles`);
+    }
+
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      // Style notification
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      `;
+      
+      // Set color based on type
+      switch (type) {
+        case 'success':
+          notification.style.background = 'var(--github-accent)';
+          break;
+        case 'error':
+          notification.style.background = 'var(--github-red)';
+          break;
+        case 'warning':
+          notification.style.background = 'var(--github-orange)';
+          break;
+        default:
+          notification.style.background = 'var(--github-blue)';
+      }
+      
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_data');
+      window.location.href = 'login.html';
+    }
+
+    // Avatar functions
+    function updateAvatar(avatarUrl) {
+      const avatarElement = document.getElementById('profileAvatar');
+      if (avatarUrl) {
+        avatarElement.style.backgroundImage = `url(${avatarUrl})`;
+        avatarElement.textContent = '';
+      } else {
+        avatarElement.style.backgroundImage = '';
+        avatarElement.textContent = '👤';
+      }
+    }
+
+    // Update navbar user info
+    function updateNavbarUserInfo(userData) {
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      
+      if (navAvatar) {
+        const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+        if (avatarUrl) {
+          navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+          navAvatar.textContent = '';
+        } else {
+          navAvatar.style.backgroundImage = '';
+          navAvatar.textContent = '👤';
+        }
+      }
+      
+      if (navUserName) {
+        navUserName.textContent = userData.name || userData.login || 'Користувач';
+      }
+    }
+
+    function openAvatarUpload() {
+      document.getElementById('avatarModal').style.display = 'flex';
+      setupAvatarUpload();
+    }
+
+    function closeAvatarModal() {
+      document.getElementById('avatarModal').style.display = 'none';
+      resetAvatarUpload();
+    }
+
+    function setupAvatarUpload() {
+      const uploadArea = document.getElementById('uploadArea');
+      const avatarInput = document.getElementById('avatarInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      
+      // File input change
+      avatarInput.addEventListener('change', handleFileSelect);
+      
+      // Drag and drop
+      uploadArea.addEventListener('click', () => avatarInput.click());
+      uploadArea.addEventListener('dragover', handleDragOver);
+      uploadArea.addEventListener('dragleave', handleDragLeave);
+      uploadArea.addEventListener('drop', handleDrop);
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        processAvatarFile(file);
+      }
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+      event.currentTarget.classList.remove('dragover');
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('dragover');
+      
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        processAvatarFile(files[0]);
+      }
+    }
+
+    function processAvatarFile(file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        showNotification('Будь ласка, виберіть файл зображення', 'error');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('Розмір файлу не повинен перевищувати 5MB', 'error');
+        return;
+      }
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('avatarPreview');
+        preview.src = e.target.result;
+        
+        document.getElementById('uploadArea').style.display = 'none';
+        document.getElementById('previewArea').style.display = 'block';
+        document.getElementById('uploadBtn').disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function uploadAvatar() {
+      const avatarInput = document.getElementById('avatarInput');
+      const file = avatarInput.files[0];
+      
+      if (!file) {
+        showNotification('Будь ласка, виберіть файл', 'error');
+        return;
+      }
+
+      const uploadBtn = document.getElementById('uploadBtn');
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Завантаження...';
+
+      try {
+        // Convert to base64
+        const base64Data = await fileToBase64(file);
+        
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(`${API_BASE}/upload-avatar`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            image_data: base64Data
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showNotification('Аватар успішно завантажено!', 'success');
+          updateAvatar(result.avatar_url);
+          closeAvatarModal();
+          
+          // Update current user data
+          if (currentUser) {
+            currentUser.avatar_url = result.avatar_url;
+          }
+        } else {
+          throw new Error(result.error || 'Помилка завантаження аватара');
+        }
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        showNotification(error.message || 'Помилка завантаження аватара', 'error');
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Завантажити';
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function resetAvatarUpload() {
+      document.getElementById('avatarInput').value = '';
+      document.getElementById('uploadArea').style.display = 'block';
+      document.getElementById('previewArea').style.display = 'none';
+      document.getElementById('uploadBtn').disabled = true;
+      document.getElementById('uploadBtn').textContent = 'Завантажити';
+    }
+  </script>
 </body>
 </html>
+

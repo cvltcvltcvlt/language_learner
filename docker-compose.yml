@@ -33,11 +33,9 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-        # Ждём, пока MinIO станет доступен
         until curl -f http://minio:9000/minio/health/live; do
           echo 'Waiting for MinIO…'; sleep 3;
         done;
-        # Настраиваем хост и создаём бакеты (игнорируем уже существующие)
         mc config host add local http://minio:9000 minioadmin minioadmin
         mc mb --ignore-existing local/audio-files
       "

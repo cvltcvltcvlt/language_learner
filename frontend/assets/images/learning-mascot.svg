@@ -1,0 +1,82 @@
+<svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .character { 
+        animation: bounce 2s ease-in-out infinite;
+        transform-origin: center bottom;
+      }
+      .book { 
+        animation: bookOpen 3s ease-in-out infinite;
+        transform-origin: center;
+      }
+      .eyes { 
+        animation: blink 4s ease-in-out infinite;
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-5px) rotate(1deg); }
+      }
+      @keyframes bookOpen {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.05) rotate(-2deg); }
+      }
+      @keyframes blink {
+        0%, 90%, 100% { opacity: 1; }
+        95% { opacity: 0; }
+      }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <!-- Removed background rect to eliminate border -->
+  
+  <!-- Character -->
+  <g class="character">
+    <!-- Body -->
+    <ellipse cx="100" cy="140" rx="30" ry="25" fill="#238636"/>
+    
+    <!-- Head -->
+    <circle cx="100" cy="80" r="25" fill="#f0f6fc"/>
+    
+    <!-- Eyes -->
+    <g class="eyes">
+      <circle cx="92" cy="75" r="3" fill="#0d1117"/>
+      <circle cx="108" cy="75" r="3" fill="#0d1117"/>
+    </g>
+    
+    <!-- Smile -->
+    <path d="M 90 85 Q 100 90 110 85" stroke="#238636" stroke-width="2" fill="none"/>
+    
+    <!-- Arms -->
+    <ellipse cx="75" cy="120" rx="8" ry="15" fill="#f0f6fc" transform="rotate(-20 75 120)"/>
+    <ellipse cx="125" cy="120" rx="8" ry="15" fill="#f0f6fc" transform="rotate(20 125 120)"/>
+  </g>
+  
+  <!-- Book -->
+  <g class="book">
+    <rect x="80" y="100" width="40" height="30" fill="#1f6feb" rx="3"/>
+    <rect x="82" y="102" width="36" height="26" fill="#f0f6fc" rx="2"/>
+    <line x1="85" y1="110" x2="115" y2="110" stroke="#238636" stroke-width="1"/>
+    <line x1="85" y1="115" x2="110" y2="115" stroke="#238636" stroke-width="1"/>
+    <line x1="85" y1="120" x2="112" y2="120" stroke="#238636" stroke-width="1"/>
+  </g>
+  
+  <!-- Floating particles -->
+  <g>
+    <circle cx="50" cy="50" r="2" fill="#238636" opacity="0.6">
+      <animate attributeName="cy" values="50;40;50" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="150" cy="60" r="1.5" fill="#1f6feb" opacity="0.4">
+      <animate attributeName="cy" values="60;50;60" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="170" cy="150" r="2" fill="#8b5cf6" opacity="0.5">
+      <animate attributeName="cy" values="150;140;150" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0.9;0.5" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="185" font-family="Arial, sans-serif" font-size="12" fill="#7d8590" text-anchor="middle">Навчаюся...</text>
+</svg> 

@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, Enum as PgEnum, ARRAY, UUID
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, Enum as PgEnum, ARRAY, UUID, JSON
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
 from passlib.context import CryptContext
@@ -36,11 +36,21 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     login = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=True)
-    password_hash = Column(String, nullable=False)
+    password_hash = Column(String, nullable=True)  # Made nullable for OAuth users
     registered_at = Column(DateTime, default=datetime.utcnow)
     last_active = Column(DateTime, default=datetime.utcnow)
     timezone = Column(String, default="UTC")
     profile_picture_s3_link = Column(String)
+    
+    # Additional user info fields
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    username = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    
+    # OAuth providers info stored as JSON
+    oauth_providers = Column(JSON, nullable=True)
 
     language_level = Column(PgEnum(LanguageLevel), default=LanguageLevel.A1)
     experience = Column(Integer, default=0)
@@ -52,10 +62,19 @@ class User(Base):
     words = relationship("Word", back_populates="user", cascade="all, delete")
 
     def set_password(self, password: str):
-        self.password_hash = pwd_context.hash(password)
+        if password:
+            self.password_hash = pwd_context.hash(password)
 
     def verify_password(self, password: str) -> bool:
+        if not self.password_hash:
+            return False
         return pwd_context.verify(password, self.password_hash)
+    
+    def has_oauth_provider(self, provider: str) -> bool:
+        """Check if user has connected OAuth provider"""
+        if not self.oauth_providers:
+            return False
+        return provider in self.oauth_providers
 
 
 class Admin(User):
@@ -170,3 +189,44 @@ class AudioFiles(Base):
     id = Column(UUID, primary_key=True, index=True)
     word = Column(String, nullable=False)
     s3_link = Column(String, nullable=False)
+
+
+class AchievementType(enum.Enum):
+    LESSONS_COMPLETED = "lessons_completed"
+    WORDS_LEARNED = "words_learned"
+    STREAK_DAYS = "streak_days"
+    EXPERIENCE_GAINED = "experience_gained"
+    TESTS_PASSED = "tests_passed"
+    PRONUNCIATION_SCORE = "pronunciation_score"
+
+
+class Achievement(Base):
+    __tablename__ = "achievement"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    achievement_type = Column(PgEnum(AchievementType), nullable=False)
+    target_value = Column(Integer, nullable=False)  # Required value to unlock
+    xp_reward = Column(Integer, default=0)
+    icon = Column(String, nullable=True)  # Emoji or icon name
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Achievement(id={self.id}, name={self.name}, type={self.achievement_type.value})>"
+
+
+class UserAchievement(Base):
+    __tablename__ = "user_achievement"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
+    achievement_id = Column(Integer, ForeignKey("achievement.id", ondelete="CASCADE"), nullable=False, index=True)
+    unlocked_at = Column(DateTime, default=datetime.utcnow)
+    current_progress = Column(Integer, default=0)  # Current progress towards achievement
+
+    user = relationship("User")
+    achievement = relationship("Achievement")
+
+    def __repr__(self):
+        return f"<UserAchievement(user_id={self.user_id}, achievement_id={self.achievement_id})>"

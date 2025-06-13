@@ -1,0 +1,53 @@
+# OAuth Configuration Example
+# Copy this file to .env and fill in your actual values
+
+# Database Configuration
+DATABASE_URL=postgresql://user:password@localhost:5432/language_learner
+
+# JWT Configuration
+JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+# Frontend Configuration
+FRONTEND_URL=http://localhost:8001
+
+# Google OAuth Configuration
+# Get these from: https://console.developers.google.com/
+# Steps:
+# 1. Create a new project or select existing
+# 2. Enable Google+ API
+# 3. Create OAuth 2.0 credentials
+# 4. Add authorized redirect URIs
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:8080/auth/oauth/google/callback
+
+# Facebook OAuth Configuration  
+# Get these from: https://developers.facebook.com/
+# Steps:
+# 1. Create a new app
+# 2. Add Facebook Login product
+# 3. Configure Valid OAuth Redirect URIs
+FACEBOOK_CLIENT_ID=your-facebook-app-id
+FACEBOOK_CLIENT_SECRET=your-facebook-app-secret
+FACEBOOK_REDIRECT_URI=http://localhost:8080/auth/oauth/facebook/callback
+
+# GitHub OAuth Configuration
+# Get these from: https://github.com/settings/applications/new
+# Steps:
+# 1. Register a new OAuth application
+# 2. Set Authorization callback URL
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_REDIRECT_URI=http://localhost:8080/auth/oauth/github/callback
+
+# OpenAI Configuration (if needed)
+OPENAI_API_KEY=your-openai-api-key
+
+# Session Configuration
+SESSION_SECRET_KEY=your-session-secret-key-change-this-too
+
+# Development Settings
+DEBUG=True
+LOG_LEVEL=INFO 

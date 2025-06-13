@@ -4,346 +4,682 @@
   <meta charset="UTF-8">
   <title>Адмін-панель — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
   <style>
-    /* ФОН І НАВБАР */
+    :root {
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-border: #30363d;
+      --github-text: #e6edf3;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #2f81f7;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-danger: #da3633;
+      --github-danger-emphasis: #f85149;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      margin: 0; padding: 0;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
-      height: 100vh; overflow-x: hidden; color: white; position: relative;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      line-height: 1.6;
+      min-height: 100vh;
     }
-    @keyframes gradientMove {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-    .background-image {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') center center / cover no-repeat;
-      filter: blur(8px) brightness(0.7); z-index: -1;
-    }
-    .navbar {
-      display: flex; justify-content: center; padding: 20px;
-      background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 10;
-    }
-    .nav-item {
-      margin: 0 15px; font-weight: bold; font-size: 18px; color: #fff; text-decoration: none;
-      padding: 10px 20px; border-radius: 8px; transition: 0.3s;
-    }
-    .nav-item:hover {background: #2575fc;}
 
-    /* КОНТЕНТ */
-    .content {margin-top: 120px; padding: 20px; display: flex; flex-direction: column; align-items: center;}
-    h1 {font-size: 32px; margin-bottom: 20px;}
+    /* Navigation */
+    .nav {
+      background: var(--github-surface);
+      border-bottom: 1px solid var(--github-border);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
 
-    /* КНОПКИ */
-    .btn {padding: 10px 20px; margin: 5px; font-size: 16px; border-radius: 8px; border: none; cursor: pointer; transition: 0.3s;}
-    .btn-add {background: #28a745; color: white;}
-    .btn-add:hover {background: #218838;}
-    .btn-edit {background: #ffc107; color: #333;}
-    .btn-edit:hover {background: #e0a800;}
-    .btn-delete {background: #dc3545; color: white;}
-    .btn-delete:hover {background: #c82333;}
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
 
-    /* ТАБЛИЦЯ */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
+    }
+
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 10px;
+    }
+
+    .nav-user:hover {
+      background: var(--github-surface-hover);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .user-name {
+      color: var(--github-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.2rem;
+    }
+
+    /* Dashboard Grid */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .admin-card {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .admin-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--github-accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--github-text);
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.25rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      border: 1px solid var(--github-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-border);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--github-danger), var(--github-danger-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(218, 54, 51, 0.3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(218, 54, 51, 0.4);
+    }
+
+    /* Tables */
+    .table-container {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+
     table {
-      width: 90%; max-width: 1000px; margin-top: 20px; border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.9); color: #333; border-radius: 12px; overflow: hidden;
+      width: 100%;
+      border-collapse: collapse;
     }
-    th, td {padding: 12px 18px; text-align: center; border-bottom: 1px solid #ddd;}
-    th {background: #2575fc; color: white;}
-    tr:hover {background: rgba(0,0,0,0.05);}
 
-    /* МОДАЛКИ */
+    th, td {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid var(--github-border);
+    }
+
+    th {
+      background: var(--github-surface-hover);
+      font-weight: 600;
+      color: var(--github-text);
+    }
+
+    tr:hover {
+      background: var(--github-surface-hover);
+    }
+
+    /* Modal */
     .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
+
     .modal-content {
-      background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; color: #333;
-      overflow-y: auto; max-height: 90vh;
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-    input, select, textarea {
-      width: 90%; margin: 8px 0; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px;
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--github-border);
     }
-    .close-btn {background: #dc3545; margin-top: 15px; color: white;}
-    .close-btn:hover {background: #c82333;}
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--github-text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--github-text-secondary);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
+
+    .modal-close:hover {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--github-text);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--github-bg);
+      border: 1px solid var(--github-border);
+      border-radius: 8px;
+      color: var(--github-text);
+      font-size: 0.9rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="dashboard.html" class="nav-brand">
+        <div class="nav-brand-icon">🔧</div>
+        <span>Адмін-панель</span>
+      </a>
+      <div class="nav-user" onclick="goToProfile()">
+        <div class="user-avatar" id="navAvatar">👤</div>
+        <span class="user-name" id="navUserName">Адмін</span>
+      </div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+        <a href="admin_panel.html" class="nav-link active">🔧 Адмін-панель</a>
+        <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+      </div>
+    </div>
+  </nav>
 
-<div class="background-image"></div>
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Адміністрування</h1>
+      <p class="page-subtitle">Управління системою та користувачами</p>
+    </div>
 
-<!-- НАВБАР -->
-<div class="navbar">
-  <a href="dashboard.html" class="nav-item">Головна 🏠</a>
-  <a href="admin_panel.html" class="nav-item">Адмін-панель 🔧</a>
-  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
-</div>
+    <div class="admin-grid">
+      <!-- User Management -->
+      <div class="admin-card" id="userManagementCard">
+        <div class="card-header">
+          <h3 class="card-title">Користувачі</h3>
+          <div class="card-icon">👥</div>
+        </div>
+        <p class="card-description">Управління користувачами та правами доступу</p>
+        <div class="card-actions">
+          <button class="btn btn-primary" onclick="showUserManagement()">
+            Управляти користувачами
+          </button>
+        </div>
+      </div>
 
-<!-- КОНТЕНТ -->
-<div class="content">
-  <h1>Управління уроками</h1>
-  <button class="btn btn-add" onclick="openCreateLesson()">➕ Створити урок</button>
-  <table id="lesson-table">
-    <thead>
-      <tr>
-        <th>ID</th><th>Назва</th><th>Тип</th><th>XP</th><th>Необхідний досвід</th><th>Дії</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+      <!-- Lesson Management -->
+      <div class="admin-card">
+        <div class="card-header">
+          <h3 class="card-title">Уроки</h3>
+          <div class="card-icon">📚</div>
+        </div>
+        <p class="card-description">Створення та редагування уроків</p>
+        <div class="card-actions">
+          <button class="btn btn-primary" onclick="window.location.href='manageLessons.html'">
+            Управляти уроками
+          </button>
+          <button class="btn btn-secondary" onclick="window.location.href='createLesson.html'">
+            Створити урок
+          </button>
+        </div>
+      </div>
 
-<!-- МОДАЛКА УРОКУ -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <h2 id="modal-title">Створити урок</h2>
-    <input type="text" id="lesson-title" placeholder="Назва уроку">
-    <select id="lesson-type">
-      <option value="GRAMMAR">Граматика</option>
-      <option value="VOCABULARY">Словник</option>
-      <option value="READING">Читання</option>
-      <option value="LISTENING">Аудіювання</option>
-    </select>
-    <input type="number" id="lesson-xp" placeholder="XP за урок">
-    <input type="number" id="lesson-req-xp" placeholder="Необхідний досвід">
-    <textarea id="lesson-theory" placeholder="Теорія (необов'язково)"></textarea>
+      <!-- Word Management -->
+      <div class="admin-card">
+        <div class="card-header">
+          <h3 class="card-title">Словник</h3>
+          <div class="card-icon">📖</div>
+        </div>
+        <p class="card-description">Додавання та редагування слів</p>
+        <div class="card-actions">
+          <button class="btn btn-primary" onclick="window.location.href='addWord.html'">
+            Додати слово
+          </button>
+        </div>
+      </div>
 
-    <h3>Матеріали</h3>
-    <div id="materials-list"></div>
-    <button class="btn btn-add" onclick="addMaterial()">➕ Додати матеріал</button>
+      <!-- System Stats -->
+      <div class="admin-card">
+        <div class="card-header">
+          <h3 class="card-title">Статистика</h3>
+          <div class="card-icon">📊</div>
+        </div>
+        <p class="card-description">Аналітика та звіти системи</p>
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="loadSystemStats()">
+            Переглянути статистику
+          </button>
+        </div>
+      </div>
+    </div>
 
-    <h3>Вправи</h3>
-    <div id="exercises-list"></div>
-    <button class="btn btn-add" onclick="addExercise()">➕ Додати вправу</button>
-
-    <h3>Слова для вивчення</h3>
-    <div id="words-list"></div>
-    <button class="btn btn-add" onclick="addWordToLearn()">➕ Додати слово</button>
-
-    <br><br>
-    <button class="btn btn-add" onclick="submitLesson()">💾 Зберегти</button>
-    <button class="btn close-btn" onclick="closeModal()">Скасувати</button>
+    <!-- User Management Section -->
+    <div id="userManagementSection" style="display: none;">
+      <div class="table-container">
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Логін</th>
+              <th>Email</th>
+              <th>Рівень</th>
+              <th>Досвід</th>
+              <th>Роль</th>
+              <th>Дії</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
-let editingLessonId = null;
+  <!-- Make Admin Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Призначити адміністратора</h3>
+        <button class="modal-close" onclick="closeAdminModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Користувач:</label>
+          <p id="selectedUserInfo" style="color: var(--github-text-secondary);"></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Підтвердження:</label>
+          <p style="color: var(--github-text-secondary);">
+            Ви впевнені, що хочете надати права адміністратора цьому користувачу?
+          </p>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" onclick="confirmMakeAdmin()">Підтвердити</button>
+          <button class="btn btn-secondary" onclick="closeAdminModal()">Скасувати</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-// Перевірка прав адміністратора
-if (localStorage.getItem('isAdmin') !== 'true') {
-  window.location.href = 'login.html';
-}
+  <script>
+    const API_URL = 'http://127.0.0.1:8080';
+    let selectedUserId = null;
 
-async function loadLessons() {
-  const res = await fetch(`${API_URL}/lessons`);
-  const lessons = await res.json();
-  const tbody = document.querySelector('#lesson-table tbody');
-  tbody.innerHTML = '';
-  lessons.forEach(lesson => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${lesson.id}</td>
-      <td>${lesson.title}</td>
-      <td>${lesson.lesson_type}</td>
-      <td>${lesson.xp}</td>
-      <td>${lesson.required_experience}</td>
-      <td>
-        <button class="btn btn-edit" onclick="editLesson(${lesson.id})">✏️</button>
-        <button class="btn btn-delete" onclick="deleteLesson(${lesson.id})">🗑️</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+    // Check admin permissions
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.href = 'login.html';
+    }
 
-function openCreateLesson() {
-  editingLessonId = null;
-  document.getElementById('modal-title').innerText = "Створити урок";
-  document.getElementById('lesson-title').value = '';
-  document.getElementById('lesson-type').value = 'GRAMMAR';
-  document.getElementById('lesson-xp').value = '';
-  document.getElementById('lesson-req-xp').value = '';
-  document.getElementById('lesson-theory').value = '';
-  document.getElementById('materials-list').innerHTML = '';
-  document.getElementById('exercises-list').innerHTML = '';
-  document.getElementById('words-list').innerHTML = '';
-  document.getElementById('modal').style.display = 'flex';
-}
+    // Load user info on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCurrentUser();
+    });
 
-function addMaterial() {
-  const div = document.createElement('div');
-  div.innerHTML = `
-    <input type="text" placeholder="Назва" class="material-title">
-    <select class="material-type">
-      <option value="VIDEO">Відео</option>
-      <option value="TEXT">Текст</option>
-      <option value="AUDIO">Аудіо</option>
-    </select>
-    <input type="text" placeholder="URL" class="material-url">
-    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-    <hr>
-  `;
-  document.getElementById('materials-list').appendChild(div);
-}
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-async function editLesson(id) {
-  editingLessonId = id;
-  const res = await fetch(`${API_URL}/lessons/${id}`);
-  const lesson = await res.json();
+        if (response.ok) {
+          const userData = await response.json();
+          updateNavbarUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
 
-  document.getElementById('lesson-title').value = lesson.title;
-  document.getElementById('lesson-type').value = lesson.lesson_type;
-  document.getElementById('lesson-xp').value = lesson.xp;
-  document.getElementById('lesson-req-xp').value = lesson.required_experience;
-  document.getElementById('lesson-theory').value = lesson.theory || '';
+    function updateNavbarUserInfo(userData) {
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      
+      if (navAvatar) {
+        const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+        if (avatarUrl) {
+          navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+          navAvatar.textContent = '';
+        }
+      }
+      
+      if (navUserName) {
+        navUserName.textContent = userData.name || userData.login || 'Адмін';
+      }
+    }
 
-  document.getElementById('materials-list').innerHTML = '';
-  document.getElementById('exercises-list').innerHTML = '';
-  document.getElementById('words-list').innerHTML = '';
+    async function showUserManagement() {
+      const section = document.getElementById('userManagementSection');
+      if (section.style.display === 'none') {
+        await loadUsers();
+        section.style.display = 'block';
+      } else {
+        section.style.display = 'none';
+      }
+    }
 
-  (lesson.material_links || []).forEach(mat => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <input type="text" placeholder="Назва" class="material-title" value="${mat.title}">
-      <select class="material-type">
-        <option value="VIDEO" ${mat.content_type === "VIDEO" ? 'selected' : ''}>Відео</option>
-        <option value="TEXT" ${mat.content_type === "TEXT" ? 'selected' : ''}>Текст</option>
-        <option value="AUDIO" ${mat.content_type === "AUDIO" ? 'selected' : ''}>Аудіо</option>
-      </select>
-      <input type="text" placeholder="URL" class="material-url" value="${mat.content_url}">
-      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-      <hr>
-    `;
-    document.getElementById('materials-list').appendChild(div);
-  });
+    async function loadUsers() {
+      try {
+        const response = await fetch(`${API_URL}/top_users?limit=100`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-  (lesson.exercises || []).forEach(ex => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <input type="text" placeholder="Питання" class="exercise-question" value="${ex.question}">
-      <input type="text" placeholder="Правильна відповідь" class="exercise-answer" value="${ex.correct_answer}">
-      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-      <hr>
-    `;
-    document.getElementById('exercises-list').appendChild(div);
-  });
+        if (response.ok) {
+          const users = await response.json();
+          const tbody = document.querySelector('#usersTable tbody');
+          tbody.innerHTML = '';
 
-  (lesson.words_to_learn_links || []).forEach(word => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <input type="text" placeholder="Слово" class="word-text" value="${word.word}">
-      <input type="text" placeholder="Переклад" class="word-translation" value="${word.translation}">
-      <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-      <hr>
-    `;
-    document.getElementById('words-list').appendChild(div);
-  });
+          users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${user.id}</td>
+              <td>${user.login || 'N/A'}</td>
+              <td>${user.email || 'N/A'}</td>
+              <td>${user.language_level || 'A1'}</td>
+              <td>${user.experience || 0}</td>
+              <td>${user.is_admin ? 'Адмін' : 'Користувач'}</td>
+              <td>
+                ${!user.is_admin 
+                  ? `<button class="btn btn-primary" onclick="openAdminModal(${user.id}, '${user.login}')">Зробити адміном</button>`
+                  : `<span style="color: var(--github-accent);">Адміністратор</span>`
+                }
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
 
-  document.getElementById('modal-title').innerText = "Редагувати урок";
-  document.getElementById('modal').style.display = 'flex';
-}
+    function openAdminModal(userId, userLogin) {
+      selectedUserId = userId;
+      document.getElementById('selectedUserInfo').textContent = `${userLogin} (ID: ${userId})`;
+      document.getElementById('adminModal').style.display = 'flex';
+    }
 
-function addExercise() {
-  const div = document.createElement('div');
-  div.innerHTML = `
-    <input type="text" placeholder="Питання" class="exercise-question">
-    <input type="text" placeholder="Правильна відповідь" class="exercise-answer">
-    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-    <hr>
-  `;
-  document.getElementById('exercises-list').appendChild(div);
-}
+    function closeAdminModal() {
+      document.getElementById('adminModal').style.display = 'none';
+      selectedUserId = null;
+    }
 
-function addWordToLearn() {
-  const div = document.createElement('div');
-  div.innerHTML = `
-    <input type="text" placeholder="Слово" class="word-text">
-    <input type="text" placeholder="Переклад" class="word-translation">
-    <button class="btn btn-delete" onclick="this.parentElement.remove()">❌</button>
-    <hr>
-  `;
-  document.getElementById('words-list').appendChild(div);
-}
+    async function confirmMakeAdmin() {
+      if (!selectedUserId) return;
 
-async function submitLesson() {
-  const title = document.getElementById('lesson-title').value.trim();
-  const type = document.getElementById('lesson-type').value;
-  const xp = parseInt(document.getElementById('lesson-xp').value);
-  const reqXP = parseInt(document.getElementById('lesson-req-xp').value);
-  const theory = document.getElementById('lesson-theory').value.trim();
-  const creator_id = localStorage.getItem('userId');
+      try {
+        const response = await fetch(`${API_URL}/make-admin/${selectedUserId}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-  const materials = Array.from(document.querySelectorAll('#materials-list > div')).map(div => ({
-    title: div.querySelector('.material-title').value.trim(),
-    content_type: div.querySelector('.material-type').value.trim().toUpperCase(),
-    content_url: div.querySelector('.material-url').value.trim()
-  }));
+        if (response.ok) {
+          alert('Користувача успішно призначено адміністратором!');
+          closeAdminModal();
+          await loadUsers();
+        } else {
+          const error = await response.json();
+          alert(`Помилка: ${error.error || 'Невідома помилка'}`);
+        }
+      } catch (error) {
+        console.error('Error making admin:', error);
+        alert('Помилка при призначенні адміністратора');
+      }
+    }
 
-  const exercises = Array.from(document.querySelectorAll('#exercises-list > div')).map((div, idx) => ({
-    index: idx,
-    question: div.querySelector('.exercise-question').value.trim(),
-    correct_answer: div.querySelector('.exercise-answer').value.trim()
-  }));
+    function loadSystemStats() {
+      alert('Статистика буде доступна в наступних версіях');
+    }
 
-  const words_to_learn = Array.from(document.querySelectorAll('#words-list > div')).map(div => ({
-    word: div.querySelector('.word-text').value.trim(),
-    translation: div.querySelector('.word-translation').value.trim()
-  }));
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
 
-  const payload = {
-    creator_id, title, lesson_type: type, xp, required_experience: reqXP, theory,
-    materials, exercises, words_to_learn
-  };
-
-  let url = `${API_URL}/lessons`;
-  let method = 'POST';
-
-  if (editingLessonId) {
-    url = `${API_URL}/lessons/${editingLessonId}`;
-    method = 'PUT';
-  }
-
-  const res = await fetch(url, {
-    method,
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(payload)
-  });
-
-  if (res.ok) {
-    alert(editingLessonId ? 'Урок оновлено!' : 'Урок створено!');
-    closeModal();
-    loadLessons();
-  } else {
-    alert('Помилка при збереженні.');
-  }
-}
-
-async function deleteLesson(id) {
-  if (confirm('Видалити урок?')) {
-    await fetch(`${API_URL}/lessons/${id}`, { method: 'DELETE' });
-    loadLessons();
-  }
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
-
-window.onload = loadLessons;
-</script>
-
+    function logout() {
+      if (confirm('Ви впевнені, що хочете вийти?')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 </body>
 </html>

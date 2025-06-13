@@ -1,174 +1,1097 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Реєстрація — Language Learner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto', sans-serif;
-      height: 100vh;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація — Language Learner</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0f172a;
+            --secondary-blue: #1e293b;
+            --accent-blue: #3b82f6;
+            --light-blue: #60a5fa;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-primary: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-secondary: 0 10px 25px -3px rgba(0, 0, 0, 0.3);
+        }
 
-    @keyframes gradientMove {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .background-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
 
-    .container {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      max-width: 450px;
-      width: 100%;
-      animation: fadeIn 0.6s ease-out;
-      text-align: center;
-      color: #333;
-    }
+        /* Professional Background Elements */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.05;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridFloat 20s linear infinite;
+        }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(40px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
+        @keyframes gridFloat {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
 
-    h2 {
-      margin-bottom: 20px;
-      font-size: 26px;
-      color: #333;
-    }
+        .bg-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
 
-    input, select {
-      width: 90%;
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      background: #fff;
-    }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent);
+            animation: orbFloat 8s ease-in-out infinite;
+        }
 
-    input:focus, select:focus {
-      outline: none;
-      box-shadow: 0 0 10px rgba(106, 17, 203, 0.4);
-    }
+        .orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 20px;
-      border-radius: 8px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      background: #2575fc;
-      color: white;
-      transition: 0.3s;
-    }
+        .orb:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: -5%;
+            animation-delay: 2s;
+        }
 
-    .btn:hover {
-      background: #1d5ed8;
-      transform: scale(1.02);
-    }
+        .orb:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 4s;
+        }
 
-    .back-btn {
-      background: #6c757d;
-    }
+        @keyframes orbFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
 
-    .back-btn:hover {
-      background: #5a6268;
-    }
+        /* Main Container */
+        .registration-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
 
-    .error-message {
-      margin-top: 10px;
-      color: #dc3545;
-      font-size: 14px;
-      display: none;
-    }
-  </style>
-  <link rel="stylesheet" href="style.css?v=2">
+        .registration-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .registration-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .registration-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--light-blue));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-secondary);
+            animation: logoFloat 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .registration-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--light-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .registration-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.025em;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-container:focus-within .input-icon {
+            color: var(--accent-blue);
+            transform: scale(1.1);
+        }
+
+        /* Professional Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--light-blue));
+            color: white;
+            box-shadow: var(--shadow-secondary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Additional Styles */
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: var(--light-blue);
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .input-validation {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .input-validation.success {
+            color: var(--success-green);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .input-validation.error {
+            color: var(--error-red);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .input-validation.warning {
+            color: var(--warning-orange);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .strength-segment {
+            height: 4px;
+            flex: 1;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .strength-segment.active {
+            transform: scaleY(1.5);
+        }
+
+        .strength-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-primary);
+            animation: modalSlideIn 0.5s ease forwards;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(239, 68, 68, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            max-width: 400px;
+            z-index: 1001;
+            animation: toastSlideIn 0.3s ease forwards;
+        }
+
+        .toast.show {
+            display: flex;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .registration-container {
+                padding: 1rem;
+            }
+
+            .registration-card {
+                padding: 2rem;
+                border-radius: 16px;
+            }
+
+            .registration-title {
+                font-size: 1.75rem;
+            }
+
+            .toast {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Professional Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
 
-<div class="background-image"></div>
+    <!-- Main Container -->
+    <div class="registration-container">
+        <div class="registration-card">
+            <!-- Header -->
+            <div class="registration-header">
+                <div class="logo-icon" id="logoIcon">🎓</div>
+                <h1 class="registration-title">Створити Акаунт</h1>
+                <p class="registration-subtitle">Приєднуйтесь до тисяч студентів по всьому світу</p>
+            </div>
 
-<div class="container">
-  <h2>Реєстрація</h2>
-  <form id="register-form">
-    <input type="text" id="login" placeholder="Логін" required>
-    <input type="password" id="password" placeholder="Пароль" required>
-    <input type="email" id="email" placeholder="Email" required>
+            <!-- Registration Form -->
+            <form id="registrationForm" class="registration-form">
+                <div class="form-group">
+                    <label for="login" class="form-label">Ім'я користувача</label>
+                    <div class="input-container">
+                        <input type="text" id="login" name="login" class="form-input" required placeholder="Введіть ім'я користувача">
+                        <div class="input-icon">👤</div>
+                    </div>
+                    <div class="input-validation" id="loginValidation"></div>
+                </div>
 
-    <select id="language-level" required>
-      <option value="A1">A1 — Початковий</option>
-      <option value="A2">A2 — Базовий</option>
-      <option value="B1">B1 — Середній</option>
-      <option value="B2">B2 — Вище середнього</option>
-      <option value="C1">C1 — Просунутий</option>
-      <option value="C2">C2 — Вільне володіння</option>
-    </select>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email адреса</label>
+                    <div class="input-container">
+                        <input type="email" id="email" name="email" class="form-input" required placeholder="Введіть email адресу">
+                        <div class="input-icon">📧</div>
+                    </div>
+                    <div class="input-validation" id="emailValidation"></div>
+                </div>
 
-    <button type="submit" class="btn">Зареєструватися</button>
-  </form>
-  <button class="btn back-btn" onclick="backToLogin()">⬅ Назад</button>
-  <div class="error-message" id="error-message">Помилка реєстрації</div>
-</div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Пароль</label>
+                    <div class="input-container">
+                        <input type="password" id="password" name="password" class="form-input" required placeholder="Введіть пароль">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <div class="input-validation" id="passwordValidation"></div>
+                </div>
 
-<script>
-const API_URL = 'http://127.0.0.1:8080';
+                <div class="form-group">
+                    <label for="confirm-password" class="form-label">Підтвердіть пароль</label>
+                    <div class="input-container">
+                        <input type="password" id="confirm-password" name="confirm-password" class="form-input" required placeholder="Повторіть пароль">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                    <div class="input-validation" id="confirmPasswordValidation"></div>
+                </div>
 
-document.getElementById('register-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
+                <div class="form-group">
+                    <label for="language_level" class="form-label">Рівень володіння мовою</label>
+                    <div class="input-container">
+                        <select id="language_level" name="language_level" class="form-input">
+                            <option value="A1">A1 - Початковий</option>
+                            <option value="A2">A2 - Елементарний</option>
+                            <option value="B1">B1 - Середній</option>
+                            <option value="B2">B2 - Вище середнього</option>
+                            <option value="C1">C1 - Просунутий</option>
+                            <option value="C2">C2 - Професійний</option>
+                        </select>
+                        <div class="input-icon">📊</div>
+                    </div>
+                </div>
 
-  const login = document.getElementById('login').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const languageLevel = document.getElementById('language-level').value;
+                <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+                    <span class="btn-text">Створити Акаунт</span>
+                    <div class="btn-loader" style="display: none;">⏳</div>
+                </button>
 
-  const res = await fetch(`${API_URL}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ login, password, email, language_level: languageLevel })
-  });
+                <div class="form-footer">
+                    <p>Вже маєте акаунт? <a href="login.html" class="login-link">Увійти</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
 
-  const data = await res.json();
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">✅</div>
+            <h2>Ласкаво просимо! 🎉</h2>
+            <p>Ваш акаунт успішно створено!</p>
+            <button class="btn btn-primary" onclick="redirectToLogin()">Перейти до входу</button>
+        </div>
+    </div>
 
-  if (res.ok) {
-    alert('Реєстрація успішна!');
-    window.location.href = 'login.html';
-  } else {
-    alert(`Помилка: ${data.error}`);
-  }
-});
+    <!-- Error Toast -->
+    <div id="errorToast" class="toast">
+        <div class="toast-icon">❌</div>
+        <div class="toast-content">
+            <div class="toast-title">Помилка реєстрації</div>
+            <div class="toast-message" id="errorMessage"></div>
+        </div>
+        <button class="toast-close" onclick="hideToast()">&times;</button>
+    </div>
 
-function backToLogin() {
-  window.location.href = 'login.html';
-}
-</script>
+    <script>
+        // Professional Registration with Advanced Animations
+        const form = document.getElementById('registrationForm');
+        const inputs = document.querySelectorAll('.form-input');
+        const logoIcon = document.getElementById('logoIcon');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkIfAlreadyLoggedIn();
+            initializeAnimations();
+            setupFormValidation();
+            setupInteractiveElements();
+        });
+        
+        // Check if user is already logged in
+        async function checkIfAlreadyLoggedIn() {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8080/verify-token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.valid) {
+                        // User is already logged in, redirect to dashboard
+                        window.location.href = '/dashboard.html';
+                    }
+                } else {
+                    // Token is invalid, remove it
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_data');
+                }
+            } catch (error) {
+                console.error('Token verification error:', error);
+                // If there's an error, remove potentially invalid token
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user_data');
+            }
+        }
 
+        function initializeAnimations() {
+            // Logo click animation
+            logoIcon.addEventListener('click', () => {
+                logoIcon.style.animation = 'none';
+                logoIcon.offsetHeight; // Trigger reflow
+                logoIcon.style.animation = 'logoFloat 0.6s ease';
+            });
+
+            // Stagger form animations
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                setTimeout(() => {
+                    group.style.animation = `fadeInUp 0.6s ease forwards`;
+                }, index * 100);
+            });
+        }
+
+        function setupFormValidation() {
+            inputs.forEach(input => {
+                input.addEventListener('input', validateField);
+                input.addEventListener('focus', handleInputFocus);
+                input.addEventListener('blur', handleInputBlur);
+            });
+        }
+
+        function setupInteractiveElements() {
+            // Smooth hover effects for inputs
+            inputs.forEach(input => {
+                const container = input.closest('.input-container');
+                
+                input.addEventListener('mouseenter', () => {
+                    container.style.transform = 'translateY(-2px)';
+                });
+                
+                input.addEventListener('mouseleave', () => {
+                    if (!input.matches(':focus')) {
+                        container.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+        }
+
+        function validateField(e) {
+            const field = e.target;
+            const value = field.value.trim();
+            const fieldName = field.name;
+            
+            switch(fieldName) {
+                case 'login':
+                    validateUsername(value);
+                    break;
+                case 'email':
+                    validateEmail(value);
+                    break;
+                case 'password':
+                    validatePassword(value);
+                    break;
+                case 'confirm-password':
+                    validateConfirmPassword(value);
+                    break;
+            }
+        }
+
+        function handleInputFocus(e) {
+            const container = e.target.closest('.input-container');
+            const icon = container.querySelector('.input-icon');
+            
+            container.style.transform = 'translateY(-2px)';
+            container.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.15)';
+            icon.style.transform = 'scale(1.1)';
+        }
+
+        function handleInputBlur(e) {
+            const container = e.target.closest('.input-container');
+            const icon = container.querySelector('.input-icon');
+            
+            container.style.transform = 'translateY(0)';
+            container.style.boxShadow = 'none';
+            icon.style.transform = 'scale(1)';
+        }
+
+        function validateUsername(username) {
+            const validation = document.getElementById('loginValidation');
+            if (username.length < 3) {
+                showValidation(validation, 'Username must be at least 3 characters', 'error');
+                return false;
+            } else if (username.length > 20) {
+                showValidation(validation, 'Username must be less than 20 characters', 'error');
+                return false;
+            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showValidation(validation, 'Username can only contain letters, numbers, and underscores', 'error');
+                return false;
+            } else {
+                showValidation(validation, 'Username looks good!', 'success');
+                return true;
+            }
+        }
+
+        function validateEmail(email) {
+            const validation = document.getElementById('emailValidation');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailRegex.test(email)) {
+                showValidation(validation, 'Please enter a valid email address', 'error');
+                return false;
+            } else {
+                showValidation(validation, 'Email looks good!', 'success');
+                return true;
+            }
+        }
+
+        function validatePassword(password) {
+            const validation = document.getElementById('passwordValidation');
+            const strengthIndicator = document.getElementById('passwordStrength');
+            
+            if (password.length < 6) {
+                showValidation(validation, 'Password must be at least 6 characters', 'error');
+                updatePasswordStrength(0);
+                return false;
+            }
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            updatePasswordStrength(strength);
+            
+            if (strength >= 3) {
+                showValidation(validation, 'Strong password!', 'success');
+                return true;
+            } else if (strength >= 2) {
+                showValidation(validation, 'Good password, but could be stronger', 'warning');
+                return true;
+            } else {
+                showValidation(validation, 'Password is too weak', 'error');
+                return false;
+            }
+        }
+
+        function validateConfirmPassword(confirmPassword) {
+            const validation = document.getElementById('confirmPasswordValidation');
+            const password = document.getElementById('password').value;
+            
+            if (confirmPassword !== password) {
+                showValidation(validation, 'Passwords do not match', 'error');
+                return false;
+            } else if (confirmPassword.length > 0) {
+                showValidation(validation, 'Passwords match!', 'success');
+                return true;
+            }
+            return false;
+        }
+
+        function showValidation(element, message, type) {
+            element.textContent = message;
+            element.className = `input-validation ${type}`;
+            element.style.display = 'block';
+            
+            // Add animation
+            element.classList.add('animate-slideInUp');
+            setTimeout(() => element.classList.remove('animate-slideInUp'), 300);
+        }
+
+        function updatePasswordStrength(strength) {
+            const indicator = document.getElementById('passwordStrength');
+            const strengthTexts = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const strengthColors = ['#ef4444', '#f59e0b', '#eab308', '#10b981', '#059669'];
+            
+            indicator.innerHTML = `
+                <div class="strength-bar">
+                    ${Array.from({length: 5}, (_, i) => 
+                        `<div class="strength-segment ${i < strength ? 'active' : ''}" 
+                              style="background-color: ${i < strength ? strengthColors[strength-1] : '#e5e7eb'}"></div>`
+                    ).join('')}
+                </div>
+                <span class="strength-text" style="color: ${strengthColors[strength-1] || '#6b7280'}">
+                    ${strengthTexts[strength-1] || 'Enter password'}
+                </span>
+            `;
+        }
+
+        function handleInputFocus(e) {
+            const container = e.target.closest('.input-container');
+            container.classList.add('focused');
+            
+            // Add focus animation
+            const focusEffect = container.querySelector('.input-focus-effect');
+            focusEffect.style.transform = 'scaleX(1)';
+        }
+
+        function handleInputBlur(e) {
+            const container = e.target.closest('.input-container');
+            if (!e.target.value) {
+                container.classList.remove('focused');
+            }
+            
+            // Remove focus animation
+            const focusEffect = container.querySelector('.input-focus-effect');
+            focusEffect.style.transform = 'scaleX(0)';
+        }
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.parentNode.querySelector('.password-toggle');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                button.textContent = '🙈';
+                button.classList.add('active');
+            } else {
+                field.type = 'password';
+                button.textContent = '👁️';
+                button.classList.remove('active');
+            }
+            
+            // Add click animation
+            button.classList.add('animate-pulse');
+            setTimeout(() => button.classList.remove('animate-pulse'), 300);
+        }
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Manually collect form data to ensure correct field names
+            const data = {
+                login: document.getElementById('login').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+                'confirm-password': document.getElementById('confirm-password').value,
+                language_level: document.getElementById('language_level').value
+            };
+            
+            // Validate all fields
+            const isUsernameValid = validateUsername(data.login);
+            const isEmailValid = validateEmail(data.email);
+            const isPasswordValid = validatePassword(data.password);
+            const isConfirmPasswordValid = validateConfirmPassword(data['confirm-password']);
+            
+            if (!isUsernameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+                showError('Please fix the validation errors before submitting');
+                return;
+            }
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const btnText = registerBtn.querySelector('.btn-text');
+            const btnLoader = registerBtn.querySelector('.btn-loader');
+            
+            // Show loading state
+            registerBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'flex';
+            registerBtn.classList.add('loading');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8080/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Success animation
+                    form.classList.add('animate-fadeOut');
+                    setTimeout(() => {
+                        showSuccessModal();
+                    }, 300);
+                } else {
+                    showError(result.error || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError('Network error. Please check your connection and try again.');
+            } finally {
+                // Reset button state
+                registerBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+                registerBtn.classList.remove('loading');
+            }
+        });
+
+        function showError(message) {
+            const toast = document.getElementById('errorToast');
+            const messageEl = document.getElementById('errorMessage');
+            
+            messageEl.textContent = message;
+            toast.classList.add('show', 'animate-slideInRight');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                hideToast();
+            }, 5000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('errorToast');
+            toast.classList.add('animate-slideOutRight');
+            setTimeout(() => {
+                toast.classList.remove('show', 'animate-slideInRight', 'animate-slideOutRight');
+            }, 300);
+        }
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+            
+            // Trigger confetti effect
+            createConfetti();
+        }
+
+        function redirectToLogin() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('animate-fadeOut');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 300);
+        }
+
+        function createConfetti() {
+            const colors = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+            const confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti-container';
+            document.body.appendChild(confettiContainer);
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confettiContainer.appendChild(confetti);
+            }
+            
+            // Clean up confetti after animation
+            setTimeout(() => {
+                document.body.removeChild(confettiContainer);
+            }, 5000);
+        }
+
+        // Add particle click effects
+        document.addEventListener('click', (e) => {
+            createClickParticles(e.clientX, e.clientY);
+        });
+
+        // Professional click effects
+        document.addEventListener('click', (e) => {
+            createProfessionalEffect(e.clientX, e.clientY);
+        });
+
+        function createProfessionalEffect(x, y) {
+            const colors = ['rgba(59, 130, 246, 0.6)', 'rgba(16, 185, 129, 0.6)', 'rgba(245, 158, 11, 0.6)'];
+            
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'fixed';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.width = '6px';
+                particle.style.height = '6px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '9999';
+                
+                document.body.appendChild(particle);
+                
+                const angle = (Math.PI * 2 * i) / 8;
+                const velocity = 60 + Math.random() * 40;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particle.animate([
+                    { 
+                        transform: 'translate(0, 0) scale(1)', 
+                        opacity: 1 
+                    },
+                    { 
+                        transform: `translate(${vx}px, ${vy}px) scale(0)`, 
+                        opacity: 0 
+                    }
+                ], {
+                    duration: 800,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                }).onfinish = () => {
+                    if (document.body.contains(particle)) {
+                        document.body.removeChild(particle);
+                    }
+                };
+            }
+        }
+
+        // Advanced keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit'));
+            }
+            
+            // ESC to close modals
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('successModal');
+                if (modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+                hideToast();
+            }
+        });
+
+        // Professional form submission feedback
+        const registerBtn = document.getElementById('registerBtn');
+        registerBtn.addEventListener('click', () => {
+            // Button press animation
+            registerBtn.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                registerBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+    </script>
 </body>
 </html>

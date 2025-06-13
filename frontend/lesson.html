@@ -1,249 +1,1077 @@
 <!DOCTYPE html>
+<!--
+  Lessons Page - Language Learning Platform
+  
+  Features:
+  - Browse and complete lessons with real API integration
+  - GitHub dark theme consistent with other pages
+  - Progress tracking and completion status
+  - Exercises and word learning
+  - XP gain and level progression
+  
+  API Integration:
+  - GET /lessons - Get all available lessons
+  - GET /lessons/{id} - Get specific lesson details
+  - POST /lessons/complete - Mark lesson as completed
+  - GET /lesson/{id}/words/{user_id} - Get words to learn
+  - POST /check_word_answer - Check word translation answer
+  
+  Dependencies:
+  - Google Fonts (Inter, Poppins)
+  - Backend API running on port 8080
+-->
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Уроки — Language Learner</title>
+  <title>Уроки — Майстер англійської з ШІ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body {
+    :root {
+      /* GitHub Theme Variables */
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-surface-active: #30363d;
+      --github-border: #30363d;
+      --github-border-hover: #40464e;
+      --github-text: #f0f6fc;
+      --github-text-secondary: #7d8590;
+      --github-text-tertiary: #656d76;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #1f6feb;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-pink: #d63384;
+      --github-red: #f85149;
+      --github-yellow: #f0c814;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
       overflow-x: hidden;
-      color: white;
-      position: relative;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .background-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
-
-    .navbar {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
+    /* Animated particles background */
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    .nav-item {
-      margin: 0 15px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid transparent;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-
-    .nav-item:hover {
-      background: #2575fc;
-      border-color: #2575fc;
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .content {
-      margin-top: 160px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Уроки */
-    .lesson-item {
-      background: rgba(255, 255, 255, 0.95);
-      color: #222;
-      padding: 30px;
-      margin: 20px 0;
-      border-radius: 14px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-      text-align: center;
-      width: 95%;
-      max-width: 700px;
-      font-size: 18px;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .lesson-item.locked {
-      filter: blur(2px) grayscale(50%);
+      width: 100%;
+      height: 100%;
+      z-index: -1;
       pointer-events: none;
     }
 
-    .lesson-title {
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 15px;
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--github-accent);
+      border-radius: 50%;
+      animation: float 8s infinite ease-in-out;
+      opacity: 0.3;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-100px) rotate(180deg); opacity: 0.6; }
     }
 
-    .completed {
-      color: #28a745;
-      font-size: 22px;
-      margin-left: 10px;
+    .lesson-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
     }
 
-    .start-btn {
-      margin-top: 10px;
-      background: #007bff;
+    /* Navigation */
+    .lesson-nav {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      margin: 1.5rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-brand:hover {
+      transform: scale(1.05);
+      color: var(--github-accent);
+    }
+
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
       color: white;
-      padding: 10px 20px;
-      font-size: 16px;
+      box-shadow: 0 5px 15px rgba(31, 111, 235, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main content */
+    .lesson-main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .lesson-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .lesson-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-blue), var(--github-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .lesson-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+
+    /* Loading state */
+    .loading-card {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--github-border);
+      border-top: 4px solid var(--github-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Lessons grid */
+    .lessons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .lesson-card {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lesson-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--github-border-hover);
+    }
+
+    .lesson-card.completed {
+      border-color: var(--github-accent);
+      background: linear-gradient(135deg, var(--github-surface), rgba(35, 134, 54, 0.1));
+    }
+
+    .lesson-status {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .lesson-status.completed {
+      background: var(--github-accent);
+      color: white;
+    }
+
+    .lesson-status.available {
+      background: var(--github-blue);
+      color: white;
+    }
+
+    .lesson-status.locked {
+      background: var(--github-surface-active);
+      color: var(--github-text-tertiary);
+    }
+
+    .lesson-card-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .lesson-card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--github-text);
+    }
+
+    .lesson-card-type {
+      background: var(--github-surface-active);
+      color: var(--github-text-secondary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .lesson-card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--github-border);
+    }
+
+    .lesson-card-xp {
+      color: var(--github-accent);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .lesson-card-requirement {
+      color: var(--github-text-tertiary);
+      font-size: 0.8rem;
+    }
+
+    /* Lesson detail modal */
+    .lesson-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .lesson-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .lesson-modal-content {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .lesson-modal.active .lesson-modal-content {
+      transform: scale(1);
+    }
+
+    .lesson-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--github-border);
+    }
+
+    .lesson-modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--github-text);
+    }
+
+    .lesson-modal-close {
+      background: var(--github-surface-hover);
       border: none;
+      color: var(--github-text-secondary);
+      padding: 0.5rem;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
     }
 
-    .start-btn:hover {
-      background: #0056b3;
+    .lesson-modal-close:hover {
+      background: var(--github-surface-active);
+      color: var(--github-text);
     }
 
-    /* Прогрес-бар */
-    .progress-container {
-      width: 90%;
-      max-width: 600px;
-      height: 6px;
-      background: #e9ecef;
-      border-radius: 6px;
-      overflow: hidden;
-      margin: 20px 0;
+    .lesson-exercises {
+      margin-bottom: 2rem;
     }
 
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #28a745;
-      transition: width 0.5s ease;
+    .exercise-item {
+      background: var(--github-surface-hover);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .exercise-question {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--github-text);
+    }
+
+    .exercise-input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--github-border);
+      border-radius: 8px;
+      background: var(--github-surface);
+      color: var(--github-text);
+      outline: none;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .exercise-input:focus {
+      border-color: var(--github-blue);
+      box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1);
+    }
+
+    .exercise-feedback {
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .exercise-feedback.correct {
+      background: rgba(35, 134, 54, 0.2);
+      color: var(--github-accent);
+      border: 1px solid var(--github-accent);
+    }
+
+    .exercise-feedback.incorrect {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--github-red);
+      border: 1px solid var(--github-red);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(31, 111, 235, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      border: 1px solid var(--github-border);
+      color: var(--github-text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-surface-active);
+      color: var(--github-text);
+      transform: translateY(-2px);
+    }
+
+    /* Utility classes */
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-2 {
+      margin-bottom: 1rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .lesson-main {
+        padding: 0 1rem;
+      }
+      
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .lessons-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .lesson-title {
+        font-size: 2rem;
+      }
+      
+      .lesson-modal-content {
+        width: 95%;
+        padding: 1.5rem;
+      }
     }
   </style>
-  <link rel="stylesheet" href="style.css?v=2">
 </head>
-
 <body>
+  <!-- Animated particles background -->
+  <div class="particles" id="particles"></div>
 
-<div class="background-image"></div>
-
-<!-- Навігаційна панель -->
-<div class="navbar">
-  <a href="profile.html" class="nav-item">Профіль 👤</a>
-  <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тести 📝</a>
-  <a href="chat.html" class="nav-item">Чат 🤖</a>
-  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
-</div>
-
-<div class="content">
-  <!-- Прогрес-бар -->
-  <div class="progress-container">
-    <div class="progress-bar" id="overall-progress-bar"></div>
-  </div>
-
-  <!-- Список уроків -->
-  <div id="lesson-list">
-    <h1>⏳ Завантаження уроків...</h1>
-  </div>
-</div>
-
-<script>
-const API_URL = 'http://127.0.0.1:8080';
-
-if (!localStorage.getItem('token')) {
-  window.location.href = 'login.html';
-}
-
-async function loadLessons() {
-  const userId = localStorage.getItem('userId');
-
-  const resUser = await fetch(`${API_URL}/profile/${userId}`);
-  const userData = await resUser.json();
-  const userXP = userData.experience;
-
-  const resLessons = await fetch(`${API_URL}/lessons?user_id=${userId}`);
-  const lessons = await resLessons.json();
-
-  const container = document.getElementById('lesson-list');
-  container.innerHTML = '';
-
-  let completedCount = 0;
-
-  lessons.forEach(lesson => {
-    const hasAccess = (lesson.required_experience || 0) <= userXP;
-    if (lesson.completed) completedCount++;
-
-    const needXp = Math.max((lesson.required_experience || 0) - userXP, 0);
-
-    const div = document.createElement('div');
-    div.className = 'lesson-item' + (hasAccess ? '' : ' locked');
-
-    div.innerHTML = `
-      <div class="lesson-title">
-        ${lesson.title} ${lesson.completed ? '<span class="completed">✅</span>' : ''} ${!hasAccess ? '🔒' : ''}
+  <div class="lesson-container">
+    <!-- Navigation -->
+    <nav class="lesson-nav">
+      <div class="nav-content">
+        <a href="#" class="nav-brand">
+          <div class="nav-brand-icon">📚</div>
+          <span>Уроки</span>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+          <a href="lesson.html" class="nav-link active">📚 Уроки</a>
+          <a href="test.html" class="nav-link">🎯 Тести</a>
+          <a href="chat.html" class="nav-link">💬 Чат</a>
+          <a href="profile.html" class="nav-link">👤 Профіль</a>
+          <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+        </div>
       </div>
-      ${!hasAccess ? `<p>Потрібно ще ${needXp} XP</p>` : ''}
-      <button ${hasAccess ? '' : 'disabled'} onclick="${hasAccess ? `startLesson(${lesson.id})` : ''}" class="start-btn">
-        ${hasAccess
-          ? (lesson.completed
-              ? 'Пройти знову'
-              : 'Почати урок')
-          : 'Недоступно'}
-      </button>
-    `;
+    </nav>
 
-    container.appendChild(div);
-  });
+    <main class="lesson-main">
+      <!-- Header -->
+      <div class="lesson-header">
+        <h1 class="lesson-title">Інтерактивні уроки</h1>
+        <p class="lesson-subtitle">Вивчайте англійську мову крок за кроком</p>
+      </div>
 
-  // Оновлюємо прогрес-бар
-  if (lessons.length > 0) {
-    const progressPercent = (completedCount / lessons.length) * 100;
-    document.getElementById('overall-progress-bar').style.width = `${progressPercent}%`;
-  } else {
-    document.getElementById('overall-progress-bar').style.width = '0%';
-  }
-}
+      <!-- Loading State -->
+      <div class="loading-card" id="loadingCard">
+        <div class="loading-spinner"></div>
+        <p>Завантаження уроків...</p>
+      </div>
 
-function startLesson(lessonId) {
-  localStorage.setItem('currentLessonId', lessonId);
-  window.location.href = 'startLesson.html';
-}
+      <!-- Lessons Grid -->
+      <div class="lessons-grid hidden" id="lessonsGrid">
+        <!-- Lessons will be populated here -->
+      </div>
+    </main>
+  </div>
 
-function logout() {
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
+  <!-- Lesson Detail Modal -->
+  <div class="lesson-modal" id="lessonModal">
+    <div class="lesson-modal-content">
+      <div class="lesson-modal-header">
+        <h2 class="lesson-modal-title" id="modalTitle">Урок</h2>
+        <button class="lesson-modal-close" onclick="closeLessonModal()">✕</button>
+      </div>
+      
+      <div id="modalContent">
+        <!-- Lesson content will be populated here -->
+      </div>
+      
+      <div class="text-center">
+        <button class="btn btn-success" id="completeLessonBtn" onclick="completeLesson()" style="display: none;">
+          Завершити урок
+        </button>
+      </div>
+    </div>
+  </div>
 
-window.onload = loadLessons;
-</script>
+  <script>
+    const API_BASE = 'http://127.0.0.1:8080';
+    let currentUser = null;
+    let allLessons = [];
+    let currentLesson = null;
 
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Lessons page loaded, initializing...');
+      
+      try {
+        console.log('🔐 Checking authentication...');
+        const isAuthenticated = await checkAuthentication();
+        
+        if (isAuthenticated) {
+          console.log('✅ Authentication successful');
+          
+          console.log('👤 Loading user profile...');
+          await loadUserProfile();
+          
+          console.log('📚 Loading lessons...');
+          await loadLessons();
+          
+          console.log('✨ Initializing particles...');
+          initializeParticles();
+          
+          console.log('🎉 Lessons initialization complete!');
+        } else {
+          console.log('❌ Authentication failed');
+        }
+      } catch (error) {
+        console.error('💥 Lessons initialization failed:', error);
+        showNotification('Помилка ініціалізації уроків', 'error');
+      }
+    });
+
+    async function checkAuthentication() {
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        redirectToLogin('Токен авторизації не знайдено');
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Токен недійсний або закінчився');
+          }
+          throw new Error(`Помилка перевірки токена: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.valid) {
+          currentUser = { id: result.user_id };
+          return true;
+        } else {
+          throw new Error('Токен недійсний');
+        }
+      } catch (error) {
+        console.error('Lessons: Authentication check failed:', error);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        redirectToLogin(error.message);
+        return false;
+      }
+    }
+
+    function redirectToLogin(message = '') {
+      if (message) {
+        localStorage.setItem('login_message', message);
+      }
+      window.location.href = 'login.html';
+    }
+
+    async function loadUserProfile() {
+      const token = localStorage.getItem('access_token');
+      
+      try {
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          currentUser = { ...currentUser, ...userData };
+          console.log('User profile loaded:', currentUser);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      }
+    }
+
+    async function loadLessons() {
+      try {
+        const response = await fetch(`${API_BASE}/lessons?user_id=${currentUser.id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load lessons');
+        }
+
+        const lessons = await response.json();
+        allLessons = lessons || [];
+        
+        if (allLessons.length === 0) {
+          showNotification('Немає доступних уроків', 'warning');
+          return;
+        }
+
+        renderLessons();
+        
+      } catch (error) {
+        console.error('Error loading lessons:', error);
+        showNotification('Помилка завантаження уроків', 'error');
+      } finally {
+        // Hide loading, show content
+        document.getElementById('loadingCard').classList.add('hidden');
+        document.getElementById('lessonsGrid').classList.remove('hidden');
+      }
+    }
+
+    function renderLessons() {
+      const lessonsGrid = document.getElementById('lessonsGrid');
+      lessonsGrid.innerHTML = '';
+
+      allLessons.forEach(lesson => {
+        const lessonCard = createLessonCard(lesson);
+        lessonsGrid.appendChild(lessonCard);
+      });
+    }
+
+    function createLessonCard(lesson) {
+      const card = document.createElement('div');
+      card.className = `lesson-card ${lesson.completed ? 'completed' : ''}`;
+      card.onclick = () => openLessonModal(lesson);
+
+      const isLocked = (lesson.required_experience || 0) > (currentUser.experience || 0);
+      const status = lesson.completed ? 'completed' : isLocked ? 'locked' : 'available';
+      const statusText = lesson.completed ? 'Завершено' : isLocked ? 'Заблоковано' : 'Доступно';
+
+      card.innerHTML = `
+        <div class="lesson-status ${status}">${statusText}</div>
+        <div class="lesson-card-icon">📖</div>
+        <h3 class="lesson-card-title">${lesson.title}</h3>
+        <div class="lesson-card-type">${lesson.lesson_type}</div>
+        <div class="lesson-card-meta">
+          <div class="lesson-card-xp">+${lesson.xp} XP</div>
+          <div class="lesson-card-requirement">
+            ${lesson.required_experience ? `Потрібно ${lesson.required_experience} XP` : 'Без вимог'}
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    async function openLessonModal(lesson) {
+      const isLocked = (lesson.required_experience || 0) > (currentUser.experience || 0);
+      
+      if (isLocked) {
+        showNotification(`Потрібно ${lesson.required_experience} XP для доступу до цього уроку`, 'warning');
+        return;
+      }
+
+      currentLesson = lesson;
+      
+      // Load full lesson details
+      try {
+        const response = await fetch(`${API_BASE}/lessons/${lesson.id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load lesson details');
+        }
+
+        const lessonDetails = await response.json();
+        renderLessonModal(lessonDetails);
+        
+      } catch (error) {
+        console.error('Error loading lesson details:', error);
+        showNotification('Помилка завантаження деталей уроку', 'error');
+      }
+    }
+
+    function renderLessonModal(lessonDetails) {
+      const modal = document.getElementById('lessonModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalContent = document.getElementById('modalContent');
+      const completeLessonBtn = document.getElementById('completeLessonBtn');
+
+      modalTitle.textContent = lessonDetails.title;
+
+      let content = '';
+
+      // Theory section
+      if (lessonDetails.theory) {
+        content += `
+          <div class="mb-4">
+            <h3>Теорія</h3>
+            <p>${lessonDetails.theory}</p>
+          </div>
+        `;
+      }
+
+      // Exercises section
+      if (lessonDetails.exercises && lessonDetails.exercises.length > 0) {
+        content += `<div class="lesson-exercises">`;
+        content += `<h3 class="mb-2">Вправи</h3>`;
+
+        lessonDetails.exercises.forEach((exercise, index) => {
+          content += `
+            <div class="exercise-item" data-exercise-id="${exercise.id}">
+              <div class="exercise-question">${index + 1}. ${exercise.question}</div>
+              <input type="text" class="exercise-input" placeholder="Введіть відповідь...">
+              <button class="btn btn-primary" onclick="checkExerciseAnswer(${exercise.id}, this)">Перевірити</button>
+              <div class="exercise-feedback hidden"></div>
+            </div>
+          `;
+        });
+
+        content += `</div>`;
+      }
+
+      modalContent.innerHTML = content;
+
+      // Show complete button if not completed
+      if (!currentLesson.completed) {
+        completeLessonBtn.style.display = 'inline-block';
+      } else {
+        completeLessonBtn.style.display = 'none';
+      }
+
+      modal.classList.add('active');
+    }
+
+    async function checkExerciseAnswer(exerciseId, button) {
+      const exerciseItem = button.closest('.exercise-item');
+      const input = exerciseItem.querySelector('.exercise-input');
+      const feedback = exerciseItem.querySelector('.exercise-feedback');
+      const answer = input.value.trim();
+
+      if (!answer) {
+        showNotification('Введіть відповідь', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/lessons/answer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            exercise_id: exerciseId,
+            answer: answer
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check answer');
+        }
+
+        const result = await response.json();
+        
+        feedback.classList.remove('hidden');
+        feedback.className = `exercise-feedback ${result.correct ? 'correct' : 'incorrect'}`;
+        feedback.textContent = result.correct ? 'Правильно! ✅' : 'Неправильно. Спробуйте ще раз. ❌';
+
+        if (result.correct) {
+          input.disabled = true;
+          button.disabled = true;
+          button.textContent = 'Виконано ✅';
+        }
+
+      } catch (error) {
+        console.error('Error checking exercise answer:', error);
+        showNotification('Помилка перевірки відповіді', 'error');
+      }
+    }
+
+    async function completeLesson() {
+      if (!currentLesson) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/lessons/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: currentUser.id,
+            lesson_id: currentLesson.id
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to complete lesson');
+        }
+
+        const result = await response.json();
+        
+        // Update lesson status
+        currentLesson.completed = true;
+        
+        // Update user XP
+        if (result.total_xp) {
+          currentUser.experience = result.total_xp;
+        }
+
+        showNotification(`Урок завершено! +${currentLesson.xp} XP`, 'success');
+        
+        // Update UI
+        renderLessons();
+        closeLessonModal();
+
+      } catch (error) {
+        console.error('Error completing lesson:', error);
+        
+        if (error.message.includes('Not all words learned')) {
+          showNotification('Спочатку вивчіть всі слова в уроці', 'warning');
+        } else {
+          showNotification('Помилка завершення уроку', 'error');
+        }
+      }
+    }
+
+    function closeLessonModal() {
+      const modal = document.getElementById('lessonModal');
+      modal.classList.remove('active');
+      currentLesson = null;
+    }
+
+    function initializeParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 25;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random positioning
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 5) + 's';
+        
+        particlesContainer.appendChild(particle);
+      }
+      
+      console.log(`Created ${particleCount} particles`);
+    }
+
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      `;
+      
+      switch (type) {
+        case 'success':
+          notification.style.background = 'var(--github-accent)';
+          break;
+        case 'error':
+          notification.style.background = 'var(--github-red)';
+          break;
+        case 'warning':
+          notification.style.background = 'var(--github-orange)';
+          break;
+        default:
+          notification.style.background = 'var(--github-blue)';
+      }
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_data');
+      window.location.href = 'login.html';
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('lessonModal');
+      if (e.target === modal) {
+        closeLessonModal();
+      }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLessonModal();
+      }
+    });
+  </script>
 </body>
 </html>

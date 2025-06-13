@@ -1,355 +1,1404 @@
 <!DOCTYPE html>
+<!--
+  Tests Page - Language Learning Platform
+  
+  Features:
+  - Word translation tests with real API integration
+  - GitHub dark theme consistent with other pages
+  - Progressive difficulty based on user level
+  - Real-time scoring and progress tracking
+  - Audio pronunciation support (future feature)
+  
+  API Integration:
+  - GET /test/words - Get words for testing
+  - POST /test/check - Submit answers and get results
+  - GET /profile - Get user profile for personalization
+  
+  Dependencies:
+  - anime.js for animations
+  - Google Fonts (Inter, Poppins)
+  - Backend API running on port 8080
+-->
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Тест слів — Language Learner</title>
+  <title>Тести — Майстер англійської з ШІ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <style>
-    /* === Загальні стилі === */
-    body {
+    :root {
+      /* GitHub Theme Variables */
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-surface-active: #30363d;
+      --github-border: #30363d;
+      --github-border-hover: #40464e;
+      --github-text: #f0f6fc;
+      --github-text-secondary: #7d8590;
+      --github-text-tertiary: #656d76;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #1f6feb;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-pink: #d63384;
+      --github-red: #f85149;
+      --github-yellow: #f0c814;
+      
+      /* Animation Variables */
+      --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      font-family: 'Roboto', sans-serif;
-      height: 100vh;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
       overflow-x: hidden;
-      color: white;
-      position: relative;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .background-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
-
-    .navbar {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
+    /* Animated particles background */
+    .particles {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
     }
 
-    .nav-item {
-      margin: 0 15px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #ffffff;
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--github-accent);
+      border-radius: 50%;
+      animation: float 6s infinite ease-in-out;
+      opacity: 0.4;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+      50% { transform: translateY(-120px) rotate(180deg); opacity: 0.8; }
+    }
+
+    .test-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    .test-nav {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      margin: 1.5rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: slideInDown 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    @keyframes slideInDown {
+      from {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
       text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid transparent;
-      border-radius: 8px;
       transition: all 0.3s ease;
     }
 
-    .nav-item:hover {
-      background: #2575fc;
-      border-color: #2575fc;
-      color: white;
+    .nav-brand:hover {
       transform: scale(1.05);
+      color: var(--github-accent);
     }
 
-    .content {
-      margin-top: 120px;
-      padding: 20px;
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
       align-items: center;
     }
 
-    .test-box {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 40px;
-      border-radius: 20px;
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Main content */
+    .test-main {
+      flex: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
       width: 100%;
-      max-width: 600px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      color: #333;
-      animation: fadeInUp 1s ease forwards;
+    }
+
+    .test-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeInUp 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    .test-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 3s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .test-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+
+    /* Progress Section */
+    .progress-section {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      animation: slideInUp 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-info {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .score-display {
+      display: flex;
+      gap: 2rem;
+      font-weight: 600;
+    }
+
+    .score-item {
       text-align: center;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .score-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
     }
 
-    h1 {
-      margin-bottom: 20px;
-      font-size: 28px;
-      color: #333;
+    .score-correct { color: var(--github-accent); }
+    .score-incorrect { color: var(--github-red); }
+    .score-total { color: var(--github-blue); }
+
+    .progress-bar-container {
+      height: 8px;
+      background: var(--github-surface-hover);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1rem;
     }
 
-    input {
-      padding: 12px;
-      width: 80%;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      margin-bottom: 5px;
-      background: rgba(255, 255, 255, 0.9);
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--github-accent), var(--github-blue));
+      border-radius: 4px;
+      transition: width 0.8s var(--ease-out-cubic);
+      position: relative;
     }
 
-    input:focus {
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Test Card */
+    .test-card {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      animation: slideInUp 0.8s var(--ease-out-cubic) forwards;
+      text-align: center;
+    }
+
+    .question-word {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--github-text);
+      margin-bottom: 1rem;
+      animation: wordPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes wordPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .question-prompt {
+      font-size: 1.2rem;
+      color: var(--github-text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .answer-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1.5rem;
+      font-size: 1.2rem;
+      border: 2px solid var(--github-border);
+      border-radius: 12px;
+      background: var(--github-surface-hover);
+      color: var(--github-text);
       outline: none;
-      box-shadow: 0 0 10px rgba(106, 17, 203, 0.6);
-      background: white;
+      transition: all 0.3s ease;
+      text-align: center;
+      margin-bottom: 2rem;
     }
 
-    .btn, .audio-btn, .back-btn {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #2575fc;
-      background: transparent;
-      border: 2px solid #2575fc;
-      border-radius: 8px;
+    .answer-input:focus {
+      border-color: var(--github-accent);
+      box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.1);
+    }
+
+    .test-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .test-button {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      min-width: 120px;
     }
 
-    .btn:hover, .audio-btn:hover, .back-btn:hover {
-      background: #2575fc;
-      color: white;
-      transform: scale(1.05);
-    }
-
-    .audio-btn {
-      margin-top: 10px;
-      background: #28a745;
-      border-color: #28a745;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
       color: white;
     }
 
-    .audio-btn:hover {
-      background: #218838;
-      border-color: #218838;
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(35, 134, 54, 0.3);
     }
 
-    .back-btn {
-      background: #6c757d;
-      border-color: #6c757d;
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      border: 1px solid var(--github-border);
+      color: var(--github-text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-surface-active);
+      color: var(--github-text);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--github-red), #dc2626);
       color: white;
     }
 
-    .back-btn:hover {
-      background: #5a6268;
-      border-color: #5a6268;
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(248, 81, 73, 0.3);
     }
+
+    /* Audio Controls */
+    .audio-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-audio {
+      background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(31, 111, 235, 0.2);
+    }
+
+    .btn-audio:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(31, 111, 235, 0.3);
+    }
+
+    .btn-audio:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-record {
+      background: linear-gradient(135deg, var(--github-red), var(--github-pink));
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(248, 81, 73, 0.2);
+    }
+
+    .btn-record:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(248, 81, 73, 0.3);
+    }
+
+    .btn-record.recording {
+      background: linear-gradient(135deg, var(--github-orange), var(--github-yellow));
+      animation: pulse-record 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-record {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .audio-icon, .record-icon {
+      font-size: 1.2rem;
+    }
+
+    .pronunciation-score {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--github-text-secondary);
+    }
+
+    .score-percentage {
+      font-weight: 700;
+      color: var(--github-accent);
+      font-size: 1.1rem;
+    }
+
+    .score-stars {
+      display: flex;
+      gap: 0.2rem;
+    }
+
+    .score-star {
+      color: var(--github-yellow);
+      font-size: 1.2rem;
+    }
+
+    .score-star.empty {
+      color: var(--github-text-tertiary);
+    }
+
+    /* Results Section */
+    .results-section {
+      background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+      border: 1px solid var(--github-border);
+      border-radius: 20px;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      animation: slideInUp 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    .results-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .results-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .result-stat {
+      text-align: center;
+    }
+
+    .result-stat-number {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-stat-label {
+      font-size: 1rem;
+      color: var(--github-text-secondary);
+      font-weight: 600;
+    }
+
+    /* Loading state */
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--github-border);
+      border-top: 3px solid var(--github-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 2rem auto;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .test-main {
+        padding: 0 1rem;
+      }
+      
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .test-card {
+        padding: 2rem 1.5rem;
+      }
+      
+      .question-word {
+        font-size: 2rem;
+      }
+      
+      .test-title {
+        font-size: 2rem;
+      }
+      
+      .score-display {
+        gap: 1rem;
+      }
+      
+      .audio-controls {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      
+      .btn-audio, .btn-record {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .pronunciation-score {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.8s var(--ease-out-cubic) forwards;
+    }
+
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-0 { margin-bottom: 0; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
   </style>
-  <link rel="stylesheet" href="style.css?v=2">
 </head>
-
 <body>
+  <!-- Animated particles background -->
+  <div class="particles" id="particles"></div>
 
-  <div class="background-image"></div>
+  <div class="test-container">
+    <!-- Navigation -->
+    <nav class="test-nav">
+      <div class="nav-content">
+        <a href="#" class="nav-brand">
+          <div class="nav-brand-icon">📝</div>
+          <span>Тести</span>
+        </a>
+        <div class="nav-links">
+          <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+          <a href="lesson.html" class="nav-link">📚 Уроки</a>
+          <a href="test.html" class="nav-link active">🎯 Тести</a>
+          <a href="chat.html" class="nav-link">💬 Чат</a>
+          <a href="profile.html" class="nav-link">👤 Профіль</a>
+          <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+        </div>
+      </div>
+    </nav>
 
-  <div class="navbar">
-    <a href="profile.html" class="nav-item">Профіль 👤</a>
-    <a href="lesson.html" class="nav-item">Уроки 📖</a>
-    <a href="test.html" class="nav-item">Тести 📝</a>
-    <a href="chat.html" class="nav-item">Чат 🤖</a>
-    <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
+    <main class="test-main">
+      <!-- Header -->
+      <div class="test-header">
+        <h1 class="test-title">Тестування словникового запасу</h1>
+        <p class="test-subtitle">Перевірте свої знання англійських слів</p>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="progress-section" id="progressSection">
+        <div class="progress-header">
+          <div class="progress-info">
+            <span id="questionCounter">Питання 0 з 0</span>
+          </div>
+          <div class="score-display">
+            <div class="score-item">
+              <div class="score-number score-correct" id="correctScore">0</div>
+              <div class="result-stat-label">Правильно</div>
+            </div>
+            <div class="score-item">
+              <div class="score-number score-incorrect" id="incorrectScore">0</div>
+              <div class="result-stat-label">Неправильно</div>
+            </div>
+            <div class="score-item">
+              <div class="score-number score-total" id="totalScore">0</div>
+              <div class="result-stat-label">Всього</div>
+            </div>
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="test-card" id="loadingCard">
+        <div class="loading-spinner"></div>
+        <p>Завантаження тесту...</p>
+      </div>
+
+      <!-- Test Card -->
+      <div class="test-card hidden" id="testCard">
+        <div class="question-word" id="questionWord">apple</div>
+        <p class="question-prompt">Переведіть це слово українською:</p>
+        
+        <!-- Audio Controls -->
+        <div class="audio-controls">
+          <button class="test-button btn-audio" id="playAudioBtn" onclick="playWordAudio()" title="Прослухати вимову">
+            <span class="audio-icon">🔊</span>
+            <span>Прослухати</span>
+          </button>
+          <button class="test-button btn-record" id="recordBtn" onclick="toggleRecording()" title="Записати вимову">
+            <span class="record-icon" id="recordIcon">🎤</span>
+            <span id="recordText">Записати</span>
+          </button>
+          <div class="pronunciation-score" id="pronunciationScore" style="display: none;">
+            <span>Оцінка вимови: </span>
+            <span id="scoreValue" class="score-percentage">-</span>
+            <div class="score-stars" id="scoreStars"></div>
+          </div>
+        </div>
+        
+        <input type="text" class="answer-input" id="answerInput" placeholder="Введіть переклад...">
+        <div class="test-buttons">
+          <button class="test-button btn-primary" onclick="submitAnswer()">Відповісти</button>
+          <button class="test-button btn-secondary" onclick="skipQuestion()">Пропустити</button>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="results-section hidden" id="resultsSection">
+        <h2 class="results-title">Тест завершено!</h2>
+        <div class="results-stats">
+          <div class="result-stat">
+            <div class="result-stat-number score-correct" id="finalCorrect">0</div>
+            <div class="result-stat-label">Правильних відповідей</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-stat-number score-incorrect" id="finalIncorrect">0</div>
+            <div class="result-stat-label">Неправильних відповідей</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-stat-number score-total" id="finalPercentage">0%</div>
+            <div class="result-stat-label">Точність</div>
+          </div>
+        </div>
+        <div class="test-buttons">
+          <button class="test-button btn-primary" onclick="startNewTest()">Новий тест</button>
+          <button class="test-button btn-secondary" onclick="backToDashboard()">Дашборд</button>
+        </div>
+      </div>
+    </main>
   </div>
 
-  <div class="content">
-    <div class="test-box" id="test-box">
-      <h1>Завантаження...</h1>
-    </div>
-  </div>
+  <script>
+    const API_BASE = 'http://127.0.0.1:8080';
+    let currentUser = null;
+    let testWords = [];
+    let currentWordIndex = 0;
+    let userAnswers = [];
+    let testResults = {
+      correct: 0,
+      incorrect: 0,
+      total: 0
+    };
 
-<script>
-    const API_URL = 'http://127.0.0.1:8080'; // или ваш реальный
-    let currentWord = '';
-    let currentWordId = null;
-
-    // Глобальные переменные для записи
+    // Audio and recording variables
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
+    let currentAudioUrl = null;
 
-    if (!localStorage.getItem('token')) {
-      window.location.href = 'login.html';
-    }
-
-    // --- Функция загрузки теста ---
-    async function loadTest() {
-      console.log('loadTest()');
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Test page loaded, initializing...');
+      
       try {
-        const res = await fetch(`${API_URL}/test/words`);
-        const data = await res.json();
-        currentWord = data.words.word;
-        currentWordId = data.words.id;
+        console.log('🔐 Checking authentication...');
+        const isAuthenticated = await checkAuthentication();
+        
+        if (isAuthenticated) {
+          console.log('✅ Authentication successful');
+          
+          console.log('👤 Loading user profile...');
+          await loadUserProfile();
+          
+          console.log('📝 Loading test words...');
+          await loadTestWords();
+          
+          console.log('✨ Initializing particles...');
+          initializeParticles();
+          
+          console.log('🎉 Test initialization complete!');
+        } else {
+          console.log('❌ Authentication failed');
+        }
+      } catch (error) {
+        console.error('💥 Test initialization failed:', error);
+        showNotification('Помилка ініціалізації тесту', 'error');
+      }
+    });
 
-        document.getElementById('test-box').innerHTML = `
-          <h1>Переклади слово</h1>
-          <p style="font-weight:bold; font-size:22px;">${currentWord}</p>
-          <input id="word-translation" placeholder="Твій переклад">
-          <button class="audio-btn" onclick="playAudio()">🔊 Відтворити</button><br>
-          <button class="btn" onclick="submitTest()">Перевірити</button>
-          <button class="btn" id="record-btn" onclick="toggleRecording()">🎤 Оцінити вимову</button>
-          <button class="back-btn" onclick="backDashboard()">⬅️ Назад</button>
-        `;
-      } catch (err) {
-        console.error('Error in loadTest:', err);
-        alert('Не вдалося завантажити тест.');
+    async function checkAuthentication() {
+      const token = localStorage.getItem('access_token');
+      
+      if (!token) {
+        redirectToLogin('Токен авторизації не знайдено');
+        return false;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/verify-token`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Токен недійсний або закінчився');
+          }
+          throw new Error(`Помилка перевірки токена: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.valid) {
+          currentUser = { id: result.user_id };
+          return true;
+        } else {
+          throw new Error('Токен недійсний');
+        }
+      } catch (error) {
+        console.error('Test: Authentication check failed:', error);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        redirectToLogin(error.message);
+        return false;
       }
     }
 
-    // --- Воспроизведение аудио ---
-async function playAudio() {
-  try {
-    // 1) Запрос ключа (или s3_key) от вашего бэка
-    const res1 = await fetch(`${API_URL}/lessons/generate_audio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: currentWord, word_id: currentWordId })
-    });
-    const data = await res1.json();
+    function redirectToLogin(message = '') {
+      if (message) {
+        localStorage.setItem('login_message', message);
+      }
+      window.location.href = 'login.html';
+    }
 
-    // допустим, эндпоинт возвращает { s3_key: "1122...fc74.wav" }
-    const key = data.s3_key;
-    if (!key) throw new Error('No s3_key in response');
-
-    // 2) Формируем URL на прокси (8080)
-    const url = `${API_URL}/audio-files/${encodeURIComponent(key)}`;
-
-    // 3) Проигрываем через Audio
-    const audio = new Audio(url);
-    await audio.play();
-
-  } catch (err) {
-    console.error('Error in playAudio:', err);
-    alert('Не вдалося відтворити аудіо.');
-  }
-}
-
-    // --- Отправка перевода ---
-    async function submitTest() {
-      console.log('submitTest()');
-      const translation = document.getElementById('word-translation').value.trim();
+    async function loadUserProfile() {
+      const token = localStorage.getItem('access_token');
+      
       try {
-        const res = await fetch(`${API_URL}/test/check`, {
+        const response = await fetch(`${API_BASE}/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          currentUser = { ...currentUser, ...userData };
+          console.log('User profile loaded:', currentUser);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      }
+    }
+
+    async function loadTestWords() {
+      try {
+        const response = await fetch(`${API_BASE}/test/words`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load test words');
+        }
+
+        const data = await response.json();
+        testWords = data.words || [];
+        
+        if (testWords.length === 0) {
+          showNotification('Немає доступних слів для тестування', 'warning');
+          return;
+        }
+
+        // Shuffle words for random order
+        testWords = shuffleArray(testWords);
+        
+        // Limit to 10 words for one test session
+        testWords = testWords.slice(0, 10);
+        
+        initializeTest();
+        
+      } catch (error) {
+        console.error('Error loading test words:', error);
+        showNotification('Помилка завантаження тесту', 'error');
+        
+        // Hide loading and show error
+        document.getElementById('loadingCard').classList.add('hidden');
+      }
+    }
+
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function initializeTest() {
+      currentWordIndex = 0;
+      userAnswers = [];
+      testResults = { correct: 0, incorrect: 0, total: testWords.length };
+      
+      updateProgress();
+      showCurrentQuestion();
+      
+      // Hide loading, show test
+      document.getElementById('loadingCard').classList.add('hidden');
+      document.getElementById('testCard').classList.remove('hidden');
+      
+      // Setup event listeners
+      const answerInput = document.getElementById('answerInput');
+      answerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitAnswer();
+        }
+      });
+      
+      // Focus on input
+      answerInput.focus();
+    }
+
+    function showCurrentQuestion() {
+      if (currentWordIndex >= testWords.length) {
+        finishTest();
+        return;
+      }
+
+      const currentWord = testWords[currentWordIndex];
+      document.getElementById('questionWord').textContent = currentWord.word;
+      document.getElementById('answerInput').value = '';
+      document.getElementById('answerInput').focus();
+      
+      // Hide pronunciation score for new question
+      document.getElementById('pronunciationScore').style.display = 'none';
+      
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const progressPercentage = (currentWordIndex / testWords.length) * 100;
+      document.getElementById('progressBar').style.width = progressPercentage + '%';
+      document.getElementById('questionCounter').textContent = `Питання ${currentWordIndex + 1} з ${testWords.length}`;
+      document.getElementById('correctScore').textContent = testResults.correct;
+      document.getElementById('incorrectScore').textContent = testResults.incorrect;
+      document.getElementById('totalScore').textContent = testWords.length;
+    }
+
+    async function submitAnswer() {
+      const answerInput = document.getElementById('answerInput');
+      const userAnswer = answerInput.value.trim();
+      
+      if (!userAnswer) {
+        showNotification('Введіть відповідь', 'warning');
+        return;
+      }
+
+      const currentWord = testWords[currentWordIndex];
+      
+      // Store user answer
+      userAnswers.push({
+        word_id: currentWord.id,
+        translation: userAnswer
+      });
+
+      // Move to next question
+      currentWordIndex++;
+      
+      // Check if test is complete
+      if (currentWordIndex >= testWords.length) {
+        await submitTestResults();
+      } else {
+        showCurrentQuestion();
+      }
+    }
+
+    function skipQuestion() {
+      // Store empty answer for skipped question
+      const currentWord = testWords[currentWordIndex];
+      userAnswers.push({
+        word_id: currentWord.id,
+        translation: '' // Empty for skipped
+      });
+
+      currentWordIndex++;
+      
+      if (currentWordIndex >= testWords.length) {
+        submitTestResults();
+      } else {
+        showCurrentQuestion();
+      }
+    }
+
+    async function submitTestResults() {
+      try {
+        const response = await fetch(`${API_BASE}/test/check`, {
           method: 'POST',
-          headers:{'Content-Type':'application/json'},
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
-            user_id: localStorage.getItem('userId'),
-            answers: [{ word_id: currentWordId, translation }]
+            user_id: currentUser.id,
+            answers: userAnswers
           })
         });
-        const result = await res.json();
-        alert(`Правильних: ${result.correct} / Неправильних: ${result.incorrect}`);
-        backDashboard();
-      } catch (err) {
-        console.error('Error in submitTest:', err);
-        alert('Помилка при перевірці відповіді.');
+
+        if (!response.ok) {
+          throw new Error('Failed to submit test results');
+        }
+
+        const results = await response.json();
+        
+        testResults.correct = results.correct || 0;
+        testResults.incorrect = results.incorrect || 0;
+        
+        showResults();
+        
+      } catch (error) {
+        console.error('Error submitting test results:', error);
+        showNotification('Помилка збереження результатів', 'error');
+        
+        // Show results anyway with local calculation
+        calculateLocalResults();
+        showResults();
       }
     }
 
-    function backDashboard() {
+    function calculateLocalResults() {
+      // Fallback local calculation if API fails
+      let correct = 0;
+      for (let i = 0; i < userAnswers.length; i++) {
+        const userAnswer = userAnswers[i].translation.toLowerCase().trim();
+        const correctAnswer = testWords[i].translation.toLowerCase().trim();
+        if (userAnswer === correctAnswer) {
+          correct++;
+        }
+      }
+      
+      testResults.correct = correct;
+      testResults.incorrect = testWords.length - correct;
+    }
+
+    function showResults() {
+      // Hide test card, show results
+      document.getElementById('testCard').classList.add('hidden');
+      document.getElementById('resultsSection').classList.remove('hidden');
+      
+      // Update final results
+      document.getElementById('finalCorrect').textContent = testResults.correct;
+      document.getElementById('finalIncorrect').textContent = testResults.incorrect;
+      
+      const percentage = testWords.length > 0 ? Math.round((testResults.correct / testWords.length) * 100) : 0;
+      document.getElementById('finalPercentage').textContent = percentage + '%';
+      
+      // Update progress to 100%
+      document.getElementById('progressBar').style.width = '100%';
+      
+      showNotification('Тест завершено!', 'success');
+    }
+
+    function startNewTest() {
+      // Reset everything
+      testResults = { correct: 0, incorrect: 0, total: 0 };
+      currentWordIndex = 0;
+      userAnswers = [];
+      
+      // Hide results, show loading
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('loadingCard').classList.remove('hidden');
+      
+      // Load new test
+      loadTestWords();
+    }
+
+    function backToDashboard() {
       window.location.href = 'dashboard.html';
     }
+
+    function initializeParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random positioning
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+        
+        particlesContainer.appendChild(particle);
+      }
+      
+      console.log(`Created ${particleCount} particles`);
+    }
+
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.textContent = message;
+      
+      // Style notification
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      `;
+      
+      // Set color based on type
+      switch (type) {
+        case 'success':
+          notification.style.background = 'var(--github-accent)';
+          break;
+        case 'error':
+          notification.style.background = 'var(--github-red)';
+          break;
+        case 'warning':
+          notification.style.background = 'var(--github-orange)';
+          break;
+        default:
+          notification.style.background = 'var(--github-blue)';
+      }
+      
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
     function logout() {
-      localStorage.clear();
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_data');
       window.location.href = 'login.html';
     }
 
-    // --- Утилита для getUserMedia с fallback ---
-    function getUserMediaCompat(constraints) {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        return navigator.mediaDevices.getUserMedia(constraints);
-      }
-      const legacy = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-      if (!legacy) {
-        return Promise.reject(new Error('getUserMedia не поддерживается'));
-      }
-      return new Promise((resolve, reject) => {
-        legacy.call(navigator, constraints, resolve, reject);
-      });
-    }
+    // Audio Functions
+    async function playWordAudio() {
+      const currentWord = testWords[currentWordIndex];
+      if (!currentWord) return;
 
-    // --- Callback для остановки записи ---
-    async function onRecordingStop() {
-      console.log('onRecordingStop()');
-      const blob = new Blob(audioChunks, { type: 'audio/webm' });
-      const file = new File([blob], 'pronunciation.webm', { type: blob.type });
-      const form = new FormData();
-      form.append('user_id', localStorage.getItem('userId'));
-      form.append('word_id', currentWordId);
-      form.append('audio', file);
+      const playBtn = document.getElementById('playAudioBtn');
+      playBtn.disabled = true;
+      playBtn.innerHTML = '<span class="audio-icon">⏳</span><span>Завантаження...</span>';
 
       try {
-        const res = await fetch(`${API_URL}/test/check`, {
+        // First generate audio for the word
+        const generateResponse = await fetch(`${API_BASE}/lessons/generate_audio`, {
           method: 'POST',
-          body: form
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            word: currentWord.word,
+            word_id: currentWord.id
+          })
         });
-        const result = await res.json();
-        if (result.average_confidence != null) {
-          alert(`Оцінка вимови: ${(result.average_confidence * 100).toFixed(1)}%`);
-        } else {
-          alert('Вимова не була оцінована.');
+
+        if (!generateResponse.ok) {
+          throw new Error('Failed to generate audio');
         }
-      } catch (err) {
-        console.error('Error sending pronunciation:', err);
-        alert('Помилка при оцінці вимови.');
+
+        const generateData = await generateResponse.json();
+        const audioKey = generateData.s3_key;
+
+        // Now fetch the audio file
+        const audioResponse = await fetch(`${API_BASE}/audio-files/${audioKey}.wav`);
+        
+        if (!audioResponse.ok) {
+          throw new Error('Failed to fetch audio file');
+        }
+
+        const audioBlob = await audioResponse.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Play the audio
+        const audio = new Audio(audioUrl);
+        audio.play();
+        
+        // Clean up URL after playing
+        audio.addEventListener('ended', () => {
+          URL.revokeObjectURL(audioUrl);
+        });
+
+        showNotification('Аудіо відтворено', 'success');
+
+      } catch (error) {
+        console.error('Error playing audio:', error);
+        showNotification('Помилка відтворення аудіо', 'error');
+      } finally {
+        playBtn.disabled = false;
+        playBtn.innerHTML = '<span class="audio-icon">🔊</span><span>Прослухати</span>';
       }
     }
 
-    // --- Запуск/остановка записи ---
     async function toggleRecording() {
-      console.log('toggleRecording(), isRecording=', isRecording);
-      const btn = document.getElementById('record-btn');
-
-      if (!isRecording) {
-        try {
-          const stream = await getUserMediaCompat({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-          mediaRecorder.onstop = onRecordingStop;
-          mediaRecorder.start();
-          btn.textContent = '⏹️ Зупинити запис';
-          isRecording = true;
-          console.log('Recording started');
-        } catch (err) {
-          console.error('Error accessing mic:', err);
-          alert('Не вдалося отримати доступ до мікрофона.');
-        }
+      if (isRecording) {
+        stopRecording();
       } else {
-        if (mediaRecorder) {
-          mediaRecorder.stop();
-          btn.textContent = '🎤 Оцінити вимову';
-          isRecording = false;
-          console.log('Recording stopped');
-        }
+        startRecording();
       }
     }
 
-    // Инициализируем при загрузке страницы
-    window.onload = loadTest;
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+        
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          await submitPronunciation(audioBlob);
+          
+          // Stop all tracks to release microphone
+          stream.getTracks().forEach(track => track.stop());
+        };
+        
+        mediaRecorder.start();
+        isRecording = true;
+        
+        // Update UI
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIcon = document.getElementById('recordIcon');
+        const recordText = document.getElementById('recordText');
+        
+        recordBtn.classList.add('recording');
+        recordIcon.textContent = '⏹️';
+        recordText.textContent = 'Зупинити';
+        
+        showNotification('Запис розпочато', 'info');
+        
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        showNotification('Помилка доступу до мікрофона', 'error');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        
+        // Update UI
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIcon = document.getElementById('recordIcon');
+        const recordText = document.getElementById('recordText');
+        
+        recordBtn.classList.remove('recording');
+        recordIcon.textContent = '🎤';
+        recordText.textContent = 'Записати';
+        
+        showNotification('Запис зупинено, обробка...', 'info');
+      }
+    }
+
+    async function submitPronunciation(audioBlob) {
+      const currentWord = testWords[currentWordIndex];
+      if (!currentWord) return;
+
+      try {
+        const formData = new FormData();
+        formData.append('user_id', currentUser.id);
+        formData.append('word_id', currentWord.id);
+        formData.append('audio', audioBlob, 'pronunciation.webm');
+
+        const response = await fetch(`${API_BASE}/test/check`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to submit pronunciation');
+        }
+
+        const result = await response.json();
+        
+        if (result.average_confidence !== undefined) {
+          displayPronunciationScore(result.average_confidence);
+          showNotification('Оцінка вимови отримана!', 'success');
+        }
+
+      } catch (error) {
+        console.error('Error submitting pronunciation:', error);
+        showNotification('Помилка оцінки вимови', 'error');
+      }
+    }
+
+    function displayPronunciationScore(confidence) {
+      const scoreSection = document.getElementById('pronunciationScore');
+      const scoreValue = document.getElementById('scoreValue');
+      const scoreStars = document.getElementById('scoreStars');
+      
+      // Convert confidence (0-1) to percentage
+      const percentage = Math.round(confidence * 100);
+      scoreValue.textContent = percentage + '%';
+      
+      // Generate stars based on score
+      const starCount = Math.round((confidence * 5));
+      scoreStars.innerHTML = '';
+      
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = i <= starCount ? 'score-star' : 'score-star empty';
+        star.textContent = '⭐';
+        scoreStars.appendChild(star);
+      }
+      
+      // Show the score section
+      scoreSection.style.display = 'flex';
+      
+      // Add animation
+      scoreSection.style.opacity = '0';
+      scoreSection.style.transform = 'translateY(10px)';
+      
+      setTimeout(() => {
+        scoreSection.style.transition = 'all 0.3s ease';
+        scoreSection.style.opacity = '1';
+        scoreSection.style.transform = 'translateY(0)';
+      }, 100);
+    }
   </script>
 </body>
 </html>

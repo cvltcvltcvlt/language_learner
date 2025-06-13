@@ -2,166 +2,569 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Управління уроками — Додаток для вивчення англійської</title>
+  <title>Управління уроками — Language Learner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
   <style>
+    :root {
+      --github-bg: #0d1117;
+      --github-surface: #161b22;
+      --github-surface-hover: #21262d;
+      --github-border: #30363d;
+      --github-text: #e6edf3;
+      --github-text-secondary: #7d8590;
+      --github-accent: #238636;
+      --github-accent-emphasis: #2ea043;
+      --github-blue: #2f81f7;
+      --github-purple: #8b5cf6;
+      --github-orange: #fb8500;
+      --github-danger: #da3633;
+      --github-danger-emphasis: #f85149;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: var(--github-bg);
+      color: var(--github-text);
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    /* Фон з розмиванням */
-    .background {
-      position: absolute;
+    /* Navigation */
+    .nav {
+      background: var(--github-surface);
+      border-bottom: 1px solid var(--github-border);
+      padding: 1rem 0;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-DhZrSV00CLm1KeNl4qVMnZGJx51QTRPEwg&s');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px);
-      z-index: -1;
+      z-index: 100;
+      backdrop-filter: blur(20px);
     }
 
-    .container {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 600px;
-      text-align: center;
-      animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-      0% { transform: translateY(30px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    button {
-      width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #0056b3;
-      transform: scale(1.05);
-    }
-
-    #logout {
-      background: #dc3545;
-    }
-
-    #logout:hover {
-      background: #c82333;
-    }
-
-    .lesson-list {
-      margin-top: 20px;
-      list-style: none;
-      padding: 0;
-    }
-
-    .lesson-item {
-      background: #f1f3f5;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+    .nav-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      animation: fadeIn 0.5s ease-out;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
     }
 
-    .lesson-item button {
-      background: #28a745;
-      font-size: 14px;
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--github-text);
+      text-decoration: none;
     }
 
-    .lesson-item button:hover {
-      background: #218838;
+    .nav-brand-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
     }
 
-    .remove-button {
-      background: #dc3545;
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem;
+      border-radius: 10px;
     }
 
-    .remove-button:hover {
-      background: #c82333;
+    .nav-user:hover {
+      background: var(--github-surface-hover);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .user-name {
+      color: var(--github-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.8rem 1.5rem;
+      color: var(--github-text-secondary);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+    }
+
+    .nav-link:hover:not(.active) {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--github-text-secondary);
+      font-size: 1.2rem;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+    }
+
+    /* Lessons Grid */
+    .lessons-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .lesson-card {
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lesson-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--github-accent);
+    }
+
+    .lesson-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .lesson-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--github-text);
+      margin-bottom: 0.5rem;
+    }
+
+    .lesson-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--github-accent);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .lesson-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--github-text-secondary);
+    }
+
+    .lesson-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+      color: white;
+      box-shadow: 0 3px 10px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(35, 134, 54, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--github-surface-hover);
+      color: var(--github-text);
+      border: 1px solid var(--github-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--github-border);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--github-danger), var(--github-danger-emphasis));
+      color: white;
+      box-shadow: 0 3px 10px rgba(218, 54, 51, 0.3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(218, 54, 51, 0.4);
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--github-surface);
+      border: 1px solid var(--github-border);
+      border-radius: 16px;
+      margin: 2rem 0;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--github-text);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-subtitle {
+      color: var(--github-text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--github-border);
+      border-top: 4px solid var(--github-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .lessons-container {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+
+      .lesson-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-content">
+      <a href="dashboard.html" class="nav-brand">
+        <div class="nav-brand-icon">📚</div>
+        <span>Управління уроками</span>
+      </a>
+      <div class="nav-user" onclick="goToProfile()">
+        <div class="user-avatar" id="navAvatar">👤</div>
+        <span class="user-name" id="navUserName">Вчитель</span>
+      </div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link">📊 Дашборд</a>
+        <a href="manageLessons.html" class="nav-link active">📚 Уроки</a>
+        <a href="admin_panel.html" class="nav-link">🔧 Адмін-панель</a>
+        <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+      </div>
+    </div>
+  </nav>
 
-  <!-- Фон з розмиванням -->
-  <div class="background"></div>
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Ваші уроки</h1>
+      <p class="page-subtitle">Управляйте створеними уроками</p>
+    </div>
 
-  <div class="container">
-    <h2>Ваші уроки</h2>
+    <div class="action-bar">
+      <div>
+        <span id="lessonsCount">Завантаження...</span>
+      </div>
+      <div>
+        <a href="createLesson.html" class="btn btn-primary btn-large">
+          ➕ Створити новий урок
+        </a>
+      </div>
+    </div>
 
-    <ul id="lesson-list" class="lesson-list"></ul>
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+      <div class="spinner"></div>
+    </div>
 
-    <button id="dashboard" onclick="backToDashBoard()">Назад до панелі</button>
-    <button id="logout" onclick="logout()">Вийти</button>
+    <!-- Lessons Container -->
+    <div id="lessonsContainer" class="lessons-container" style="display: none;"></div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-icon">📚</div>
+      <h3 class="empty-title">Немає уроків</h3>
+      <p class="empty-subtitle">Створіть свій перший урок, щоб почати</p>
+      <a href="createLesson.html" class="btn btn-primary btn-large">
+        ➕ Створити урок
+      </a>
+    </div>
   </div>
 
   <script>
     const API_URL = 'http://127.0.0.1:8080';
 
-    if (!localStorage.getItem('token')) {
+    // Check authentication
+    const token = localStorage.getItem('access_token');
+    if (!token) {
       window.location.href = 'login.html';
     }
 
-    document.addEventListener('DOMContentLoaded', loadLessons);
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCurrentUser();
+      await loadLessons();
+    });
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch(`${API_URL}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          updateNavbarUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
+
+    function updateNavbarUserInfo(userData) {
+      const navAvatar = document.getElementById('navAvatar');
+      const navUserName = document.getElementById('navUserName');
+      
+      if (navAvatar) {
+        const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+        if (avatarUrl) {
+          navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+          navAvatar.textContent = '';
+        }
+      }
+      
+      if (navUserName) {
+        navUserName.textContent = userData.name || userData.login || 'Вчитель';
+      }
+    }
 
     async function loadLessons() {
-      const teacherId = localStorage.getItem('userId');
-      const res = await fetch(`${API_URL}/lessons?teacher_id=${teacherId}`);
-      const data = await res.json();
+      const loadingState = document.getElementById('loadingState');
+      const lessonsContainer = document.getElementById('lessonsContainer');
+      const emptyState = document.getElementById('emptyState');
+      const lessonsCount = document.getElementById('lessonsCount');
 
-      const lessonList = document.getElementById('lesson-list');
-      lessonList.innerHTML = '';
-
-      if (!data.length) {
-        lessonList.innerHTML = '<li>Немає доступних уроків</li>';
-      } else {
-        data.forEach(lesson => {
-          const li = document.createElement('li');
-          li.classList.add('lesson-item');
-          li.innerHTML = `
-            <span>${lesson.title}</span>
-            <div>
-              <button onclick="editLesson(${lesson.id})">Редагувати</button>
-              <button class="remove-button" onclick="deleteLesson(${lesson.id})">Видалити</button>
-            </div>
-          `;
-          lessonList.appendChild(li);
+      try {
+        const teacherId = localStorage.getItem('userId');
+        const response = await fetch(`${API_URL}/lessons?teacher_id=${teacherId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to load lessons');
+        }
+
+        const lessons = await response.json();
+
+        // Hide loading
+        loadingState.style.display = 'none';
+
+        if (!lessons.length) {
+          // Show empty state
+          emptyState.style.display = 'block';
+          lessonsCount.textContent = 'Немає уроків';
+        } else {
+          // Show lessons
+          lessonsContainer.style.display = 'grid';
+          renderLessons(lessons);
+          lessonsCount.textContent = `Всього уроків: ${lessons.length}`;
+        }
+      } catch (error) {
+        console.error('Error loading lessons:', error);
+        loadingState.style.display = 'none';
+        lessonsCount.textContent = 'Помилка завантаження';
+        
+        // Show error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'empty-state';
+        errorDiv.innerHTML = `
+          <div class="empty-icon">❌</div>
+          <h3 class="empty-title">Помилка завантаження</h3>
+          <p class="empty-subtitle">Не вдалося завантажити уроки</p>
+          <button class="btn btn-primary btn-large" onclick="location.reload()">
+            🔄 Спробувати знову
+          </button>
+        `;
+        document.querySelector('.main-container').appendChild(errorDiv);
       }
+    }
+
+    function renderLessons(lessons) {
+      const container = document.getElementById('lessonsContainer');
+      container.innerHTML = '';
+
+      lessons.forEach(lesson => {
+        const lessonCard = document.createElement('div');
+        lessonCard.className = 'lesson-card';
+        
+        lessonCard.innerHTML = `
+          <div class="lesson-header">
+            <div>
+              <h3 class="lesson-title">${lesson.title}</h3>
+              <span class="lesson-type">${lesson.lesson_type}</span>
+            </div>
+          </div>
+          <div class="lesson-meta">
+            <span>🏆 ${lesson.xp || 0} XP</span>
+            <span>📊 Досвід: ${lesson.required_experience || 0}</span>
+            <span>🆔 ID: ${lesson.id}</span>
+          </div>
+          <div class="lesson-actions">
+            <button class="btn btn-primary" onclick="editLesson(${lesson.id})">
+              ✏️ Редагувати
+            </button>
+            <button class="btn btn-danger" onclick="deleteLesson(${lesson.id})">
+              🗑️ Видалити
+            </button>
+          </div>
+        `;
+        
+        container.appendChild(lessonCard);
+      });
     }
 
     function editLesson(lessonId) {
@@ -169,28 +572,67 @@
     }
 
     async function deleteLesson(lessonId) {
-      const res = await fetch(`${API_URL}/lessons/${lessonId}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
+      if (!confirm('Ви впевнені, що хочете видалити цей урок? Цю дію неможливо скасувати.')) {
+        return;
+      }
 
-      if (res.ok) {
-        alert('Урок успішно видалено');
-        loadLessons();
-      } else {
-        alert(`Помилка: ${data.error}`);
+      try {
+        const response = await fetch(`${API_URL}/lessons/${lessonId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // Reload lessons list
+          await loadLessons();
+          showNotification('Урок успішно видалено', 'success');
+        } else {
+          const error = await response.json();
+          showNotification(`Помилка: ${error.error || 'Невідома помилка'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting lesson:', error);
+        showNotification('Помилка при видаленні уроку', 'error');
       }
     }
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = 'login.html';
+    function showNotification(message, type = 'info') {
+      // Simple notification implementation
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        background: ${type === 'success' ? 'var(--github-accent)' : 'var(--github-danger)'};
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 4000);
     }
 
-    function backToDashBoard() {
-      window.location.href = 'dashboard.html';
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
+    function logout() {
+      if (confirm('Ви впевнені, що хочете вийти?')) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        window.location.href = 'login.html';
+      }
     }
   </script>
-
 </body>
 </html>

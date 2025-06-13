@@ -1,146 +1,1291 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Панель керування — Language Learner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
-      background-size: 600% 600%;
-      animation: gradientMove 15s ease infinite;
-      overflow-x: hidden;
-      color: white;
-      position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд - Майстер англійської з ШІ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --github-bg: #0d1117;
+            --github-surface: #161b22;
+            --github-border: #30363d;
+            --github-text: #f0f6fc;
+            --github-text-secondary: #7d8590;
+            --github-accent: #238636;
+            --github-accent-emphasis: #2ea043;
+            --github-blue: #1f6feb;
+            --github-purple: #8b5cf6;
+            --github-orange: #fb8500;
+            --github-pink: #d63384;
+            --github-red: #f85149;
+        }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .background-image {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url('https://i.pinimg.com/originals/b1/58/74/b158741d3532cf61bdead1bd9e2e87f7.png') no-repeat center center;
-      background-size: cover;
-      filter: blur(8px) brightness(0.7);
-      z-index: -1;
-    }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    /* Навігаційна панель */
-    .navbar {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 10;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--github-bg);
+            color: var(--github-text);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
 
-    .nav-item {
-      margin: 0 15px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid transparent;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
+        /* Animated particles background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
 
-    .nav-item:hover {
-      background: #2575fc;
-      border-color: #2575fc;
-      color: white;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      transform: scale(1.05);
-    }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--github-accent);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+            opacity: 0.4;
+        }
 
-    .content {
-      margin-top: 120px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: calc(100vh - 120px);
-      text-align: center;
-      padding: 20px;
-    }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+            50% { transform: translateY(-120px) rotate(180deg); opacity: 0.8; }
+        }
 
-    .dashboard-box {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      padding: 50px;
-      border-radius: 20px;
-      color: #333;
-      max-width: 600px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      animation: fadeInUp 1s ease forwards;
-    }
+        /* Navigation */
+        .dashboard-nav {
+            background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+            border: 1px solid var(--github-border);
+            border-radius: 16px;
+            margin: 1.5rem;
+            padding: 1.5rem;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-100px);
+            opacity: 0;
+            animation: slideInDown 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s forwards;
+        }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    h1 {
-      margin-bottom: 20px;
-      font-size: 32px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-    }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--github-text);
+        }
 
-    p {
-      font-size: 18px;
-      color: #555;
-    }
-  </style>
-  <link rel="stylesheet" href="style.css?v=2">
+        .nav-brand-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: rotate360 4s ease-in-out infinite;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+
+        .nav-user:hover {
+            background: var(--github-surface-hover);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+        }
+
+        .user-name {
+            color: var(--github-text);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        @keyframes rotate360 {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 0.8rem 1.5rem;
+            color: var(--github-text-secondary);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--github-accent), var(--github-accent-emphasis));
+            color: white;
+            box-shadow: 0 5px 15px rgba(35, 134, 54, 0.3);
+        }
+
+        .nav-link:hover:not(.active) {
+            background: var(--github-surface);
+            color: var(--github-text);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        /* Main Dashboard Content */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s ease-out 0.5s forwards;
+        }
+
+        .dashboard-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--github-text), var(--github-accent), var(--github-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .dashboard-subtitle {
+            color: var(--github-text-secondary);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+            border: 1px solid var(--github-border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .dashboard-card.animate {
+            animation: slideInUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            border-color: var(--github-accent);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(35, 134, 54, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .dashboard-card:hover::before {
+            left: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--github-text);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--github-accent), var(--github-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(35, 134, 54, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(35, 134, 54, 0.5); }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid var(--github-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--github-text);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:hover {
+            background: var(--github-accent);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(35, 134, 54, 0.3);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Progress Stats */
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(22, 27, 34, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--github-border);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(35, 134, 54, 0.1);
+            border-color: var(--github-accent);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--github-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--github-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Activity List */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(22, 27, 34, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--github-border);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(31, 111, 235, 0.1);
+            border-color: var(--github-blue);
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--github-blue), var(--github-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--github-text);
+            margin-bottom: 0.2rem;
+        }
+
+        .activity-time {
+            color: var(--github-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Tips List */
+        .tips-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(22, 27, 34, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--github-border);
+            transition: all 0.3s ease;
+        }
+
+        .tip-item:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--github-orange);
+            transform: scale(1.02);
+        }
+
+        .tip-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--github-orange), var(--github-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .tip-text {
+            color: var(--github-text-secondary);
+            font-weight: 500;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--github-surface), rgba(22, 27, 34, 0.95));
+            border: 1px solid var(--github-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transform: translateX(400px);
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+
+        .notification-success { border-left: 4px solid var(--github-accent); }
+        .notification-error { border-left: 4px solid var(--github-red); }
+        .notification-warning { border-left: 4px solid var(--github-orange); }
+        .notification-info { border-left: 4px solid var(--github-blue); }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-message {
+            color: var(--github-text);
+            font-weight: 500;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--github-text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--github-text);
+        }
+
+        /* Click Particles */
+        .click-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: clickParticleExplode 1s ease-out forwards;
+        }
+
+        @keyframes clickParticleExplode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--vx), var(--vy)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideInDown {
+            0% { transform: translateY(-100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(400px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes slideOutRight {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(400px); }
+        }
+
+        /* Loading States */
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--github-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-nav {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .dashboard-title {
+                font-size: 2.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .action-buttons,
+            .progress-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .notification {
+                right: 1rem;
+                left: 1rem;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-card {
+                padding: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Animated Background Particles -->
+    <div class="particles"></div>
 
-<div class="background-image"></div>
+    <!-- Navigation -->
+    <nav class="dashboard-nav">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <div class="nav-brand-icon">🎓</div>
+                <span>Language Learning</span>
+            </div>
+            <div class="nav-user" onclick="goToProfile()">
+                <div class="user-avatar" id="navAvatar">👤</div>
+                <span class="user-name" id="navUserName">Користувач</span>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link active">📊 Дашборд</a>
+                <a href="lesson.html" class="nav-link">📚 Уроки</a>
+                <a href="test.html" class="nav-link">🎯 Тести</a>
+                <a href="chat.html" class="nav-link">💬 Чат</a>
+                <a href="profile.html" class="nav-link">👤 Профіль</a>
+                <a href="#" class="nav-link" onclick="logout()">🚪 Вихід</a>
+            </div>
+        </div>
+    </nav>
 
-<!-- Навігаційна панель -->
-<div class="navbar">
-  <a href="profile.html" class="nav-item">Профіль 👤</a>
-  <a href="lesson.html" class="nav-item">Уроки 📖</a>
-  <a href="test.html" class="nav-item">Тести 📝</a>
-  <a href="chat.html" class="nav-item">Чат 🤖</a>
-  <a href="#" class="nav-item" onclick="logout()">Вийти 🚪</a>
-</div>
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Ласкаво просимо!</h1>
+            <p class="dashboard-subtitle">Продовжуйте вашу подорож вивчення мови</p>
+        </div>
 
-<!-- Контент -->
-<div class="content">
-  <div class="dashboard-box">
-    <h1>Ласкаво просимо!</h1>
-    <p>Почни вивчати англійську просто зараз — обирай уроки, проходь тести та покращуй свій рівень щодня!</p>
-  </div>
-</div>
+        <div class="dashboard-grid">
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2 class="card-title">Швидкі дії</h2>
+                    <div class="card-icon">⚡</div>
+                </div>
+                <div class="card-content">
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="goToChat()">
+                            <div class="action-icon">💬</div>
+                            <span>Почати чат</span>
+                        </button>
+                        <button class="action-btn" onclick="goToProfile()">
+                            <div class="action-icon">👤</div>
+                            <span>Переглянути профіль</span>
+                        </button>
+                        <button class="action-btn" onclick="startLesson()">
+                            <div class="action-icon">📚</div>
+                            <span>Новий урок</span>
+                        </button>
+                        <button class="action-btn" onclick="takeTest()">
+                            <div class="action-icon">🎯</div>
+                            <span>Пройти тест</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-<script>
-  // Перевірка токена
-  if (!localStorage.getItem('token')) {
-    window.location.href = 'login.html';
-  }
+            <!-- Progress Overview -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2 class="card-title">Ваш прогрес</h2>
+                    <div class="card-icon">📈</div>
+                </div>
+                <div class="card-content">
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalWords">0</div>
+                            <div class="stat-label">Вивчено слів</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="streakDays">0</div>
+                            <div class="stat-label">Днів поспіль</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedLessons">0</div>
+                            <div class="stat-label">Уроків</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="testResults">0</div>
+                            <div class="stat-label">Тестів</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  // Вихід
-  function logout() {
-    localStorage.clear();
-    window.location.href = 'login.html';
-  }
-</script>
+            <!-- Recent Activity -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2 class="card-title">Остання активність</h2>
+                    <div class="card-icon">📊</div>
+                </div>
+                <div class="card-content">
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">💬</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Розпочато чат-сесію з ШІ</div>
+                                <div class="activity-time">2 години тому</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">👤</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Оновлено профіль</div>
+                                <div class="activity-time">1 день тому</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">🎯</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Завершено тест</div>
+                                <div class="activity-time">2 дні тому</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Learning Tips -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2 class="card-title">Поради для навчання</h2>
+                    <div class="card-icon">💡</div>
+                </div>
+                <div class="card-content">
+                    <div class="tips-list">
+                        <div class="tip-item">
+                            <div class="tip-icon">🎯</div>
+                            <div class="tip-text">Практикуйтеся щодня для кращого запам'ятовування</div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">💬</div>
+                            <div class="tip-text">Використовуйте ШІ-чат для практики розмов</div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">📚</div>
+                            <div class="tip-text">Регулярно переглядайте свій прогрес</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://127.0.0.1:8080';
+        
+        // Check authentication and load data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initializeDashboard();
+            } catch (error) {
+                console.error('Dashboard initialization failed:', error);
+            }
+        });
+
+        // Initialize dashboard with all necessary checks and animations
+        async function initializeDashboard() {
+            // Show loading state
+            document.body.classList.add('loading');
+            
+            try {
+                // Check authentication first
+                const isAuthenticated = await checkAuthentication();
+                if (!isAuthenticated) {
+                    return; // User will be redirected
+                }
+
+                // Load user data
+                await loadUserData();
+                
+                // Initialize animations
+                initializeAnimations();
+                
+                // Initialize particles
+                initializeParticles();
+                
+                showNotification('Ласкаво просимо до дашборду!', 'success');
+                
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showNotification('Помилка ініціалізації дашборду', 'error');
+            } finally {
+                // Remove loading state
+                document.body.classList.remove('loading');
+            }
+        }
+
+        // Enhanced authentication check with better error handling
+        async function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                redirectToLogin('Токен авторизації не знайдено');
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/verify-token`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Токен недійсний або закінчився');
+                    }
+                    throw new Error(`Помилка перевірки токена: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (!result.valid) {
+                    throw new Error('Токен недійсний');
+                }
+
+                console.log('Authentication successful');
+                return true;
+                
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                
+                // Clear invalid tokens
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user_data');
+                
+                redirectToLogin(error.message);
+                return false;
+            }
+        }
+
+        // Enhanced redirect with better UX
+        function redirectToLogin(message = 'Необхідна авторизація') {
+            showNotification(message, 'warning');
+            
+            // Add fade out animation before redirect
+            document.body.style.transition = 'opacity 0.5s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+
+        // Load user data with enhanced error handling
+        async function loadUserData() {
+            const token = localStorage.getItem('access_token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('User data loaded:', userData);
+                    
+                    // Update dashboard with user data
+                    await updateDashboardStats(userData);
+                    
+                    // Update navbar avatar and name
+                    updateNavbarUserInfo(userData);
+                    
+                    // Store user data locally for offline access
+                    localStorage.setItem('user_data', JSON.stringify(userData));
+                    
+                } else if (response.status === 401) {
+                    // Token expired or invalid
+                    throw new Error('Термін дії токена закінчився');
+                } else {
+                    throw new Error(`Помилка завантаження даних: ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Failed to load user data:', error);
+                
+                // Try to use cached data
+                const cachedData = localStorage.getItem('user_data');
+                if (cachedData) {
+                    try {
+                        const userData = JSON.parse(cachedData);
+                        await updateDashboardStats(userData);
+                        showNotification('Використовуються збережені дані', 'info');
+                    } catch (parseError) {
+                        console.error('Failed to parse cached data:', parseError);
+                    }
+                }
+                
+                // Handle authentication errors
+                if (error.message.includes('401') || error.message.includes('Термін дії токена')) {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_data');
+                    redirectToLogin(error.message);
+                } else {
+                    showNotification(error.message, 'error');
+                }
+            }
+        }
+
+        // Update dashboard statistics
+        async function updateDashboardStats(userData) {
+            // Load progress data from the new endpoint
+            const token = localStorage.getItem('access_token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/progress`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const progressData = await response.json();
+                    const progress = progressData.progress;
+                    
+                    // Animate counters with real progress data
+                    animateCounter('totalWords', progress.words_learned || 0);
+                    animateCounter('streakDays', progress.streak_days || 0);
+                    animateCounter('completedLessons', progress.lessons_completed || 0);
+                    animateCounter('testResults', progress.tests_passed || 0);
+                } else {
+                    // Fallback to user data if progress endpoint fails
+                    animateCounter('totalWords', userData.learned_words || 0);
+                    animateCounter('streakDays', userData.streak_days || 0);
+                    animateCounter('completedLessons', userData.completedLessons || 0);
+                    animateCounter('testResults', userData.testResults || 0);
+                }
+            } catch (error) {
+                console.error('Failed to load progress data:', error);
+                // Fallback to user data
+                animateCounter('totalWords', userData.learned_words || 0);
+                animateCounter('streakDays', userData.streak_days || 0);
+                animateCounter('completedLessons', userData.completedLessons || 0);
+                animateCounter('testResults', userData.testResults || 0);
+            }
+        }
+
+        // Enhanced counter animation
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const startValue = 0;
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Enhanced easing function
+                const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutCubic);
+                
+                element.textContent = currentValue;
+                
+                // Add visual effects during animation
+                if (progress < 1) {
+                    element.style.transform = `scale(${1 + Math.sin(progress * Math.PI) * 0.1})`;
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = targetValue;
+                    element.style.transform = 'scale(1)';
+                }
+            }
+            
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Initialize animations
+        function initializeAnimations() {
+            // Animate dashboard cards with stagger
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${0.8 + index * 0.1}s`;
+                card.classList.add('animate');
+            });
+        }
+
+        // Initialize background particles
+        function initializeParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            
+            if (!particlesContainer) {
+                console.error('Particles container not found!');
+                return;
+            }
+            
+            console.log('Initializing particles...');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random positioning
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            console.log(`Created ${particleCount} particles`);
+        }
+
+        // Navigation functions
+        function goToChat() {
+            showNotification('Переходимо до чату...', 'info');
+            setTimeout(() => {
+                window.location.href = 'chat.html';
+            }, 1000);
+        }
+
+        function goToProfile() {
+            showNotification('Переходимо до профілю...', 'info');
+            setTimeout(() => {
+                window.location.href = 'profile.html';
+            }, 1000);
+        }
+
+        function startLesson() {
+            showNotification('Переходимо до уроків...', 'info');
+            setTimeout(() => {
+                window.location.href = 'lesson.html';
+            }, 1000);
+        }
+
+        function takeTest() {
+            showNotification('Переходимо до тестів...', 'info');
+            setTimeout(() => {
+                window.location.href = 'test.html';
+            }, 1000);
+        }
+
+        // Update navbar user info
+        function updateNavbarUserInfo(userData) {
+            const navAvatar = document.getElementById('navAvatar');
+            const navUserName = document.getElementById('navUserName');
+            
+            if (navAvatar) {
+                const avatarUrl = userData.avatar_url || userData.profile_picture_s3_link;
+                if (avatarUrl) {
+                    navAvatar.style.backgroundImage = `url(${avatarUrl})`;
+                    navAvatar.textContent = '';
+                } else {
+                    navAvatar.style.backgroundImage = '';
+                    navAvatar.textContent = '👤';
+                }
+            }
+            
+            if (navUserName) {
+                navUserName.textContent = userData.name || userData.login || 'Користувач';
+            }
+        }
+
+        // Enhanced logout function
+        function logout() {
+            if (confirm('Ви впевнені, що хочете вийти?')) {
+                // Clear all stored data
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user_data');
+                localStorage.removeItem('chat_history');
+                
+                showNotification('Успішно вийшли з системи', 'success');
+                
+                // Add fade out animation
+                document.body.style.transition = 'opacity 0.5s ease-out';
+                document.body.style.opacity = '0';
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.classList.add('animate-slideOutRight');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            });
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon">${icons[type] || icons.info}</div>
+                <div class="notification-content">
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    notification.classList.add('animate-slideOutRight');
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Enhanced click effects
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.action-btn') || e.target.closest('.nav-link') || e.target.closest('.stat-item')) {
+                createClickParticles(e.clientX, e.clientY);
+            }
+        });
+
+        function createClickParticles(x, y) {
+            const colors = [
+                'var(--github-accent)',
+                'var(--github-blue)', 
+                'var(--github-purple)',
+                'var(--github-orange)'
+            ];
+            
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'click-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = (Math.PI * 2 * i) / 8;
+                const velocity = 50 + Math.random() * 50;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particle.style.setProperty('--vx', vx + 'px');
+                particle.style.setProperty('--vy', vy + 'px');
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (document.body.contains(particle)) {
+                        document.body.removeChild(particle);
+                    }
+                }, 1000);
+            }
+        }
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case '1':
+                        e.preventDefault();
+                        goToChat();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        goToProfile();
+                        break;
+                    case 'l':
+                        e.preventDefault();
+                        logout();
+                        break;
+                }
+            }
+        });
+
+        // Service Worker registration for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

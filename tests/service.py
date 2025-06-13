@@ -7,14 +7,24 @@ from models import Word
 
 
 async def get_words_for_test():
+    """Get multiple words for testing"""
     async for session in get_session():
+        # Get 15 random words for testing
         result = await session.execute(
-            select(Word).order_by(func.random()).limit(1)
+            select(Word).order_by(func.random()).limit(15)
         )
-        word = result.scalars().first()
-        if word:
-            return {"id": word.id, "word": word.word, "translation": word.translation}
-    return None
+        words = result.scalars().all()
+        
+        if words:
+            return [
+                {
+                    "id": word.id, 
+                    "word": word.word, 
+                    "translation": word.translation
+                } 
+                for word in words
+            ]
+    return []
 
 async def check_user_answers(answers):
     word_map = {w.id: w.translation for w in await get_words()}
